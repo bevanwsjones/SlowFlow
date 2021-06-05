@@ -111,8 +111,8 @@ def setup_connectivity(cells, verticies):
 
     # Size tables
     vertex_table = vt.VertexTable(len(verticies))
-    cell_table = ct.nd.CellTable(len(cells))
-    face_table = ft.fc.FaceTable(len(face_cell_connectivity))
+    cell_table = ct.CellTable(len(cells))
+    face_table = ft.FaceTable(len(face_cell_connectivity))
 
     # Construct cell face connectivity.
     for iface in range(face_table.max_face):
