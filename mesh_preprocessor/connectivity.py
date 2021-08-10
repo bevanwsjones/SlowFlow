@@ -16,14 +16,12 @@
 # ----------------------------------------------------------------------------------------------------------------------
 
 import numpy as np
-import mesh_generation as mg
-from mesh_generation import face as ft
-from mesh_generation import cell as ct
-from mesh_generation import vertex as vt
+from mesh import cell as ct, face as ft, vertex as vt
 
 # ----------------------------------------------------------------------------------------------------------------------
 # 2D Mesh Connectivity-Preprocessing Simplex Mesh
 # ----------------------------------------------------------------------------------------------------------------------
+
 
 def find_face_connected_cells(icell, vertex0_connected_cells, vertex1_connected_cells):
     """
@@ -102,7 +100,7 @@ def add_ghost_cell(cell_table, face_table, vertex_table):
         raise ValueError("No boundary faces found.")
 
     # loop over faces and link up the new ghost nodes
-    for iface in range(face_table.max_face):
+    for iface in range(face_table.number_of_face):
         if face_table.boundary[iface]:
             ivertex0 = face_table.connected_vertex[iface][0]
             ivertex1 = face_table.connected_vertex[iface][1]

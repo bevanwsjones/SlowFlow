@@ -11,30 +11,32 @@
 #  You should have received a copy of the GNU General Public License along with this program. If not, see
 #  <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------------------------------------------------------
-# filename: mesh_type.py
-# description: todo
+# filename: face.py
+# description: Definition of mesh faces.
 # ----------------------------------------------------------------------------------------------------------------------
 
-from enum import Enum, auto
-
-class MeshType(Enum):
-    simplex = auto()
-    cartesian = auto()
+import numpy as np
 
 
-def mvertex(mesh_type):
-    if mesh_type == MeshType.simplex:
-        return 3
-    elif mesh_type == MeshType.cartesian:
-        return 4
-    else:
-        raise ValueError("Enumerator not found")
+class FaceTable:
+    """
+    The face table, containing basic mesh cell face geometry data.
+    """
 
+    def __init__(self, number_of_face):
+        """
+        Initialises, allocates the memory, for the faces in the mesh given a number of faces.
 
-def mface(mesh_type):
-    if mesh_type == MeshType.simplex:
-        return 3
-    elif mesh_type == MeshType.cartesian:
-        return 4
-    else:
-        raise ValueError("Enumerator not found")
+        :param number_of_face: Number of faces to allocate.
+        :type number_of_face: int
+        """
+        self.max_face = number_of_face
+        self.boundary = np.zeros([number_of_face, ], dtype=bool)
+        self.connected_cell = np.zeros([number_of_face, 2], dtype=int)
+        self.connected_vertex = np.zeros([number_of_face, 2], dtype=int)
+        self.cell_first = np.empty([number_of_face, 0], dtype=int)
+        self.cell_last = np.empty([number_of_face, 0], dtype=int)
+
+        self.length = np.zeros([number_of_face, ], dtype=float)
+        self.tangent = np.zeros([number_of_face, 2], dtype=float)
+        self.coefficient = np.zeros([number_of_face, 2], dtype=float)

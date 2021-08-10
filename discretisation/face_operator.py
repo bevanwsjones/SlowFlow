@@ -18,7 +18,6 @@
 import numpy as np
 import limiter as lm
 
-
 # ----------------------------------------------------------------------------------------------------------------------
 # Face Reconstruction Operators
 # ----------------------------------------------------------------------------------------------------------------------
@@ -75,14 +74,14 @@ def construct_gauss_green_coefficient_matrix(cell_table, face_table, vertex_tabl
         np.zeros(shape=((cell_table.max_cell)*2, cell_table.max_cell + cell_table.max_ghost_cell), dtype=float)
 
     # Pre-compute c_k
-    vertex_cell_coefficient = np.zeros(shape=vertex_table.max_vertex, dtype=float)
-    for ivertex in range(vertex_table.max_vertex):
+    vertex_cell_coefficient = np.zeros(shape=vertex_table.number_of_vertex, dtype=float)
+    for ivertex in range(vertex_table.number_of_vertex):
         for icell in vertex_table.connected_cell[ivertex]:
             vertex_cell_coefficient[ivertex] += 1.0/np.linalg.norm(vertex_table.coordinate[ivertex] - cell_table.coordinate[icell])
         vertex_cell_coefficient[ivertex] = 1.0/vertex_cell_coefficient[ivertex]
 
     # Construct Coefficient Matrix.
-    for iface in range(face_table.max_face):
+    for iface in range(face_table.number_of_face):
         cell0 = face_table.connected_cell[iface][0]
         cell1 = face_table.connected_cell[iface][1]
         for ivertex in face_table.connected_vertex[iface]:

@@ -107,7 +107,7 @@ def setup_2D_simplex_mesh():
     verticies, cells = dmsh.generate(geo, 0.5)
     dmsh.helpers.show(verticies, cells, geo)  # Put on to print mesh
 
-    return  verticies, cells
+    return verticies, cells
 
 # ----------------------------------------------------------------------------------------------------------------------
 # 2D Mesh Generation - Cartesian Mesh

@@ -11,20 +11,49 @@
 #  You should have received a copy of the GNU General Public License along with this program. If not, see
 #  <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------------------------------------------------------
-# filename: vertex.py
-# description: todo
+# filename: mesh_type.py
+# description: Contains helper functions and types for the preset supported mesh types.
 # ----------------------------------------------------------------------------------------------------------------------
 
-import numpy as np
+from enum import Enum, auto
 
 
-class VertexTable:
+class MeshType(Enum):
     """
-    Contains cell vertex geometric and connectivity data.
+    Enumerators for the supported mesh types.
     """
 
-    def __init__(self, max_vertex):
-        self.max_vertex = max_vertex
-        self.connected_cell = [np.empty(shape=(0,), dtype=int) for _ in range(max_vertex)]  # not square
+    simplex = auto()
+    cartesian = auto()
 
-        self.coordinate = np.zeros([max_vertex, 2], dtype=float)
+
+def number_of_vertex(mesh_type):
+    """
+    Returns the number of nodes for a given mesh type, i.e. for triangle 3, quad 4.... hexagon is the bestagon?
+
+    :param mesh_type: Mesh type enumerator.
+    :type mesh_type: MeshType
+    :return: number of vertices
+    """
+
+    if mesh_type == MeshType.simplex:
+        return 3
+    elif mesh_type == MeshType.cartesian:
+        return 4
+    else:
+        raise ValueError("Enumerator not found")
+
+
+def number_of_face(mesh_type):
+    """
+    Returns the number of faces for a given mesh type, i.e. for triangle 3, quad 4.... hexagon is the bestagon?
+
+    :param mesh_type:
+    :return: number of vertices
+    """
+    if mesh_type == MeshType.simplex:
+        return 3
+    elif mesh_type == MeshType.cartesian:
+        return 4
+    else:
+        raise ValueError("Enumerator not found")

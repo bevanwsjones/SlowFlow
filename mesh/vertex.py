@@ -11,26 +11,26 @@
 #  You should have received a copy of the GNU General Public License along with this program. If not, see
 #  <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------------------------------------------------------
-# filename: face.py
-# description: todo
+# filename: vertex.py
+# description: Definition of mesh vertices.
 # ----------------------------------------------------------------------------------------------------------------------
 
 import numpy as np
 
 
-class FaceTable:
+class VertexTable:
     """
-    Contains both cell face geometric and connectivity data.
+    The vertex table, containing basic mesh vertex geometry data.
     """
 
-    def __init__(self, max_face):
-        self.max_face = max_face
-        self.boundary = np.zeros([max_face, ], dtype=bool)
-        self.connected_cell = np.zeros([max_face, 2], dtype=int)
-        self.connected_vertex = np.zeros([max_face, 2],  dtype=int)
-        self.cell_first = np.empty([max_face, 0], dtype=int)
-        self.cell_last = np.empty([max_face, 0], dtype=int)
+    def __init__(self, max_vertex):
+        """
+        Initialises, allocates the memory, for the vertices in the mesh given a number of faces.
 
-        self.length = np.zeros([max_face, ], dtype=float)
-        self.tangent = np.zeros([max_face, 2], dtype=float)
-        self.coefficient = np.zeros([max_face, 2], dtype=float)
+        :param max_vertex: Number of vertices to allocate.
+        :type max_vertex: int
+        """
+        self.max_vertex = max_vertex
+        self.connected_cell = [np.empty(shape=(0,), dtype=int) for _ in range(max_vertex)]  # not square
+
+        self.coordinate = np.zeros([max_vertex, 2], dtype=float)

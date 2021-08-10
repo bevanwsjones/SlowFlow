@@ -20,7 +20,7 @@ import numpy as np
 def setup_ghost_cell_geometry(cell_table, face_table, vertex_table):
 
     # loop over faces and link up the new ghost nodes
-    for iface in range(face_table.max_face):
+    for iface in range(face_table.number_of_face):
         if face_table.boundary[iface]:
             ivertex0 = face_table.connected_vertex[iface][0]
             ivertex1 = face_table.connected_vertex[iface][1]
@@ -54,10 +54,10 @@ def setup_finite_volume_geometry(cell_table, face_table, vertex_table):
     face_table.tangent[:] = (cell_table.coordinate[face_table.connected_cell[:, 1]]
                              - cell_table.coordinate[face_table.connected_cell[:, 0]])/face_table.length[:, None]
     face_normal = np.delete(np.cross(np.concatenate((vertex_table.coordinate[face_table.connected_vertex[:, 1]],
-                                                     np.zeros(shape=(face_table.max_face, 1))), axis=1)
+                                                     np.zeros(shape=(face_table.number_of_face, 1))), axis=1)
                                      - np.concatenate((vertex_table.coordinate[face_table.connected_vertex[:, 0]],
-                                                       np.zeros(shape=(face_table.max_face, 1))), axis=1),
-                                     np.full((face_table.max_face, 3), [0.0, 0.0, 1.0])), 2, axis=1)
+                                                       np.zeros(shape=(face_table.number_of_face, 1))), axis=1),
+                                     np.full((face_table.number_of_face, 3), [0.0, 0.0, 1.0])), 2, axis=1)
     face_normal = face_normal[:]/np.linalg.norm(face_normal[:], axis=1)[:, None]
     face_table.coefficient =\
         np.linalg.norm(vertex_table.coordinate[face_table.connected_vertex[:, 1]]
