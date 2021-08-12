@@ -24,36 +24,36 @@ class CellTable:
     The cell table, containing basic mesh cell geometry data.
     """
 
-    def __init__(self, number_of_cell, mesh_type):
+    def __init__(self, _number_of_cells, _mesh_type):
         """
         Initialises, allocates the memory, for the cells in the mesh given a number of cells and the mesh type.
 
-        :param number_of_cell: Number of cells to allocate.
-        :type number_of_cell: int
-        :param mesh_type: The type of mesh, triangle, quadrilaterals, etc.
-        :type mesh_type: mt.MeshType
+        :param _number_of_cells: Number of cells to allocate.
+        :type _number_of_cells: int
+        :param _mesh_type: The type of mesh, triangle, quadrilaterals, etc.
+        :type _mesh_type: mt.MeshType
         """
 
-        self.type = mesh_type
-        self.max_cell = number_of_cell
+        self.type = _mesh_type
+        self.max_cell = _number_of_cells
         self.max_ghost_cell = 0
-        self.connected_face = -1 * np.ones(shape=[number_of_cell, mt.number_of_face(mesh_type)], dtype=int)
-        self.connected_vertex = -1 * np.ones(shape=[number_of_cell, mt.number_of_vertex(mesh_type)], dtype=int)
-        self.boundary = np.zeros(shape=[number_of_cell, ], dtype=bool)
-        self.volume = np.zeros(shape=[number_of_cell, ], dtype=float)
-        self.coordinate = np.zeros([number_of_cell, 2], dtype=float)
+        self.connected_face = -1 * np.ones(shape=[_number_of_cells, mt.number_of_face(_mesh_type)], dtype=int)
+        self.connected_vertex = -1 * np.ones(shape=[_number_of_cells, mt.number_of_vertex(_mesh_type)], dtype=int)
+        self.boundary = np.zeros(shape=[_number_of_cells, ], dtype=bool)
+        self.volume = np.zeros(shape=[_number_of_cells, ], dtype=float)
+        self.coordinate = np.zeros([_number_of_cells, 2], dtype=float)
 
-    def add_ghost_cells(self, number_of_ghost):
+    def add_ghost_cells(self, _number_of_ghosts):
         """
         Adds ghost cells to the table by resizing all the data containers and recording the number of ghost cells.
 
-        :param number_of_ghost the number of ghost cells to add.
-        :type number_of_ghost: int
+        :param _number_of_ghosts the number of ghost cells to add.
+        :type _number_of_ghosts: int
         """
 
-        if number_of_ghost < 0:
+        if _number_of_ghosts < 0:
             raise ValueError("Adding negative ghost cells.")
-        self.max_ghost_cell = number_of_ghost
+        self.max_ghost_cell = _number_of_ghosts
         self.connected_face = \
             np.concatenate((self.connected_face, -1 * np.ones(shape=[self.max_ghost_cell, 3], dtype=int)))
         self.connected_vertex = \

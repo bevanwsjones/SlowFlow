@@ -11,49 +11,36 @@
 #  You should have received a copy of the GNU General Public License along with this program. If not, see
 #  <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------------------------------------------------------
-# filename: mesh_type.py
-# description: Contains helper functions and types for the preset supported mesh types.
+# filename: mesh.py
+# description: Contains all data for the mesh
 # ----------------------------------------------------------------------------------------------------------------------
 
-from enum import Enum, auto
+import cell as ct
+import face as ft
+import vertex as vt
 
 
-class MeshType(Enum):
+class Mesh:
     """
-    Enumerators for the supported mesh types.
-    """
-
-    simplex = auto()
-    cartesian = auto()
-
-
-def number_of_vertex(_mesh_type):
-    """
-    Returns the number of nodes for a given mesh type, i.e. for triangle 3, quad 4.... hexagon is the bestagon?
-
-    :param _mesh_type: Mesh type enumerator.
-    :type _mesh_type: MeshType
-    :return: number of vertices
+    Structure to hold all mesh entities.
     """
 
-    if _mesh_type == MeshType.simplex:
-        return 3
-    elif _mesh_type == MeshType.cartesian:
-        return 4
-    else:
-        raise ValueError("Enumerator not found")
+    def __init__(self, _number_of_cells, _number_of_faces, _number_of_vertices, _mesh_type):
+        """
+        Allocates initial memory for all mesh entities.
 
+        :param _number_of_cells: Number of cells to allocate.
+        :type _number_of_cells: int
+        :param _number_of_faces: Number of faces to allocate.
+        :type _number_of_faces: int
+        :param _number_of_vertices: Number of vertices to allocate.
+        :type _number_of_vertices: int
+        :param _mesh_type: Mesh type enumerator.
+        :type _mesh_type: MeshType
+        """
 
-def number_of_face(_mesh_type):
-    """
-    Returns the number of faces for a given mesh type, i.e. for triangle 3, quad 4.... hexagon is the bestagon?
+        self.cell_table = ct.CellTable(_number_of_cells, _mesh_type)
+        self.face_table = ft.FaceTable(_number_of_faces)
+        self.vertex_table = vt.VertexTable(_number_of_vertices)
+        self.mesh_type = _mesh_type
 
-    :param _mesh_type:
-    :return: number of vertices
-    """
-    if _mesh_type == MeshType.simplex:
-        return 3
-    elif _mesh_type == MeshType.cartesian:
-        return 4
-    else:
-        raise ValueError("Enumerator not found")

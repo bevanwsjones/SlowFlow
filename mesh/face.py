@@ -23,20 +23,20 @@ class FaceTable:
     The face table, containing basic mesh cell face geometry data.
     """
 
-    def __init__(self, number_of_face):
+    def __init__(self, _number_of_faces):
         """
         Initialises, allocates the memory, for the faces in the mesh given a number of faces.
 
-        :param number_of_face: Number of faces to allocate.
-        :type number_of_face: int
+        :param _number_of_faces: Number of faces to allocate.
+        :type _number_of_faces: int
         """
-        self.max_face = number_of_face
-        self.boundary = np.zeros([number_of_face, ], dtype=bool)
-        self.connected_cell = np.zeros([number_of_face, 2], dtype=int)
-        self.connected_vertex = np.zeros([number_of_face, 2], dtype=int)
-        self.cell_first = np.empty([number_of_face, 0], dtype=int)
-        self.cell_last = np.empty([number_of_face, 0], dtype=int)
+        self.max_face = _number_of_faces
+        self.boundary = np.zeros([_number_of_faces, ], dtype=bool)
+        self.connected_cell = np.zeros([_number_of_faces, 2], dtype=int)
+        self.connected_vertex = np.zeros([_number_of_faces, 2], dtype=int)
+        self.cell_first = np.empty([_number_of_faces, 0], dtype=int)
+        self.cell_last = np.empty([_number_of_faces, 0], dtype=int)
 
-        self.length = np.zeros([number_of_face, ], dtype=float)
-        self.tangent = np.zeros([number_of_face, 2], dtype=float)
-        self.coefficient = np.zeros([number_of_face, 2], dtype=float)
+        self.length = np.zeros([_number_of_faces, ], dtype=float)
+        self.tangent = np.zeros([_number_of_faces, 2], dtype=float)
+        self.coefficient = np.zeros([_number_of_faces, 2], dtype=float)
