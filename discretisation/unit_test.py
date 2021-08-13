@@ -52,7 +52,7 @@ class TestFaceOperators(unittest.TestCase):
     def test_muscl(self):
         """
         The ultimate value of a muscl upwinded value is dependent on the flux limiter used. Van Albada is the 'go to'
-        limiter and so is used here. One or two hand calculations are used to test as well as ensuring for r <= 0 FOU is
+        limiter and so is used here. One or two hand calculations are used to tests as well as ensuring for r <= 0 FOU is
         recovered, r = 1 2nd order CD is recovered.
         """
 
@@ -74,11 +74,11 @@ class TestFaceOperators(unittest.TestCase):
 
     def test_central_difference_recovery_construct_gauss_green_coefficient_matrix(self):
         """
-        For 1D linear equi-spaced mesh test the recovery of a 2D order accuracy for the gauss green node based gradient
+        For 1D linear equi-spaced mesh tests the recovery of a 2D order accuracy for the gauss green node based gradient
         calculation.
         """
 
-        # Cell spacing to test
+        # Cell spacing to tests
         max_cell_list = [10, 20, 40]
         errorL2 = []
         for max_cell in max_cell_list:
@@ -102,7 +102,7 @@ class TestFaceOperators(unittest.TestCase):
         cell_table, face_table, vertex_table = mg.setup_connectivity()
         mg.setup_finite_volume_geometry(cell_table, face_table, vertex_table)
 
-        # Cell spacing to test
+        # Cell spacing to tests
         errorL2 = []
         gradient_coef = fcop.construct_gauss_green_coefficient_matrix(cell_table, face_table, vertex_table)
         # print(gradient_coef)

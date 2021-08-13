@@ -16,33 +16,96 @@
 # ----------------------------------------------------------------------------------------------------------------------
 
 import numpy as np
-import mesh.mesh as mesh
+import mesh.cell as cl
 import meshio
 import dmsh
 import optimesh
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+# Mesh Generation Functions
+# ----------------------------------------------------------------------------------------------------------------------
+
+def geometric_series_sum(_common_factor, _n_terms, _ratio):
+    """
+    Computes the sum of a geometric series.
+
+    :param _common_factor: The common factor to the geometric series.
+    :type _common_factor: float
+    :param _n_terms: The number of terms in the series.
+    :type _n_terms: int
+    :param _ratio: The ratio between successive terms in the series.
+    :type _ratio: float
+    :return: The sum of the series.
+    :type: float
+    """
+
+    if _ratio**(_n_terms + 1.0) == 1.0:
+        raise ZeroDivisionError("Divide by zero, _ratio: " + str(_ratio))
+
+    return _common_factor*(1.0 - _ratio**(float(_n_terms) + 1.0))/(1.0 - _ratio)
+
+
+def geometric_series_common_factor(_series_sum, _n_terms, _ratio):
+    """
+    Computes the common factor of a geometric series.
+
+    :param _series_sum: The sum of the series for the first n terms.
+    :type _series_sum: float
+    :param _n_terms: The number of terms in the series.
+    :type _n_terms: int
+    :param _ratio: The ratio between successive terms in the series.
+    :type _ratio: float
+    :return: The sum of the series.
+    :type: float
+    """
+
+    if _ratio**(_n_terms + 1.0) == 1.0:
+        raise ZeroDivisionError("Divide by zero, _ratio: " + str(_ratio))
+
+    return _series_sum*(1.0 - _ratio)/(1.0 - _ratio**(float(_n_terms) + 1.0))
+
+# ----------------------------------------------------------------------------------------------------------------------
 # 1D Mesh Generation
 # ----------------------------------------------------------------------------------------------------------------------
 
 
-def setup_1d_unit_mesh(_number_of_cells, _start_co_ordinate=0.0, _domain_size=1.0, _growth_factor=1.0):
+def setup_1d_unit_mesh(_number_of_cells, _start_co_ordinate=0.0, _domain_size=1.0, _ratio=1.0):
     """
+    Generates the vertices, cell-vertex connectivity as well as the cell type.
 
-    :param _number_of_cells:
-    :type _number_of_cells:
-    :param _start_co_ordinate:
-    :type _start_co_ordinate:
-    :param _domain_size:
-    :type _domain_size:
-    :param _growth_factor:
-    :type _growth_factor:
+    :param _number_of_cells: The number of cells in the mesh.
+    :type _number_of_cells: int
+    :param _start_co_ordinate: The starting co-ordinate (lower x bound).
+    :type _start_co_ordinate: float
+    :param _domain_size: The total length of the domain.
+    :type _domain_size: float
+    :param _ratio: The ratio of change between successive (increasing in x) cell sizes.
+    :type _ratio: float
     :return:
     """
 
-    new_mesh = mesh.Mesh()
-    return new_mesh
+    # Layout memory
+    cell_type = np.empty(shape=(_number_of_cells, 1), dtype=cl.CellType)
+    cell_vertex_connectivity = np.zeros(shape=(_number_of_cells, 2), dtype=int)
+    vertex_coordinates = np.zeros(shape=(_number_of_cells + 1, 2), dtype=float)
+
+    # Determine starting delta x.
+    delta_x = geometric_series_common_factor(_domain_size, _number_of_cells + 2, _ratio) \
+        if _ratio != 1.0 else _domain_size / float(_number_of_cells)
+
+    # Compute vertex positions for the domain.
+    for i_vertex, vertex in enumerate(vertex_coordinates):
+        current_length = geometric_series_sum(delta_x, i_vertex + 2, _ratio) \
+            if _ratio != 1.0 else float(i_vertex) * delta_x
+        vertex[0] = _start_co_ordinate + current_length
+        vertex[1] = 0.0
+
+    # Setup cells
+    cell_type[:] = cl.CellType.edge
+    cell_vertex_connectivity[:, ] = [[i_cell, i_cell + 1] for i_cell in range(_number_of_cells)]
+
+    return [vertex_coordinates, cell_vertex_connectivity, cell_type]
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -71,8 +134,8 @@ def setup_2d_cartesian_mesh(_number_of_cells, _start_co_ordinates=None, _domain_
     if _start_co_ordinates is None:
         _start_co_ordinates = [0.0, 0.0]
 
-    new_mesh = mesh.Mesh()
-    return new_mesh
+    # new_mesh = mesh.Mesh()
+    # return new_mesh
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -90,8 +153,8 @@ def setup_2d_simplex_mesh():
                         [0.0 - np.cos(np.pi / 3.0), np.sin(np.pi / 3.0)]])
     verticies, cells = dmsh.generate(geo, 0.5)
     dmsh.helpers.show(verticies, cells, geo)  # Put on to print mesh
-    new_mesh = mesh.Mesh()
-    return new_mesh
+    # new_mesh = mesh.Mesh()
+    # return new_mesh
 
 
 

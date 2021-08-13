@@ -20,12 +20,12 @@ import face as ft
 import vertex as vt
 
 
-class Mesh:
+class CellCenteredMesh:
     """
     Structure to hold all mesh entities.
     """
 
-    def __init__(self, _number_of_cells, _number_of_faces, _number_of_vertices, _mesh_type):
+    def __init__(self, _number_of_cells, _number_of_faces, _number_of_vertices, _cell_type):
         """
         Allocates initial memory for all mesh entities.
 
@@ -35,12 +35,10 @@ class Mesh:
         :type _number_of_faces: int
         :param _number_of_vertices: Number of vertices to allocate.
         :type _number_of_vertices: int
-        :param _mesh_type: Mesh type enumerator.
-        :type _mesh_type: MeshType
+        :param _cell_type: Cell type enumerator.
+        :type _cell_type: cell.CellType
         """
 
-        self.cell_table = ct.CellTable(_number_of_cells, _mesh_type)
+        self.cell_table = ct.CellTable(_number_of_cells, _cell_type)
         self.face_table = ft.FaceTable(_number_of_faces)
         self.vertex_table = vt.VertexTable(_number_of_vertices)
-        self.mesh_type = _mesh_type
-

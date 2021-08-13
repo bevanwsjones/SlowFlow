@@ -11,9 +11,7 @@
 #  You should have received a copy of the GNU General Public License along with this program. If not, see
 #  <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------------------------------------------------------
-# filename: unit_test.py
-# description: todo
+# filename: test_mesh_generator.py
+# description: Contains unit tests for the mesh generator.
 # ----------------------------------------------------------------------------------------------------------------------
 
-import unittest
-import numpy as np

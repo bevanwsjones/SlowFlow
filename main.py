@@ -46,8 +46,11 @@
 #from mesh_generation import mesh_generator as mg
 from mesh_generation import mesh_generator as mg
 import numpy as np
-mg.create_cell_vertices(np.array(((0.0, 0.0), (1.0, 1.0))), [4, 4])
+# mg.create_cell_vertices(np.array(((0.0, 0.0), (1.0, 1.0))), [4, 4])
 
+import mesh_generation.mesh_generator as mg
+
+mg.setup_1d_unit_mesh(10)
 
 #mg.setup_connectivity()
 

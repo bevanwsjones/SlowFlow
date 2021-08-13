@@ -16,7 +16,39 @@
 # ----------------------------------------------------------------------------------------------------------------------
 
 import numpy as np
-import mesh_type as mt
+from enum import Enum, auto
+
+
+class CellType(Enum):
+    """
+    Enumerators for the supported cell types.
+    """
+
+    edge = auto()
+    triangle = auto()
+    quadrilateral = auto()
+    hexagon = auto()
+
+
+def number_of_vertex_face(_cell_type):
+    """
+    Returns the number of vertices and/or faces for a given cell type
+
+    :param _cell_type: cell type enumerator.
+    :type _cell_type: CellType
+    :return: number of vertices/faces for the cell type
+    """
+
+    if _cell_type == CellType.edge:
+        return 2
+    elif _cell_type == CellType.triangle:
+        return 3
+    if _cell_type == CellType.quadrilateral:
+        return 4
+    elif _cell_type == CellType.hexagon:
+        return 6
+    else:
+        raise ValueError("Enumerator not found")
 
 
 class CellTable:
@@ -37,27 +69,8 @@ class CellTable:
         self.type = _mesh_type
         self.max_cell = _number_of_cells
         self.max_ghost_cell = 0
-        self.connected_face = -1 * np.ones(shape=[_number_of_cells, mt.number_of_face(_mesh_type)], dtype=int)
-        self.connected_vertex = -1 * np.ones(shape=[_number_of_cells, mt.number_of_vertex(_mesh_type)], dtype=int)
+        self.connected_face = -1 * np.ones(shape=[_number_of_cells, number_of_vertex_face(_mesh_type)], dtype=int)
+        self.connected_vertex = -1 * np.ones(shape=[_number_of_cells, number_of_vertex_face(_mesh_type)], dtype=int)
         self.boundary = np.zeros(shape=[_number_of_cells, ], dtype=bool)
         self.volume = np.zeros(shape=[_number_of_cells, ], dtype=float)
         self.coordinate = np.zeros([_number_of_cells, 2], dtype=float)
-
-    def add_ghost_cells(self, _number_of_ghosts):
-        """
-        Adds ghost cells to the table by resizing all the data containers and recording the number of ghost cells.
-
-        :param _number_of_ghosts the number of ghost cells to add.
-        :type _number_of_ghosts: int
-        """
-
-        if _number_of_ghosts < 0:
-            raise ValueError("Adding negative ghost cells.")
-        self.max_ghost_cell = _number_of_ghosts
-        self.connected_face = \
-            np.concatenate((self.connected_face, -1 * np.ones(shape=[self.max_ghost_cell, 3], dtype=int)))
-        self.connected_vertex = \
-            np.concatenate((self.connected_vertex, -1 * np.ones(shape=[self.max_ghost_cell, 3], dtype=int)))
-        self.boundary = np.concatenate((self.boundary, np.zeros(shape=[self.max_ghost_cell, ], dtype=bool)))
-        self.volume = np.concatenate((self.volume, np.zeros(shape=[self.max_ghost_cell, ], dtype=float)))
-        self.coordinate = np.concatenate((self.coordinate, np.zeros([self.max_ghost_cell, 2], dtype=float)))

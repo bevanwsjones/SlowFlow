@@ -30,7 +30,8 @@ class VertexTable:
         :param _number_of_vertices: Number of vertices to allocate.
         :type _number_of_vertices: int
         """
-        self.max_vertex = _number_of_vertices
-        self.connected_cell = [np.empty(shape=(0,), dtype=int) for _ in range(_number_of_vertices)]  # not square
 
+        self.max_vertex = _number_of_vertices
+
+        self.connected_cell = [np.empty(shape=(0,), dtype=int) for _ in range(_number_of_vertices)]  # not square
         self.coordinate = np.zeros([_number_of_vertices, 2], dtype=float)
