@@ -40,10 +40,10 @@ def geometric_series_sum(_common_factor, _n_terms, _ratio):
     :type: float
     """
 
-    if _ratio**(_n_terms + 1.0) == 1.0:
+    if _ratio ** (_n_terms + 1.0) == 1.0:
         raise ZeroDivisionError("Divide by zero, _ratio: " + str(_ratio))
 
-    return _common_factor*(1.0 - _ratio**(float(_n_terms) + 1.0))/(1.0 - _ratio)
+    return _common_factor * (1.0 - _ratio ** (float(_n_terms) + 1.0)) / (1.0 - _ratio)
 
 
 def geometric_series_common_factor(_series_sum, _n_terms, _ratio):
@@ -60,17 +60,18 @@ def geometric_series_common_factor(_series_sum, _n_terms, _ratio):
     :type: float
     """
 
-    if _ratio**(_n_terms + 1.0) == 1.0:
+    if _ratio ** (_n_terms + 1.0) == 1.0:
         raise ZeroDivisionError("Divide by zero, _ratio: " + str(_ratio))
 
-    return _series_sum*(1.0 - _ratio)/(1.0 - _ratio**(float(_n_terms) + 1.0))
+    return _series_sum * (1.0 - _ratio) / (1.0 - _ratio ** (float(_n_terms) + 1.0))
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # 1D Mesh Generation
 # ----------------------------------------------------------------------------------------------------------------------
 
 
-def setup_1d_unit_mesh(_number_of_cells, _start_co_ordinate=0.0, _domain_size=1.0, _ratio=1.0):
+def setup_1d_mesh(_number_of_cells, _start_co_ordinate=0.0, _domain_size=1.0, _ratio=1.0):
     """
     Generates the vertices, cell-vertex connectivity as well as the cell type.
 
@@ -113,27 +114,67 @@ def setup_1d_unit_mesh(_number_of_cells, _start_co_ordinate=0.0, _domain_size=1.
 # ----------------------------------------------------------------------------------------------------------------------
 
 
-def setup_2d_cartesian_mesh(_number_of_cells, _start_co_ordinates=None, _domain_size=None, _growth_factor=None):
+def setup_2d_cartesian_mesh(_number_of_cells, _start_co_ordinates=None, _domain_size=None, _ratio=None):
     """
+    Generates the vertices and cells for a 2D structured cartesian mesh. The
 
-    :param _number_of_cells:
-    :type _number_of_cells:
-    :param _start_co_ordinates:
-    :type _start_co_ordinates:
+    :param _number_of_cells: Number of cells in x and y
+    :type _number_of_cells: list
+    :param _start_co_ordinates: bottom left co-ordinate of the domain.
+    :type _start_co_ordinates: np.array
     :param _domain_size:
-    :type _domain_size:
-    :param _growth_factor:
-    :type _growth_factor:
+    :type _domain_size: np.array
+    :param _ratio: The ratio of change between successive (increasing in x,y) cell sizes.
+    :type _ratio: list
     :return:
     """
 
-    if _growth_factor is None:
-        _growth_factor = [1.0, 1.0]
-    if _domain_size is None:
-        _domain_size = [1.0, 1.0]
+    # Assign default value.
     if _start_co_ordinates is None:
-        _start_co_ordinates = [0.0, 0.0]
+        _start_co_ordinates = np.array((0.0, 0.0))
+    if _domain_size is None:
+        _domain_size = np.array((1.0, 1.0))
+    if _ratio is None:
+        _ratio = [1.0, 1.0]
 
+    # Layout memory
+    _total_cells = _number_of_cells[0]*_number_of_cells[1]
+    cell_type = np.empty(shape=(_total_cells, 1), dtype=cl.CellType)
+    cell_vertex_connectivity = np.zeros(shape=(_total_cells, 2), dtype=int)
+    vertex_coordinates = np.zeros(shape=((_number_of_cells[0] + 1)*(_number_of_cells[1] + 1), 2), dtype=float)
+
+    # Determine starting delta x.
+    delta_x = geometric_series_common_factor(_domain_size[0], _number_of_cells[0] + 2, _ratio[0]) \
+        if _ratio[0] != 1.0 else _domain_size[0] / float(_number_of_cells[0])
+    delta_y = geometric_series_common_factor(_domain_size[1], _number_of_cells[1] + 2, _ratio[1]) \
+        if _ratio[1] != 1.0 else _domain_size[1] / float(_number_of_cells[1])
+
+    # Compute vertex positions for the domain.
+    for i_vertex, vertex in enumerate(vertex_coordinates):
+
+        x_index = i_vertex % (_number_of_cells[0] + 1)
+        y_index = int(i_vertex / _number_of_cells[1])
+
+
+
+        current_length_x = geometric_series_sum(delta_x, x_index, _ratio[0]) \
+            if _ratio[0] != 1.0 else float(x_index) * delta_x
+
+        current_length_y = geometric_series_sum(delta_y, y_index, _ratio[1]) \
+            if _ratio[1] != 1.0 else float(y_index) * delta_y
+
+        print(str(x_index) + "  " + str(y_index) + "  " + str(current_length_x))
+
+        vertex[0] = _start_co_ordinates[0] + current_length_x
+        vertex[1] = _start_co_ordinates[1] + current_length_y
+
+
+
+    # Setup cells
+    cell_type[:] = cl.CellType.quadrilateral
+    # cell_vertex_connectivity[:, ] = [[i_cell, i_cell + 1] for i_cell in range(_number_of_cells)]
+
+    return [vertex_coordinates, cell_vertex_connectivity, cell_type]
     # new_mesh = mesh.Mesh()
     # return new_mesh
 
@@ -155,6 +196,3 @@ def setup_2d_simplex_mesh():
     dmsh.helpers.show(verticies, cells, geo)  # Put on to print mesh
     # new_mesh = mesh.Mesh()
     # return new_mesh
-
-
-

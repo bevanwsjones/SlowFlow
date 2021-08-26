@@ -82,7 +82,7 @@ class TestFaceOperators(unittest.TestCase):
         max_cell_list = [10, 20, 40]
         errorL2 = []
         for max_cell in max_cell_list:
-            cell_table, face_table, vertex_table = mg.setup_1d_unit_mesh(max_cell)
+            cell_table, face_table, vertex_table = mg.setup_1d_mesh(max_cell)
             gradient_coef = fcop.construct_gauss_green_coefficient_matrix(cell_table, face_table, vertex_table)
             fx = np.array([f(x) for x in cell_table.coordinate[:]])
             error = np.abs(gradient_coef.dot(fx).reshape((max_cell, 2))[:, 0]

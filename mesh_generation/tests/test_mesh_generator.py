@@ -15,3 +15,16 @@
 # description: Contains unit tests for the mesh generator.
 # ----------------------------------------------------------------------------------------------------------------------
 
+import mesh_generator as mg
+import unittest as ut
+import mesh.cell as cl
+
+
+class Setup2dCartesianMeshTest(ut.TestCase):
+
+    def test_equispaced_unit_mesh(self):
+        [verticies, cells, cell_type] = mg.setup_2d_cartesian_mesh([2, 4], _ratio=[1.5, 1.0])
+
+        print(verticies)
+        for c_type in cell_type:
+            self.assertEqual(c_type, cl.CellType.quadrilateral)
