@@ -32,11 +32,10 @@ class FaceTable:
         """
         self.max_face = _number_of_faces
         self.boundary = np.zeros([_number_of_faces, ], dtype=bool)
-        self.connected_cell = np.zeros([_number_of_faces, 2], dtype=int)
-        self.connected_vertex = np.zeros([_number_of_faces, 2], dtype=int)
-        self.cell_first = np.empty([_number_of_faces, 0], dtype=int)
-        self.cell_last = np.empty([_number_of_faces, 0], dtype=int)
+        self.connected_cell = -1*np.ones([_number_of_faces, 2], dtype=int)
+        self.connected_vertex = -1*np.ones([_number_of_faces, 2], dtype=int)
 
         self.length = np.zeros([_number_of_faces, ], dtype=float)
         self.tangent = np.zeros([_number_of_faces, 2], dtype=float)
-        self.coefficient = np.zeros([_number_of_faces, 2], dtype=float)
+        self.area = np.zeros([_number_of_faces, ], dtype=float)
+        self.normal = np.zeros([_number_of_faces, 2], dtype=float)

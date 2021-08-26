@@ -17,67 +17,114 @@
 
 import numpy as np
 
-def setup_ghost_cell_geometry(cell_table, face_table, vertex_table):
+# ----------------------------------------------------------------------------------------------------------------------
+# Cell Central Co-Ordinate
+# ----------------------------------------------------------------------------------------------------------------------
 
-    # loop over faces and link up the new ghost nodes
-    for iface in range(face_table.number_of_face):
-        if face_table.boundary[iface]:
-            ivertex0 = face_table.connected_vertex[iface][0]
-            ivertex1 = face_table.connected_vertex[iface][1]
-            vect_cell_vertex = vertex_table.coordinate[ivertex0] \
-                               - cell_table.coordinate[face_table.connected_cell[iface, 0]]
-            face_vector = vertex_table.coordinate[ivertex1] - vertex_table.coordinate[ivertex0]
-            face_vector /= np.linalg.norm(face_vector)
-            vector_to_face = vect_cell_vertex - np.dot(vect_cell_vertex, face_vector) * face_vector
-
-            cell_table.coordinate[face_table.connected_cell[iface, 1]] = \
-                cell_table.coordinate[face_table.connected_cell[iface, 0]] + 2.0 * vector_to_face
-
-def calculate_tri_center(cell_table, vertex_table):
+def calculate_edge_center(_cell_table, _vertex_table):
     # triangle center
-    max_cell = cell_table.max_cell
-    cell_table.coordinate[0:max_cell] = (vertex_table.coordinate[cell_table.connected_vertex[0:max_cell, 0]]
-                                         + vertex_table.coordinate[cell_table.connected_vertex[0:max_cell, 1]]
-                                         + vertex_table.coordinate[cell_table.connected_vertex[0:max_cell, 2]]) / 3.0
-    return cell_table.coordinate
+    max_cell = _cell_table.max_cell
+    _cell_table.coordinate[0:max_cell] = (_vertex_table.coordinate[_cell_table.connected_vertex[0:max_cell, 0]]
+                                          + _vertex_table.coordinate[_cell_table.connected_vertex[0:max_cell, 1]]) / 2.0
 
-def calculate_quad_center(cell_table, vertex_table):
+
+def calculate_triangle_center(_cell_table, _vertex_table):
+    # triangle center
+    max_cell = _cell_table.max_cell
+    _cell_table.coordinate[0:max_cell] = (_vertex_table.coordinate[_cell_table.connected_vertex[0:max_cell, 0]]
+                                          + _vertex_table.coordinate[_cell_table.connected_vertex[0:max_cell, 1]]
+                                          + _vertex_table.coordinate[_cell_table.connected_vertex[0:max_cell, 2]]) / 3.0
+
+
+def calculate_quadrilateral_center(_cell_table, _vertex_table):
     # Quad center
-    max_cell = cell_table.max_cell
-    cell_table.coordinate[0:max_cell][0] = 0.50*(vertex_table.coordinate[cell_table.connected_vertex[0:max_cell, 0]][0]
-                                                 + vertex_table.coordinate[cell_table.connected_vertex[0:max_cell, 1]][0])
-    cell_table.coordinate[0:max_cell][1] = 0.50*(vertex_table.coordinate[cell_table.connected_vertex[0:max_cell, 1]][1]
-                                                 + vertex_table.coordinate[cell_table.connected_vertex[0:max_cell, 2]][1])
-    return cell_table.coordinate
+    max_cell = _cell_table.max_cell
+    _cell_table.coordinate[0:max_cell][0] = 0.50 * (
+            _vertex_table.coordinate[_cell_table.connected_vertex[0:max_cell, 0]][0]
+            + _vertex_table.coordinate[_cell_table.connected_vertex[0:max_cell, 1]][0])
+    _cell_table.coordinate[0:max_cell][1] = 0.50 * (
+            _vertex_table.coordinate[_cell_table.connected_vertex[0:max_cell, 1]][1]
+            + _vertex_table.coordinate[_cell_table.connected_vertex[0:max_cell, 2]][1])
 
 
+def calculate_hexagon_center(_cell_table, _vertex_table):
+    raise RuntimeError("Still a todo")
 
-def setup_finite_volume_geometry(cell_table, face_table, vertex_table):
 
-    # Create cell geometry
-    max_cell = cell_table.max_cell
+def calculate_cell_center(_cell_table, _vertex_table):
+    raise RuntimeError("Still a todo")
 
-    cell_table.coordinate[0:max_cell] = (vertex_table.coordinate[cell_table.connected_vertex[0:max_cell, 0]]
-                                         + vertex_table.coordinate[cell_table.connected_vertex[0:max_cell, 1]]
-                                         + vertex_table.coordinate[cell_table.connected_vertex[0:max_cell, 2]]) / 3.0
-    cell_table.volume[0:max_cell] =\
-        0.5*np.cross(vertex_table.coordinate[cell_table.connected_vertex[0:max_cell, 1]]
-                     - vertex_table.coordinate[cell_table.connected_vertex[0:max_cell, 0]],
-                     vertex_table.coordinate[cell_table.connected_vertex[0:max_cell, 2]]
-                     - vertex_table.coordinate[cell_table.connected_vertex[0:max_cell, 0]])
-    setup_ghost_cell_geometry(cell_table, face_table, vertex_table)
 
-    # Create Face Geometry
-    face_table.length[:] = np.linalg.norm(cell_table.coordinate[face_table.connected_cell[:, 1]]
-                                          - cell_table.coordinate[face_table.connected_cell[:, 0]], axis=1)
-    face_table.tangent[:] = (cell_table.coordinate[face_table.connected_cell[:, 1]]
-                             - cell_table.coordinate[face_table.connected_cell[:, 0]])/face_table.length[:, None]
-    face_normal = np.delete(np.cross(np.concatenate((vertex_table.coordinate[face_table.connected_vertex[:, 1]],
-                                                     np.zeros(shape=(face_table.number_of_face, 1))), axis=1)
-                                     - np.concatenate((vertex_table.coordinate[face_table.connected_vertex[:, 0]],
-                                                       np.zeros(shape=(face_table.number_of_face, 1))), axis=1),
-                                     np.full((face_table.number_of_face, 3), [0.0, 0.0, 1.0])), 2, axis=1)
-    face_normal = face_normal[:]/np.linalg.norm(face_normal[:], axis=1)[:, None]
-    face_table.coefficient =\
-        np.linalg.norm(vertex_table.coordinate[face_table.connected_vertex[:, 1]]
-                       - vertex_table.coordinate[face_table.connected_vertex[:, 0]], axis=1)[:, None]*face_normal[:]
+# ----------------------------------------------------------------------------------------------------------------------
+# Cell Volume
+# ----------------------------------------------------------------------------------------------------------------------
+
+def calculate_edge_volume(_cell_table, _vertex_table):
+    max_cell = _cell_table.max_cell
+    _cell_table.volume[0:max_cell] = (_vertex_table.coordinate[_cell_table.connected_vertex[0:max_cell, 0]]
+                                      - _vertex_table.coordinate[_cell_table.connected_vertex[0:max_cell, 1]])
+
+
+def calculate_triangle_volume():
+    raise RuntimeError("Still a todo")
+
+
+def calculate_quadrilateral_volume():
+    raise RuntimeError("Still a todo")
+
+
+def calculate_hexagon_volume():
+    raise RuntimeError("Still a todo")
+
+
+def calculate_cell_volume(cell_table, vertex_table):
+    raise RuntimeError("Still a todo")
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Face Geometry
+# ----------------------------------------------------------------------------------------------------------------------
+
+def calculate_face_cell_cell_length(_face_table, _cell_co_ordinate):
+    max_face = _face_table.max_face
+    _face_table.length[0:max_face] = np.linalg.norm(_cell_co_ordinate[_face_table.connected_cell[0:max_face, 0]]
+                                                    - _cell_co_ordinate[_face_table.connected_cell[0:max_face, 1]])
+
+    raise RuntimeError("handle boundaries")
+
+
+def calculate_face_cell_cell_tangent(_face_table, _cell_co_ordinate):
+    max_face = _face_table.max_face
+    _face_table.length[0:max_face] = (_cell_co_ordinate[_face_table.connected_cell[0:max_face, 1]]
+                                      - _cell_co_ordinate[_face_table.connected_cell[0:max_face, 0]]) \
+                                     / _face_table.length[0:max_face]
+    raise RuntimeError("handle boundaries")
+
+
+def calculate_face_area(_face_table, _vertex_co_ordinate):
+    max_face = _face_table.max_face
+    _face_table.length[0:max_face] = np.linalg.norm(_vertex_co_ordinate[_face_table.connected_vertex[0:max_face, 1]]
+                                                    - _vertex_co_ordinate[_face_table.connected_vertex[0:max_face, 0]])
+
+
+def calculate_face_normal(_face_table, _vertex_co_ordinate):
+    max_face = _face_table.max_face
+    _face_table.length[0:max_face] = np.cross(_vertex_co_ordinate[_face_table.connected_vertex[0:max_face, 1]]
+                                              - _vertex_co_ordinate[_face_table.connected_vertex[0:max_face, 0]],
+                                              np.array((0, 0, 1), dtype=float))[0:max_face, 2] / 2.0
+    raise RuntimeError("dot check")
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# finite volume setup
+# ----------------------------------------------------------------------------------------------------------------------
+
+def setup_finite_volume_geometry(_mesh):
+    calculate_cell_center(_mesh.cell_table, _mesh.vertex_table)
+
+    calculate_face_cell_cell_length(_mesh.face_table, _mesh.cell_table.coordinate)
+    calculate_face_cell_cell_tangent(_mesh.face_table, _mesh.cell_table.coordinate)
+    calculate_face_area(_mesh.face_table, _mesh.vertex_table.vertex_coordinate)
+    calculate_face_normal(_mesh.face_table, _mesh.vertex_table.vertex_coordinate)
+
+    calculate_cell_volume(_mesh.cell_table, _mesh.vertex_table)

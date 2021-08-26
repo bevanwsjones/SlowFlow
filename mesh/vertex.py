@@ -34,4 +34,5 @@ class VertexTable:
         self.max_vertex = _number_of_vertices
 
         self.connected_cell = [np.empty(shape=(0,), dtype=int) for _ in range(_number_of_vertices)]  # not square
+        self.connected_vertex = [np.empty(shape=(0,), dtype=int) for _ in range(_number_of_vertices)]  # not square
         self.coordinate = np.zeros([_number_of_vertices, 2], dtype=float)
