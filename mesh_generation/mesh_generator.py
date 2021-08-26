@@ -40,10 +40,10 @@ def geometric_series_sum(_common_factor, _n_terms, _ratio):
     :type: float
     """
 
-    if _ratio ** (_n_terms + 1.0) == 1.0:
+    if _ratio == 1.0:
         raise ZeroDivisionError("Divide by zero, _ratio: " + str(_ratio))
 
-    return _common_factor * (1.0 - _ratio ** (float(_n_terms) + 1.0)) / (1.0 - _ratio)
+    return _common_factor * (1.0 - _ratio ** float(_n_terms)) / (1.0 - _ratio)
 
 
 def geometric_series_common_factor(_series_sum, _n_terms, _ratio):
@@ -60,11 +60,64 @@ def geometric_series_common_factor(_series_sum, _n_terms, _ratio):
     :type: float
     """
 
-    if _ratio ** (_n_terms + 1.0) == 1.0:
+    if _ratio ** _n_terms == 1.0:
         raise ZeroDivisionError("Divide by zero, _ratio: " + str(_ratio))
 
-    return _series_sum * (1.0 - _ratio) / (1.0 - _ratio ** (float(_n_terms) + 1.0))
+    return _series_sum * (1.0 - _ratio) / (1.0 - _ratio ** float(_n_terms))
 
+# def double_geometric_series_sum(_common_factor_0, _n_terms_0, _ratio_0, _common_factor_1, _n_terms_1, _ratio_1):
+#     """
+#     Computes the sum of a geometric series.
+#
+#     :param _common_factor: The common factor to the geometric series.
+#     :type _common_factor: float
+#     :param _n_terms: The number of terms in the series.
+#     :type _n_terms: int
+#     :param _ratio: The ratio between successive terms in the series.
+#     :type _ratio: float
+#     :return: The sum of the series.
+#     :type: float
+#     """
+#
+#     if _ratio_0 == 1.0:
+#         raise ZeroDivisionError("Divide by zero, _ratio: " + str(_ratio_0))
+#     if _ratio_0 == 1.0:
+#         raise ZeroDivisionError("Divide by zero, _ratio: " + str(_ratio_1))
+#
+#     return _common_factor * (1.0 - _ratio ** float(_n_terms)) / (1.0 - _ratio)
+
+def double_geometric_series_common_factors(_series_sum, _n_terms, _ratio_0, _ratio_1):
+    """
+    Computes the common factor of a geometric series.
+
+    :param _series_sum: The sum of the series for the first n terms.
+    :type _series_sum: float
+    :param _n_terms: The number of terms in the series.
+    :type _n_terms: int
+    :param _ratio: The ratio between successive terms in the series.
+    :type _ratio: float
+    :return: The sum of the series.
+    :type: float
+    """
+
+    if _ratio_0 == 1.0:
+        raise ZeroDivisionError("Divide by zero, _ratio_0: " + str(_ratio_0))
+    if _ratio_1 == 1.0:
+        raise ZeroDivisionError("Divide by zero, _ratio_1: " + str(_ratio_1))
+
+    if _n_terms % 2 is 0:
+        n_terms_0 = _n_terms / 2
+        n_terms_1 = n_terms_0
+    else:
+        n_terms_0 = _n_terms / 2 + 1
+        n_terms_1 = n_terms_0
+
+    fact = _ratio_0 ** float(n_terms_0 - 1) / _ratio_1 ** float(n_terms_1 - 1)
+    _common_factor_0 = _series_sum / ((1.0 - _ratio_0 ** float(n_terms_0)) / (1.0 - _ratio_0) +
+                                      fact * (1.0 - _ratio_1 ** float(n_terms_1)) / (1.0 - _ratio_1))
+    _common_factor_1 = fact * _common_factor_0
+
+    return _common_factor_0, _common_factor_1
 
 # ----------------------------------------------------------------------------------------------------------------------
 # 1D Mesh Generation
@@ -92,7 +145,7 @@ def setup_1d_mesh(_number_of_cells, _start_co_ordinate=0.0, _domain_size=1.0, _r
     vertex_coordinates = np.zeros(shape=(_number_of_cells + 1, 2), dtype=float)
 
     # Determine starting delta x.
-    delta_x = geometric_series_common_factor(_domain_size, _number_of_cells + 2, _ratio) \
+    delta_x = geometric_series_common_factor(_domain_size, _number_of_cells, _ratio) \
         if _ratio != 1.0 else _domain_size / float(_number_of_cells)
 
     # Compute vertex positions for the domain.
