@@ -12,11 +12,38 @@
 #  <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------------------------------------------------------
 # filename: connectivity.py
-# description: todo
+# description: Creates the connectivity for simple meshes.
 # ----------------------------------------------------------------------------------------------------------------------
 
 import numpy as np
 from mesh import cell as ct, face as ft, vertex as vt
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Vertex connectivity
+# ----------------------------------------------------------------------------------------------------------------------
+
+def connect_vertices_to_cells(_cell_vertex_connectivity, _vertex_table):
+    """
+    Using the cell-vertex connectivity the vertex-cell connectivity is created.
+
+    :param _cell_vertex_connectivity: Cell vertex connectivity, data should be [i_cell][i_connected_vertex]
+    :type _cell_vertex_connectivity: np.array
+    :param _vertex_table: The vertex table for which the vertex cell connectivity is to be built.
+    :type _vertex_table: vertex.VertexTable
+    """
+
+    for i_cell, cv_connectivity in enumerate(_cell_vertex_connectivity):
+        for i_cv, i_vertex in enumerate(cv_connectivity):
+            _vertex_table.connected_cell[i_vertex] = np.append(_vertex_table.connected_cell[i_vertex], i_cell)
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 1D Mesh Connectivity-Preprocessing Simplex Mesh
+# ----------------------------------------------------------------------------------------------------------------------
+
+def connect_1D_mesh(mesh):
+    return
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # 2D Mesh Connectivity-Preprocessing Simplex Mesh
@@ -108,8 +135,10 @@ def add_ghost_cell(cell_table, face_table, vertex_table):
             cell_table.connected_face[ghost_node_start][0] = iface
             cell_table.connected_vertex[ghost_node_start][0] = ivertex0
             cell_table.connected_vertex[ghost_node_start][1] = ivertex1
-            vertex_table.connected_cell[ivertex0] = np.concatenate((vertex_table.connected_cell[ivertex0], np.array([ghost_node_start])))
-            vertex_table.connected_cell[ivertex1] = np.concatenate((vertex_table.connected_cell[ivertex1], np.array([ghost_node_start])))
+            vertex_table.connected_cell[ivertex0] = np.concatenate(
+                (vertex_table.connected_cell[ivertex0], np.array([ghost_node_start])))
+            vertex_table.connected_cell[ivertex1] = np.concatenate(
+                (vertex_table.connected_cell[ivertex1], np.array([ghost_node_start])))
             ghost_node_start += 1
 
 
@@ -163,5 +192,3 @@ def setup_connectivity(cells, verticies):
 
     print("WARNING: no cell first/last has been set up yet.")
     return cell_table, face_table, vertex_table
-
-

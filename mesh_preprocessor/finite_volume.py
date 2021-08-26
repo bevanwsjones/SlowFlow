@@ -33,6 +33,25 @@ def setup_ghost_cell_geometry(cell_table, face_table, vertex_table):
             cell_table.coordinate[face_table.connected_cell[iface, 1]] = \
                 cell_table.coordinate[face_table.connected_cell[iface, 0]] + 2.0 * vector_to_face
 
+def calculate_tri_center(cell_table, vertex_table):
+    # triangle center
+    max_cell = cell_table.max_cell
+    cell_table.coordinate[0:max_cell] = (vertex_table.coordinate[cell_table.connected_vertex[0:max_cell, 0]]
+                                         + vertex_table.coordinate[cell_table.connected_vertex[0:max_cell, 1]]
+                                         + vertex_table.coordinate[cell_table.connected_vertex[0:max_cell, 2]]) / 3.0
+    return cell_table.coordinate
+
+def calculate_quad_center(cell_table, vertex_table):
+    # Quad center
+    max_cell = cell_table.max_cell
+    cell_table.coordinate[0:max_cell][0] = 0.50*(vertex_table.coordinate[cell_table.connected_vertex[0:max_cell, 0]][0]
+                                                 + vertex_table.coordinate[cell_table.connected_vertex[0:max_cell, 1]][0])
+    cell_table.coordinate[0:max_cell][1] = 0.50*(vertex_table.coordinate[cell_table.connected_vertex[0:max_cell, 1]][1]
+                                                 + vertex_table.coordinate[cell_table.connected_vertex[0:max_cell, 2]][1])
+    return cell_table.coordinate
+
+
+
 def setup_finite_volume_geometry(cell_table, face_table, vertex_table):
 
     # Create cell geometry
