@@ -11,32 +11,29 @@
 #  You should have received a copy of the GNU General Public License along with this program. If not, see
 #  <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------------------------------------------------------
-# filename: face.py
-# description: Definition of mesh faces.
+# filename: test_connectivity.py
+# description: Tests the functions in connectivity .py
 # ----------------------------------------------------------------------------------------------------------------------
 
+import connectivity as ct
 import numpy as np
+import unittest as ut
+from mesh import cell as cl, face as ft, vertex as vt
 
 
-class FaceTable:
-    """
-    The face table, containing basic mesh cell face geometry data.
-    """
+class CartesianMeshTest(ut.TestCase):
 
-    def __init__(self, _number_of_faces):
-        """
-        Initialises, allocates the memory, for the faces in the mesh given a number of faces.
+    def test_connect_vertices_to_cells(self):
 
-        :param _number_of_faces: Number of faces to allocate.
-        :type _number_of_faces: int
-        """
-        self.max_face = _number_of_faces
-        self.boundary = np.zeros([_number_of_faces, ], dtype=bool)
-        self.connected_cell = np.zeros([_number_of_faces, 2], dtype=int)
-        self.connected_vertex = np.zeros([_number_of_faces, 2], dtype=int)
-        self.cell_first = np.empty([_number_of_faces, 0], dtype=int)
-        self.cell_last = np.empty([_number_of_faces, 0], dtype=int)
+        cell_vertex_connectivity = np.array(((0, 1), (1, 2)), dtype=int)
+        vertex_table = vt.VertexTable(3)
+        ct.connect_vertices_to_cells(cell_vertex_connectivity, vertex_table)
 
-        self.length = np.zeros([_number_of_faces, ], dtype=float)
-        self.tangent = np.zeros([_number_of_faces, 2], dtype=float)
-        self.coefficient = np.zeros([_number_of_faces, 2], dtype=float)
+        self.assertEqual(len(vertex_table.connected_cell[0]), 1)
+        self.assertEqual(len(vertex_table.connected_cell[1]), 2)
+        self.assertEqual(len(vertex_table.connected_cell[2]), 1)
+
+        self.assertEqual(vertex_table.connected_cell[0][0], 0)
+        self.assertEqual(vertex_table.connected_cell[1][0], 0)
+        self.assertEqual(vertex_table.connected_cell[1][1], 1)
+        self.assertEqual(vertex_table.connected_cell[2][0], 1)

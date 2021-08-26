@@ -68,7 +68,6 @@ class CellTable:
 
         self.type = _mesh_type
         self.max_cell = _number_of_cells
-        self.max_ghost_cell = 0
         self.connected_face = -1 * np.ones(shape=[_number_of_cells, number_of_vertex_face(_mesh_type)], dtype=int)
         self.connected_vertex = -1 * np.ones(shape=[_number_of_cells, number_of_vertex_face(_mesh_type)], dtype=int)
         self.boundary = np.zeros(shape=[_number_of_cells, ], dtype=bool)
