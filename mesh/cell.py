@@ -56,17 +56,17 @@ class CellTable:
     The cell table, containing basic mesh cell geometry data.
     """
 
-    def __init__(self, _number_of_cells, _mesh_type):
+    def __init__(self, _number_of_cells, _cell_type):
         """
         Initialises, allocates the memory, for the cells in the mesh given a number of cells and the mesh type.
 
         :param _number_of_cells: Number of cells to allocate.
         :type _number_of_cells: int
-        :param _mesh_type: The type of mesh, triangle, quadrilaterals, etc.
-        :type _mesh_type: mt.MeshType
+        :param _cell_type: The type of mesh, triangle, quadrilaterals, etc.
+        :type _cell_type: mt.MeshType
         """
 
-        self.type = _mesh_type
+        self.type = _cell_type
         self.max_cell = _number_of_cells
         self.connected_face = -1 * np.ones(shape=[_number_of_cells, number_of_vertex_face(_mesh_type)], dtype=int)
         self.connected_vertex = -1 * np.ones(shape=[_number_of_cells, number_of_vertex_face(_mesh_type)], dtype=int)
