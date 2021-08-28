@@ -184,34 +184,104 @@ def calculate_cell_volume(cell_table, vertex_table):
 # Face Geometry
 # ----------------------------------------------------------------------------------------------------------------------
 
-def calculate_face_cell_cell_length(_face_table, _cell_co_ordinate):
-    max_face = _face_table.max_face
-    _face_table.length[0:max_face] = np.linalg.norm(_cell_co_ordinate[_face_table.connected_cell[0:max_face, 0]]
-                                                    - _cell_co_ordinate[_face_table.connected_cell[0:max_face, 1]])
+def calculate_face_cell_cell_length(_number_boundary_face, _face_cell_connectivity, _face_vertex_connectivity,
+                                    _cell_centroid, _vertex_coordinates):
+    """
+    Computes the length between two cell centroids for each face. If the face is a boundary computes the length between
+    the cell centroid and the face centre. Assumes all boundary faces are at the front of the connectivity tables.
 
-    raise RuntimeError("handle boundaries")
+    :param _number_boundary_face: number of boundary faces in the mesh.
+    :type _number_boundary_face: int
+    :param _face_cell_connectivity: Face-cell connectivity table, of the form [i_face][list of cells].
+    :type _face_cell_connectivity: np.array
+    :param _face_vertex_connectivity: Face-vertex connectivity table, of the form [i_face][list of vertices].
+    :type _face_vertex_connectivity: np.array
+    :param _cell_centroid: Co-ordinates for all cell centroids in the mesh, of the form [i_cell][x, y coordinates]
+    :param _cell_centroid: np.array
+    :param _vertex_coordinates: Co-ordinates for all vertices in the mesh, of the form [i_vertex][x, y coordinates]
+    :param _vertex_coordinates: np.array
+    :return: List of the face normals of the form [i_face][cell centroid to cell centroid length].
+    :type: np.array
+    """
+
+    return np.concatenate((
+        np.linalg.norm(_cell_centroid[_face_cell_connectivity[:_number_boundary_face, 0]]
+                       - 0.5 * (_vertex_coordinates[_face_vertex_connectivity[:_number_boundary_face, 1]]
+                                + _vertex_coordinates[_face_vertex_connectivity[:_number_boundary_face, 0]]), axis=1),
+        np.linalg.norm(_cell_centroid[_face_cell_connectivity[_number_boundary_face:, 1]]
+                       - _cell_centroid[_face_cell_connectivity[_number_boundary_face:, 0]], axis=1)))
 
 
-def calculate_face_cell_cell_tangent(_face_table, _cell_co_ordinate):
-    max_face = _face_table.max_face
-    _face_table.length[0:max_face] = (_cell_co_ordinate[_face_table.connected_cell[0:max_face, 1]]
-                                      - _cell_co_ordinate[_face_table.connected_cell[0:max_face, 0]]) \
-                                     / _face_table.length[0:max_face]
-    raise RuntimeError("handle boundaries")
+def calculate_face_cell_cell_tangent(_number_boundary_face, _face_cell_connectivity, _face_vertex_connectivity,
+                                     _cell_centroid, _vertex_coordinates):
+    """
 
 
-def calculate_face_area(_face_table, _vertex_co_ordinate):
-    max_face = _face_table.max_face
-    _face_table.length[0:max_face] = np.linalg.norm(_vertex_co_ordinate[_face_table.connected_vertex[0:max_face, 1]]
-                                                    - _vertex_co_ordinate[_face_table.connected_vertex[0:max_face, 0]])
+    :param _number_boundary_face: number of boundary faces in the mesh.
+    :type _number_boundary_face: int
+    :param _face_cell_connectivity: Face-cell connectivity table, of the form [i_face][list of cells].
+    :type _face_cell_connectivity: np.array
+    :param _face_vertex_connectivity: Face-vertex connectivity table, of the form [i_face][list of vertices].
+    :type _face_vertex_connectivity: np.array
+    :param _cell_centroid: Co-ordinates for all cell centroids in the mesh, of the form [i_cell][x, y coordinates]
+    :param _cell_centroid: np.array
+    :param _vertex_coordinates: Co-ordinates for all vertices in the mesh, of the form [i_vertex][x, y coordinates]
+    :param _vertex_coordinates: np.array
+    :return: List of the face normals of the form [i_face][cell centroid to cell centroid length].
+    :type: np.array
+    """
+
+    return np.array([vector / np.linalg.norm(vector) for vector in
+                     np.concatenate((0.5 * (_vertex_coordinates[_face_vertex_connectivity[:_number_boundary_face, 1]]
+                                            + _vertex_coordinates[_face_vertex_connectivity[:_number_boundary_face, 0]])
+                                     - _cell_centroid[_face_cell_connectivity[:_number_boundary_face, 0]],
+                                     _cell_centroid[_face_cell_connectivity[_number_boundary_face:, 1]]
+                                     - _cell_centroid[_face_cell_connectivity[_number_boundary_face:, 0]]))])
 
 
-def calculate_face_normal(_face_table, _vertex_co_ordinate):
-    max_face = _face_table.max_face
-    _face_table.length[0:max_face] = np.cross(_vertex_co_ordinate[_face_table.connected_vertex[0:max_face, 1]]
-                                              - _vertex_co_ordinate[_face_table.connected_vertex[0:max_face, 0]],
-                                              np.array((0, 0, 1), dtype=float))[0:max_face, 2] / 2.0
-    raise RuntimeError("dot check")
+def calculate_face_area(_cell_type, _face_vertex_connectivity, _vertex_coordinates):
+    """
+    Constructs face areas, computed as the unity in 1D (edge elements) and as the distance between the two faec vertices
+    in 2D.
+
+    :param _cell_type: The type of cells described by the _cell_vertex_connectivity.
+    :type _cell_type: mesh.cell.CellType
+    :param _face_vertex_connectivity: Face-vertex connectivity table, of the form [i_face][list of vertices].
+    :type _face_vertex_connectivity: np.array
+    :param _vertex_coordinates: Co-ordinates for all vertices in the mesh, of the form [i_vertex][x, y coordinates]
+    :param _vertex_coordinates: np.array
+    :return: List of the face normals of the form [i_face][x, y normal].
+    :type: np.array
+    """
+
+    if _cell_type == cl.CellType.edge:
+        return np.ones(len(_face_vertex_connectivity))
+    else:
+        return np.linalg.norm(_vertex_coordinates[_face_vertex_connectivity[:, 1]]
+                              - _vertex_coordinates[_face_vertex_connectivity[:, 0]], axis=1)
+
+
+def calculate_face_normal(_cell_type, _face_vertex_connectivity, _vertex_coordinates):
+    """
+    Constructs face normals, are orientated assuming that face are constructed by walking anti-clockwise around cells.
+
+    :param _cell_type: The type of cells described by the _cell_vertex_connectivity.
+    :type _cell_type: mesh.cell.CellType
+    :param _face_vertex_connectivity: Face-vertex connectivity table, of the form [i_face][list of vertices].
+    :type _face_vertex_connectivity: np.array
+    :param _vertex_coordinates: Co-ordinates for all vertices in the mesh, of the form [i_vertex][x, y coordinates]
+    :param _vertex_coordinates: np.array
+    :return: List of the face normals of the form [i_face][x, y normal].
+    :type: np.array
+    """
+
+    if _cell_type == cl.CellType.edge:
+        raise RuntimeError("still to do")
+    else:
+        return np.array([vector / np.linalg.norm(vector)
+                         for vector in np.cross(_vertex_coordinates[_face_vertex_connectivity[:, 1]]
+                                                - _vertex_coordinates[_face_vertex_connectivity[:, 0]],
+                                                np.array((0, 0, 1), dtype=float))[:, 0:2]])
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -219,11 +289,12 @@ def calculate_face_normal(_face_table, _vertex_co_ordinate):
 # ----------------------------------------------------------------------------------------------------------------------
 
 def setup_finite_volume_geometry(_mesh):
-    calculate_cell_center(_mesh.cell_table, _mesh.vertex_table)
-
-    calculate_face_cell_cell_length(_mesh.face_table, _mesh.cell_table.coordinate)
-    calculate_face_cell_cell_tangent(_mesh.face_table, _mesh.cell_table.coordinate)
-    calculate_face_area(_mesh.face_table, _mesh.vertex_table.vertex_coordinate)
-    calculate_face_normal(_mesh.face_table, _mesh.vertex_table.vertex_coordinate)
-
-    calculate_cell_volume(_mesh.cell_table, _mesh.vertex_table)
+    return
+    # calculate_cell_center(_mesh.cell_table, _mesh.vertex_table)
+    #
+    # calculate_face_cell_cell_length(_mesh.face_table, _mesh.cell_table.coordinate)
+    # calculate_face_cell_cell_tangent(_mesh.face_table, _mesh.cell_table.coordinate)
+    # calculate_face_area(_mesh.face_table, _mesh.vertex_table.vertex_coordinate)
+    # calculate_face_normal(_mesh.face_table, _mesh.vertex_table.vertex_coordinate)
+    #
+    # calculate_cell_volume(_mesh.cell_table, _mesh.vertex_table)

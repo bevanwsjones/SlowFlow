@@ -22,10 +22,10 @@ from mesh import cell as cl
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-# Cell Central Co-Ordinate
+# Cell Centroids
 # ----------------------------------------------------------------------------------------------------------------------
 
-class CoordinateCentreTest(ut.TestCase):
+class CoordinateCentroidTest(ut.TestCase):
 
     def test_calculate_edge_center(self):
         vertex_coordinates = np.array([[0.5, 0.5], [1.5, 1.0], [2.5, 2.0]])
@@ -98,7 +98,8 @@ class CoordinateCentreTest(ut.TestCase):
         centre1 = np.sum((vertex_coordinates[1], vertex_coordinates[2], centre), axis=0) / 3.0
         centre2 = np.sum((vertex_coordinates[2], vertex_coordinates[3], centre), axis=0) / 3.0
         centre3 = np.sum((vertex_coordinates[3], vertex_coordinates[0], centre), axis=0) / 3.0
-        centre = (centre0 * area0 + centre1 * area1 + centre2 * area2 + centre3 * area3)/(area0 + area1 + area2 + area3)
+        centre = (centre0 * area0 + centre1 * area1 + centre2 * area2 + centre3 * area3) / (
+                    area0 + area1 + area2 + area3)
         cell_centre = fv.calculate_quadrilateral_centroid(cell_vertex_connectivity, vertex_coordinates)
 
         # check lengths
@@ -134,3 +135,103 @@ class CoordinateCentreTest(ut.TestCase):
         self.assertTrue(np.allclose(fv.calculate_quadrilateral_centroid(cell_vertex_connectivity, vertex_coordinates),
                                     fv.calculate_cell_centroid(cl.CellType.quadrilateral, cell_vertex_connectivity,
                                                                vertex_coordinates)))
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Face Geometry
+# ----------------------------------------------------------------------------------------------------------------------
+
+class FaceTest(ut.TestCase):
+
+    def test_calculate_face_cell_cell_length(self):
+        vertex_coordinates = np.array([[0.0, 0.0], [0.0, 1.0], [4.5, 3.0], [4.5, 4.0]])
+        cell_centroids = np.array([[0.5, 0.5], [1.5, 1.5], [3.5, 3.5]])
+        face_cell_connectivity = np.array([[0, -1], [2, -1], [0, 1], [1, 2]])
+        face_vertex_connectivity = np.array([[0, 1], [2, 3], [-1, -1], [-1, -1]])
+
+        face_length = fv.calculate_face_cell_cell_length(2, face_cell_connectivity, face_vertex_connectivity,
+                                                         cell_centroids, vertex_coordinates)
+
+        # Check lengths
+        self.assertEqual(4, len(face_length))
+
+        # Check values
+
+        self.assertAlmostEqual(0.5, face_length[0])
+        self.assertAlmostEqual(1.0, face_length[1])
+        self.assertAlmostEqual(np.sqrt(2.0*(1.5 - 0.5) ** 2.0), face_length[2])
+        self.assertAlmostEqual(np.sqrt(2.0*(3.5 - 1.5) ** 2.0), face_length[3])
+
+    def test_calculate_face_cell_cell_tangent(self):
+        vertex_coordinates = np.array([[0.0, 0.0], [0.0, 1.0], [4.5, 3.0], [4.5, 4.0]])
+        cell_centroids = np.array([[0.5, 0.5], [1.5, 1.5], [3.5, 3.5]])
+        face_cell_connectivity = np.array([[0, -1], [2, -1], [0, 1], [1, 2]])
+        face_vertex_connectivity = np.array([[0, 1], [2, 3], [-1, -1], [-1, -1]])
+
+        face_tangent = fv.calculate_face_cell_cell_tangent(2, face_cell_connectivity, face_vertex_connectivity,
+                                                           cell_centroids, vertex_coordinates)
+
+        #Check lengths
+        self.assertEqual(4, len(face_tangent))
+        self.assertEqual(2, len(face_tangent[0]))
+        self.assertEqual(2, len(face_tangent[1]))
+        self.assertEqual(2, len(face_tangent[2]))
+        self.assertEqual(2, len(face_tangent[3]))
+
+        # Check values
+        self.assertAlmostEqual(-1.0, face_tangent[0][0])
+        self.assertAlmostEqual(0.0, face_tangent[0][1])
+        self.assertAlmostEqual(1.0, face_tangent[1][0])
+        self.assertAlmostEqual(0.0, face_tangent[1][1])
+        self.assertAlmostEqual(np.sqrt(2.0)/2.0, face_tangent[2][0])
+        self.assertAlmostEqual(np.sqrt(2.0)/2.0, face_tangent[2][1])
+        self.assertAlmostEqual(np.sqrt(2.0)/2.0, face_tangent[3][0])
+        self.assertAlmostEqual(np.sqrt(2.0)/2.0, face_tangent[3][1])
+
+    def test_calculate_face_area_1D(self):
+        vertex_coordinates = np.array([[0.0, 0.0], [1.0, 0.0], [2, 0]])
+        face_vertex_connectivity = np.array([[0, 1], [1, 2]])
+        face_area = fv.calculate_face_area(cl.CellType.edge, face_vertex_connectivity, vertex_coordinates)
+
+        # Check lengths
+        self.assertEqual(2, len(face_area))
+
+        # Check values
+        self.assertAlmostEqual(1.0, face_area[0])
+        self.assertAlmostEqual(1.0, face_area[1])
+
+    def test_calculate_face_area_2D(self):
+        vertex_coordinates = np.array([[0.0, 0.0], [1.0, 0.0], [2.0, 1.0], [0.0, 1.0]])
+        face_vertex_connectivity = np.array([[0, 1], [1, 2], [2, 3], [3, 0]])
+        face_area = fv.calculate_face_area(cl.CellType.quadrilateral, face_vertex_connectivity, vertex_coordinates)
+
+        # Check lengths
+        self.assertEqual(4, len(face_area))
+
+        # Check values
+        self.assertAlmostEqual(1.0, face_area[0])
+        self.assertAlmostEqual(np.sqrt((2.0 - 1.0) ** 2.0 + (0.0 - 1.0) ** 2.0), face_area[1])
+        self.assertAlmostEqual(2.0, face_area[2])
+        self.assertAlmostEqual(1.0, face_area[3])
+
+    def test_calculate_face_normal(self):
+        vertex_coordinates = np.array([[0.0, 0.0], [1.0, 0.0], [2.0, 1.0], [0.0, 1.0]])
+        face_vertex_connectivity = np.array([[0, 1], [1, 2], [2, 3], [3, 0]])
+        face_normals = fv.calculate_face_normal(cl.CellType.quadrilateral, face_vertex_connectivity, vertex_coordinates)
+
+        # Check lengths
+        self.assertEqual(4, len(face_normals))
+        self.assertEqual(2, len(face_normals[0]))
+        self.assertEqual(2, len(face_normals[1]))
+        self.assertEqual(2, len(face_normals[2]))
+        self.assertEqual(2, len(face_normals[3]))
+
+        # Check values
+        self.assertAlmostEqual(0.0, face_normals[0][0])
+        self.assertAlmostEqual(-1.0, face_normals[0][1])
+        self.assertAlmostEqual(np.sqrt(2.0) / 2.0, face_normals[1][0])
+        self.assertAlmostEqual(-np.sqrt(2.0) / 2.0, face_normals[1][1])
+        self.assertAlmostEqual(0.0, face_normals[2][0])
+        self.assertAlmostEqual(1.0, face_normals[2][1])
+        self.assertAlmostEqual(-1.0, face_normals[3][0])
+        self.assertAlmostEqual(0.0, face_normals[3][1])
