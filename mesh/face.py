@@ -35,7 +35,7 @@ class FaceTable:
         self.connected_cell = -1*np.ones([_number_of_faces, 2], dtype=int)
         self.connected_vertex = -1*np.ones([_number_of_faces, 2], dtype=int)
 
-        self.length = np.zeros([_number_of_faces, ], dtype=float)
-        self.tangent = np.zeros([_number_of_faces, 2], dtype=float)
+        self.cc_length = np.zeros([_number_of_faces, ], dtype=float)
+        self.cc_unit_vector = np.zeros([_number_of_faces, 2], dtype=float)
         self.area = np.zeros([_number_of_faces, ], dtype=float)
         self.normal = np.zeros([_number_of_faces, 2], dtype=float)

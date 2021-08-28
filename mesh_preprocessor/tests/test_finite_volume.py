@@ -25,7 +25,7 @@ from mesh import cell as cl
 # Cell Centroids
 # ----------------------------------------------------------------------------------------------------------------------
 
-class CoordinateCentroidTest(ut.TestCase):
+class CellCentroidTest(ut.TestCase):
 
     def test_calculate_edge_center(self):
         vertex_coordinates = np.array([[0.5, 0.5], [1.5, 1.0], [2.5, 2.0]])
@@ -138,10 +138,72 @@ class CoordinateCentroidTest(ut.TestCase):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+# Cell Volume
+# ----------------------------------------------------------------------------------------------------------------------
+
+class CellVolumeTest(ut.TestCase):
+
+    def test_calculate_edge_volume(self):
+
+        vertex_coordinates = np.array([[0.0, 0.0], [1.0, 0.0], [3.0, 0.0]])
+        cell_vertex_connectivity = np.array([[0, 1], [1, 2]])
+
+        cell_volume = fv.calculate_edge_volume(cell_vertex_connectivity, vertex_coordinates)
+
+        # Check lengths
+        self.assertEqual(2, len(cell_volume))
+
+        # Check values
+        self.assertAlmostEqual(1.0, cell_volume[0])
+        self.assertAlmostEqual(2.0, cell_volume[1])
+
+    def test_calculate_2D_cell_volume_triangle(self):
+        vertex_coordinates = np.array([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0]])
+        cell_centroids = np.array([[2.0/3.0, 1.0/3.0]])
+        face_normals = np.array([[0.0, -1.0], [1.0, 0.0], [-0.5*np.sqrt(2.0), 0.5*np.sqrt(2.0)]])
+        face_areas = np.array([1.0, 1.0, np.sqrt(2.0)])
+        cell_face_connectivity = np.array([[0, 1, 2]])
+        face_cell_connectivity = np.array([[0, -1], [0, -1], [0, -1]])
+        face_vertex_connectivity = np.array([[0, 1], [1, 2], [2, 0]])
+
+        cell_volume = fv.calculate_2d_cell_volume(cell_face_connectivity, face_cell_connectivity,
+                                                  face_vertex_connectivity, cell_centroids, face_normals, face_areas,
+                                                  vertex_coordinates)
+
+        # Check lengths
+        self.assertEqual(1, len(cell_volume))
+
+        # Check values
+        self.assertAlmostEqual(0.5*1.0*1.0, cell_volume[0])
+
+    def test_calculate_cell_volume_quadrilateral(self):
+
+        vertex_coordinates = np.array([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0], [2.0, 0.0], [2.0, 1.0]])
+        cell_centroids = np.array([[0.5, 0.5], [1.5, 0.5]])
+        face_normals = np.array([[0.0, -1.0], [1.0, 0.0], [0.0, 1.0], [-1.0, 0.0], [0.0, -1.0], [1.0, 0.0],
+                                 [0.0, 1.0]])
+        face_areas = np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
+        cell_face_connectivity = np.array([[0, 1, 2, 3], [1, 4, 5, 6]])
+        face_cell_connectivity = np.array([[0, -1], [0, 1], [0, -1], [0, -1], [1, -1], [1, -1], [1, -1]])
+        face_vertex_connectivity = np.array([[0, 1], [1, 2], [2, 3], [3, 0], [1, 4], [4, 5], [5, 2]])
+
+        cell_volume = fv.calculate_2d_cell_volume(cell_face_connectivity, face_cell_connectivity,
+                                                  face_vertex_connectivity, cell_centroids, face_normals, face_areas,
+                                                  vertex_coordinates)
+
+        # Check lengths
+        self.assertEqual(2, len(cell_volume))
+
+        # Check values
+        self.assertAlmostEqual(1.0, cell_volume[0])
+        self.assertAlmostEqual(1.0, cell_volume[1])
+
+
+# ----------------------------------------------------------------------------------------------------------------------
 # Face Geometry
 # ----------------------------------------------------------------------------------------------------------------------
 
-class FaceTest(ut.TestCase):
+class FaceGeometryTest(ut.TestCase):
 
     def test_calculate_face_cell_cell_length(self):
         vertex_coordinates = np.array([[0.0, 0.0], [0.0, 1.0], [4.5, 3.0], [4.5, 4.0]])
@@ -156,20 +218,19 @@ class FaceTest(ut.TestCase):
         self.assertEqual(4, len(face_length))
 
         # Check values
-
         self.assertAlmostEqual(0.5, face_length[0])
         self.assertAlmostEqual(1.0, face_length[1])
         self.assertAlmostEqual(np.sqrt(2.0*(1.5 - 0.5) ** 2.0), face_length[2])
         self.assertAlmostEqual(np.sqrt(2.0*(3.5 - 1.5) ** 2.0), face_length[3])
 
-    def test_calculate_face_cell_cell_tangent(self):
+    def test_calculate_face_cell_cell_unit_vector(self):
         vertex_coordinates = np.array([[0.0, 0.0], [0.0, 1.0], [4.5, 3.0], [4.5, 4.0]])
         cell_centroids = np.array([[0.5, 0.5], [1.5, 1.5], [3.5, 3.5]])
         face_cell_connectivity = np.array([[0, -1], [2, -1], [0, 1], [1, 2]])
         face_vertex_connectivity = np.array([[0, 1], [2, 3], [-1, -1], [-1, -1]])
 
-        face_tangent = fv.calculate_face_cell_cell_tangent(2, face_cell_connectivity, face_vertex_connectivity,
-                                                           cell_centroids, vertex_coordinates)
+        face_tangent = fv.calculate_face_cell_cell_unit_vector(2, face_cell_connectivity, face_vertex_connectivity,
+                                                               cell_centroids, vertex_coordinates)
 
         #Check lengths
         self.assertEqual(4, len(face_tangent))
