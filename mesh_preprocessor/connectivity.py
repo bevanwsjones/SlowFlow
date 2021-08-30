@@ -55,7 +55,7 @@ def connect_vertices_to_vertices(_cell_vertex_connectivity, _number_of_vertices)
     :type _cell_vertex_connectivity: np.array
     :param _number_of_vertices: Number of vertices in the mesh.
     :type _number_of_vertices: int
-    :return: The vertex-vertex connectivity table of the form [i_vertex][ascending list of vertex indices]
+    :return: The vertex-vertex connectivity table of the form [i_vertex][ascending list of vertices]
     :type: list
     """
 
@@ -88,26 +88,38 @@ def compute_number_of_faces():
     return -1
 
 
-def connect_faces_to_vertex(_cell_vertex_connectivity, _face_table):
+def connect_faces_to_vertex(_cell_vertex_connectivity):
     """
-    Using the cell-vertex connectivity the face-vertex connectivity is created. It is assumed that the local cell-vertex
-    connectivity is ordered in an anti-clockwise fashion. Using this assumption a 'new' face is found when the local
-    'forward' vertex index is higher than the 'backward' vertex index.
+    Using the cell-vertex connectivity the face-vertex connectivity is created.
 
-    :param _cell_vertex_connectivity: Cell vertex connectivity, data should be [i_cell][i_connected_vertex]
+    TODO: sort for boundary faces first.
+
+    :param _cell_vertex_connectivity: Cell-vertex connectivity table, of the form [i_cell][list of vertices].
     :type _cell_vertex_connectivity: np.array
-    :param _face_table: The vertex table for which the vertex cell connectivity is to be built.
-    :type _face_table: face.FaceTable
+    :return Face-vertex connectivity table, of the form [i_face][ascending list of vertices].
+    :type np.array
     """
 
-    i_face = 0
+    face_vertex_connectivity = np.empty(shape=[0, 2], dtype=int)
 
-    for i_cell, cv_connectivity in enumerate(_cell_vertex_connectivity):
+    for cv_connectivity in _cell_vertex_connectivity:
         for i_cv, i_vertex in enumerate(cv_connectivity):
-            if i_vertex > cv_connectivity[i_vertex - 1]:
-                _face_table.connected_vertex[i_face][0] = cv_connectivity[i_vertex - 1]
-                _face_table.connected_vertex[i_face][1] = i_vertex
-                i_face += 1
+            face_vertex_connectivity = np.append(face_vertex_connectivity,
+                                                 [[i_vertex, cv_connectivity[i_cv - 1]]], axis=0)
+            face_vertex_connectivity[-1].sort()
+
+    # Each row is already sorted, so we now go to sort the entire list by column 0, the column 1,
+    # I not claiming this efficient.
+    face_vertex_connectivity = face_vertex_connectivity[face_vertex_connectivity[:, 0].argsort()]
+    face_vertex_connectivity = face_vertex_connectivity[face_vertex_connectivity[:, 1].argsort(kind='mergesort')]
+
+    delete_indices = np.empty(shape=[0], dtype=int)
+    for iface, vertex_connectivity in enumerate(face_vertex_connectivity):
+        if np.array_equal(face_vertex_connectivity[iface - 1], vertex_connectivity):
+            delete_indices = np.append(delete_indices, iface)
+    face_vertex_connectivity = np.delete(face_vertex_connectivity, delete_indices, axis=0)
+
+    return face_vertex_connectivity
 
 
 def connect_faces_to_cells(_vertex_cell_connectivity, _vertex_table, _face_table):
@@ -141,7 +153,7 @@ def determine_face_boundary_status(_face_cell_connectivity):
     :param _face_cell_connectivity: Face-cell connectivity table, of the form [i_cell][list of vertices].
     :type _face_cell_connectivity: np.array
     """
-    
+
     return np.array((_face_cell_connectivity[:, 1] == -1))
 
 

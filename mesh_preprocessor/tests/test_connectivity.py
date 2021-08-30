@@ -87,6 +87,23 @@ class FaceConnectivityTest(ut.TestCase):
     def test_compute_number_of_faces(self):
         return True
 
+    def test_connect_faces_to_vertex(self):
+        cell_vertex_connectivity = np.array([[0, 1, 2], [2, 1, 3], [3, 1, 4], [3, 4, 5]])
+        face_vertex_connectivity = ct.connect_faces_to_vertex(cell_vertex_connectivity)
+
+        self.assertEqual(9, len(face_vertex_connectivity))
+
+        # check values (must be ascending for each vertex)
+        self.assertTrue(np.array_equal([0, 1], face_vertex_connectivity[0]))
+        self.assertTrue(np.array_equal([0, 2], face_vertex_connectivity[1]))
+        self.assertTrue(np.array_equal([1, 2], face_vertex_connectivity[2]))
+        self.assertTrue(np.array_equal([1, 3], face_vertex_connectivity[3]))
+        self.assertTrue(np.array_equal([2, 3], face_vertex_connectivity[4]))
+        self.assertTrue(np.array_equal([1, 4], face_vertex_connectivity[5]))
+        self.assertTrue(np.array_equal([3, 4], face_vertex_connectivity[6]))
+        self.assertTrue(np.array_equal([3, 5], face_vertex_connectivity[7]))
+        self.assertTrue(np.array_equal([4, 5], face_vertex_connectivity[8]))
+
     def test_determine_face_boundary_status(self):
 
         face_cell_connectivity = np.array([[0, -1], [0, 1], [1, 2], [2, 3], [3, 4], [4, -1]])
@@ -95,7 +112,7 @@ class FaceConnectivityTest(ut.TestCase):
         # check lenghths
         self.assertEqual(6, len(face_boundary_status))
 
-        # check values (must be ascending for each vertex)
+        # check values
         self.assertTrue(np.array_equal([True, False, False, False, False, True], face_boundary_status))
 
 
