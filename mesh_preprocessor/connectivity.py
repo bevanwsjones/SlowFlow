@@ -22,22 +22,28 @@ import numpy as np
 # Vertex connectivity
 # ----------------------------------------------------------------------------------------------------------------------
 
-def connect_vertices_to_cells(_cell_vertex_connectivity, _vertex_table):
+def connect_vertices_to_cells(_cell_vertex_connectivity, _number_of_vertices):
     """
-    Using the cell-vertex connectivity the vertex-cell connectivity is created.
+    Using the cell-vertex connectivity the vertex-cell connectivity is created. Once all connected cells have been found
+    each row is sorted ascending.
 
-    :param _cell_vertex_connectivity: Cell vertex connectivity, data should be [i_cell][i_connected_vertex]
+    :param _cell_vertex_connectivity: Cell-vertex connectivity table, of the form [i_cell][list of vertices].
     :type _cell_vertex_connectivity: np.array
-    :param _vertex_table: The vertex table for which the vertex cell connectivity is to be built.
-    :type _vertex_table: vertex.VertexTable
+    :param _number_of_vertices: Number of vertices in the mesh.
+    :type _number_of_vertices: int
+    :return: The vertex-vertex connectivity table of the form [i_vertex][ascending list of vertex indices]
+    :type: list
     """
 
+    vertex_cell_connectivity = [np.empty(shape=(0,), dtype=int) for _ in range(_number_of_vertices)]
     for i_cell, cv_connectivity in enumerate(_cell_vertex_connectivity):
         for i_cv, i_vertex in enumerate(cv_connectivity):
-            _vertex_table.connected_cell[i_vertex] = np.append(_vertex_table.connected_cell[i_vertex], i_cell)
+            vertex_cell_connectivity[i_vertex] = np.append(vertex_cell_connectivity[i_vertex], i_cell)
 
-    for vc in _vertex_table.connected_cell:
-        vc = np.sort(vc)
+    for cell_connectivity in vertex_cell_connectivity:
+        np.sort(cell_connectivity)
+
+    return vertex_cell_connectivity
 
 
 def connect_vertices_to_vertices(_cell_vertex_connectivity, _number_of_vertices):

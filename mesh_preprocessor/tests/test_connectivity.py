@@ -25,18 +25,29 @@ class VertexConnectivityTest(ut.TestCase):
 
     def test_connect_vertices_to_cells(self):
 
-        cell_vertex_connectivity = np.array(((0, 1), (1, 2)), dtype=int)
-        vertex_table = vt.VertexTable(3)
-        ct.connect_vertices_to_cells(cell_vertex_connectivity, vertex_table)
+        cell_vertex_connectivity = np.array([[0, 1, 2, 3], [2, 1, 4, 5], [5, 4, 6, 7]])
+        vertex_cell_connectivity = ct.connect_vertices_to_cells(cell_vertex_connectivity, 8)
 
-        self.assertEqual(len(vertex_table.connected_cell[0]), 1)
-        self.assertEqual(len(vertex_table.connected_cell[1]), 2)
-        self.assertEqual(len(vertex_table.connected_cell[2]), 1)
+        # check lenghths
+        self.assertEqual(8, len(vertex_cell_connectivity))
+        self.assertEqual(1, len(vertex_cell_connectivity[0]))
+        self.assertEqual(2, len(vertex_cell_connectivity[1]))
+        self.assertEqual(2, len(vertex_cell_connectivity[2]))
+        self.assertEqual(1, len(vertex_cell_connectivity[3]))
+        self.assertEqual(2, len(vertex_cell_connectivity[4]))
+        self.assertEqual(2, len(vertex_cell_connectivity[5]))
+        self.assertEqual(1, len(vertex_cell_connectivity[6]))
+        self.assertEqual(1, len(vertex_cell_connectivity[7]))
 
-        self.assertEqual(vertex_table.connected_cell[0][0], 0)
-        self.assertEqual(vertex_table.connected_cell[1][0], 0)
-        self.assertEqual(vertex_table.connected_cell[1][1], 1)
-        self.assertEqual(vertex_table.connected_cell[2][0], 1)
+        # check values (must be ascending for each vertex)
+        self.assertTrue(np.array_equal([0], vertex_cell_connectivity[0]))
+        self.assertTrue(np.array_equal([0, 1], vertex_cell_connectivity[1]))
+        self.assertTrue(np.array_equal([0, 1], vertex_cell_connectivity[2]))
+        self.assertTrue(np.array_equal([0], vertex_cell_connectivity[3]))
+        self.assertTrue(np.array_equal([1, 2], vertex_cell_connectivity[4]))
+        self.assertTrue(np.array_equal([1, 2], vertex_cell_connectivity[5]))
+        self.assertTrue(np.array_equal([2], vertex_cell_connectivity[6]))
+        self.assertTrue(np.array_equal([2], vertex_cell_connectivity[7]))
 
     def test_connect_vertices_to_vertices(self):
         cell_vertex_connectivity = np.array([[0, 1, 2, 3], [2, 1, 4, 5], [5, 4, 6, 7]])
@@ -54,7 +65,6 @@ class VertexConnectivityTest(ut.TestCase):
         self.assertEqual(2, len(vertex_vertex_connectivity[7]))
 
         # check values (must be ascending for each vertex)
-        print(vertex_vertex_connectivity[0])
         self.assertTrue(np.array_equal([1, 3], vertex_vertex_connectivity[0]))
         self.assertTrue(np.array_equal([0, 2, 4], vertex_vertex_connectivity[1]))
         self.assertTrue(np.array_equal([1, 3, 5], vertex_vertex_connectivity[2]))
