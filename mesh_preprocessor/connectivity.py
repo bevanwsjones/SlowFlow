@@ -131,26 +131,25 @@ def connect_faces_to_cells(_vertex_cell_connectivity, _vertex_table, _face_table
                 _face_table.connected_cell[i_fv][0 if _face_table.connected_cell[i_fv][0] != -1 else 1] = cell
 
     for fc in _face_table.connected_cell:
-        fc = np.sort(fc)
+        np.sort(fc)
 
 
-def determine_face_boundary_status(_face_table):
+def determine_face_boundary_status(_face_cell_connectivity):
     """
-    todo
+    Determines the boundary status for each face, boundary faces are considered to be faces not connected to two cells.
 
-    :param _face_table: The vertex table for which the vertex cell connectivity is to be built.
-    :type _face_table: face.FaceTable
+    :param _face_cell_connectivity: Face-cell connectivity table, of the form [i_cell][list of vertices].
+    :type _face_cell_connectivity: np.array
     """
-
-    for i_face in range(_face_table.connected_cell):
-        _face_table.boundary[i_face] = _face_table.connected_cell[i_face][1] == -1
+    
+    return np.array((_face_cell_connectivity[:, 1] == -1))
 
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Cell connectivity
 # ----------------------------------------------------------------------------------------------------------------------
 
-def connect_cells_to_faces(_face_cell_connectivity, _cell_table):
+def connect_cells_to_faces(_face_cell_connectivity):
     """
     todo
 

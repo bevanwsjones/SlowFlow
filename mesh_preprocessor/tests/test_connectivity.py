@@ -18,8 +18,11 @@
 import connectivity as ct
 import numpy as np
 import unittest as ut
-from mesh import cell as cl, face as ft, vertex as vt
 
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Vertex Connectivity
+# ----------------------------------------------------------------------------------------------------------------------
 
 class VertexConnectivityTest(ut.TestCase):
 
@@ -75,8 +78,27 @@ class VertexConnectivityTest(ut.TestCase):
         self.assertTrue(np.array_equal([5, 6], vertex_vertex_connectivity[7]))
 
 
+# ----------------------------------------------------------------------------------------------------------------------
+# Face Connectivity
+# ----------------------------------------------------------------------------------------------------------------------
+
+class FaceConnectivityTest(ut.TestCase):
+
+    def test_compute_number_of_faces(self):
+        return True
+
+    def test_determine_face_boundary_status(self):
+
+        face_cell_connectivity = np.array([[0, -1], [0, 1], [1, 2], [2, 3], [3, 4], [4, -1]])
+        face_boundary_status = ct.determine_face_boundary_status(face_cell_connectivity)
+
+        # check lenghths
+        self.assertEqual(6, len(face_boundary_status))
+
+        # check values (must be ascending for each vertex)
+        self.assertTrue(np.array_equal([True, False, False, False, False, True], face_boundary_status))
 
 
-
-
-
+# ----------------------------------------------------------------------------------------------------------------------
+# Cell connectivity
+# ----------------------------------------------------------------------------------------------------------------------
