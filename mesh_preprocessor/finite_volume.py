@@ -84,6 +84,7 @@ def calculate_quadrilateral_centroid(_cell_vertex_connectivity, _vertex_coordina
           -------------------------
           | x_0 - x_2   y_0 - y_2 |
           | x_1 - x_3   y_1 - y_3 |
+
     For further reading see https://mathworld.wolfram.com/Line-LineIntersection.html
 
     :param _cell_vertex_connectivity: Cell-vertex connectivity table, of the form [i_cell][list of vertices].

@@ -16,7 +16,6 @@
 # ----------------------------------------------------------------------------------------------------------------------
 
 import numpy as np
-from mesh import cell as ct, face as ft, vertex as vt
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -41,29 +40,37 @@ def connect_vertices_to_cells(_cell_vertex_connectivity, _vertex_table):
         vc = np.sort(vc)
 
 
-def connect_vertices_to_vertices(_cell_vertex_connectivity, _vertex_table):
+def connect_vertices_to_vertices(_cell_vertex_connectivity, _number_of_vertices):
     """
-    todo
+    Using the cell vertex connectivity the direct neighbours of each vertex are determined. Once all connected vertices
+    have been found each row is sorted ascending.
 
-    :param _cell_vertex_connectivity: Cell vertex connectivity, data should be [i_cell][i_connected_vertex]
+    :param _cell_vertex_connectivity: Cell-vertex connectivity table, of the form [i_cell][list of vertices].
     :type _cell_vertex_connectivity: np.array
-    :param _vertex_table: The vertex table for which the vertex cell connectivity is to be built.
-    :type _vertex_table: vertex.VertexTable
+    :param _number_of_vertices: Number of vertices in the mesh.
+    :type _number_of_vertices: int
+    :return: The vertex-vertex connectivity table of the form [i_vertex][ascending list of vertex indices]
+    :type: list
     """
 
+    vertex_vertex_connectivity = [np.empty(shape=(0,), dtype=int) for _ in range(_number_of_vertices)]
     for i_cell, cv_connectivity in enumerate(_cell_vertex_connectivity):
         for i_cv, i_vertex in enumerate(cv_connectivity):
 
-            if len(np.where(_vertex_table.connected_vertex[i_vertex], cv_connectivity[i_cv - 1])) == 0:
-                _vertex_table.connected_cell[i_vertex] = \
-                    np.append(_vertex_table.connected_cell[i_vertex], cv_connectivity[i_cv - 1])
+            i_backward = i_cv - 1  # -1 wraps around
+            if cv_connectivity[i_backward] not in vertex_vertex_connectivity[i_vertex]:
+                vertex_vertex_connectivity[i_vertex] = \
+                    np.append(vertex_vertex_connectivity[i_vertex], cv_connectivity[i_backward])
 
-            if len(np.where(_vertex_table.connected_vertex[i_vertex], cv_connectivity[i_cv + 1])) == 0:
-                _vertex_table.connected_cell[i_vertex] = \
-                    np.append(_vertex_table.connected_cell[i_vertex], cv_connectivity[i_cv + 1])
+            i_forward = i_cv + 1 if i_cv + 1 < len(cv_connectivity) else 0
+            if cv_connectivity[i_forward] not in vertex_vertex_connectivity[i_vertex]:
+                vertex_vertex_connectivity[i_vertex] = \
+                   np.append(vertex_vertex_connectivity[i_vertex], cv_connectivity[i_forward])
 
-    for vv in _vertex_table.connected_vertex:
-        vv = np.sort(vv)
+    for vertex_connectivity in vertex_vertex_connectivity:
+        vertex_connectivity.sort()
+
+    return vertex_vertex_connectivity
 
 
 # ----------------------------------------------------------------------------------------------------------------------

@@ -21,7 +21,7 @@ import unittest as ut
 from mesh import cell as cl, face as ft, vertex as vt
 
 
-class CartesianMeshTest(ut.TestCase):
+class VertexConnectivityTest(ut.TestCase):
 
     def test_connect_vertices_to_cells(self):
 
@@ -37,3 +37,36 @@ class CartesianMeshTest(ut.TestCase):
         self.assertEqual(vertex_table.connected_cell[1][0], 0)
         self.assertEqual(vertex_table.connected_cell[1][1], 1)
         self.assertEqual(vertex_table.connected_cell[2][0], 1)
+
+    def test_connect_vertices_to_vertices(self):
+        cell_vertex_connectivity = np.array([[0, 1, 2, 3], [2, 1, 4, 5], [5, 4, 6, 7]])
+        vertex_vertex_connectivity = ct.connect_vertices_to_vertices(cell_vertex_connectivity, 8)
+
+        # check lenghths
+        self.assertEqual(8, len(vertex_vertex_connectivity))
+        self.assertEqual(2, len(vertex_vertex_connectivity[0]))
+        self.assertEqual(3, len(vertex_vertex_connectivity[1]))
+        self.assertEqual(3, len(vertex_vertex_connectivity[2]))
+        self.assertEqual(2, len(vertex_vertex_connectivity[3]))
+        self.assertEqual(3, len(vertex_vertex_connectivity[4]))
+        self.assertEqual(3, len(vertex_vertex_connectivity[5]))
+        self.assertEqual(2, len(vertex_vertex_connectivity[6]))
+        self.assertEqual(2, len(vertex_vertex_connectivity[7]))
+
+        # check values (must be ascending for each vertex)
+        print(vertex_vertex_connectivity[0])
+        self.assertTrue(np.array_equal([1, 3], vertex_vertex_connectivity[0]))
+        self.assertTrue(np.array_equal([0, 2, 4], vertex_vertex_connectivity[1]))
+        self.assertTrue(np.array_equal([1, 3, 5], vertex_vertex_connectivity[2]))
+        self.assertTrue(np.array_equal([0, 2], vertex_vertex_connectivity[3]))
+        self.assertTrue(np.array_equal([1, 5, 6], vertex_vertex_connectivity[4]))
+        self.assertTrue(np.array_equal([2, 4, 7], vertex_vertex_connectivity[5]))
+        self.assertTrue(np.array_equal([4, 7], vertex_vertex_connectivity[6]))
+        self.assertTrue(np.array_equal([5, 6], vertex_vertex_connectivity[7]))
+
+
+
+
+
+
+
