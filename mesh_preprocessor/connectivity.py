@@ -131,28 +131,39 @@ def connect_faces_to_vertex(_cell_vertex_connectivity):
     return face_vertex_connectivity
 
 
-def connect_faces_to_cells(_vertex_cell_connectivity, _vertex_table, _face_table):
+def connect_faces_to_cells(_vertex_cell_connectivity, _face_vertex_connectivity):
     """
-    todo
+    Using the face-vertex connectivity the common cells for the vertices attached to each face can be found. These are
+    the connected cells to each face. For boundary cell only 1 cell is present, as such the second index in the face-
+    cell connectivity table is -1 for boundary faces.
 
-    :param _vertex_cell_connectivity: Vertex cell connectivity, data should be [i_vertex][i_connected_cell]
+    :param _vertex_cell_connectivity: Vertex-cell connectivity table, of the form [i_vertex][list of cells].
     :type _vertex_cell_connectivity: np.array
-    :param _vertex_table: Vertex cell connectivity, data should be [i_vertex][i_connected_cell]
-    :type _vertex_table: np.array
-    :param _face_table: The vertex table for which the vertex cell connectivity is to be built.
-    :type _face_table: face.FaceTable
+    :param _face_vertex_connectivity: Face-vertex connectivity table, of the form [i_face][list of vertices].
+    :type _face_vertex_connectivity: np.array
+    :return Face-cell connectivity table, of the form [i_face][ascending list of cells].
+    :type np.array
     """
 
-    for i_fv, fv_connectivity in _face_table.connected_vertex:
-        vertex_0_cells = _vertex_table.connected_cell[fv_connectivity[0]]
-        vertex_1_cells = _vertex_table.connected_cell[fv_connectivity[1]]
+    face_cell_connectivity = -1*np.ones(shape=(len(_face_vertex_connectivity), 2), dtype=int)
+    for i_fv, face_connectivity in enumerate(_face_vertex_connectivity):
+        i_cell = np.intersect1d(_vertex_cell_connectivity[face_connectivity[0]],
+                                _vertex_cell_connectivity[face_connectivity[1]])
 
-        for cell in vertex_0_cells:
-            if len(np.where(vertex_1_cells, cell)) != 0:
-                _face_table.connected_cell[i_fv][0 if _face_table.connected_cell[i_fv][0] != -1 else 1] = cell
+        if len(i_cell) == 1:
+            face_cell_connectivity[i_fv][0] = i_cell[0]
+        elif len(i_cell) == 2:
+            face_cell_connectivity[i_fv] = i_cell
+        else:
+            raise RuntimeError("Vertex " + str(face_connectivity[0]) + " and " + str(face_connectivity[1])
+                               + " do not share a face.")
 
-    for fc in _face_table.connected_cell:
-        np.sort(fc)
+    for face_connectivity in face_cell_connectivity:
+        if face_connectivity[1] != -1:
+            face_connectivity.sort()
+
+    print(face_cell_connectivity)
+    return face_cell_connectivity
 
 
 def determine_face_boundary_status(_face_cell_connectivity):
