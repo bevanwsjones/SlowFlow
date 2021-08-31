@@ -90,14 +90,18 @@ def compute_number_of_faces():
 
 def connect_faces_to_vertex(_cell_vertex_connectivity):
     """
-    Using the cell-vertex connectivity the face-vertex connectivity is created.
+    Using the cell-vertex connectivity the face-vertex connectivity is created. The table is returned such that faces
+    are sorted so that boundary faces are first.
 
-    TODO: sort for boundary faces first.
+    Note: It is important to used this function before other faces connectivities are built, since it generates the
+          order correctly in regard to having boundary faces first.
 
     :param _cell_vertex_connectivity: Cell-vertex connectivity table, of the form [i_cell][list of vertices].
     :type _cell_vertex_connectivity: np.array
     :return Face-vertex connectivity table, of the form [i_face][ascending list of vertices].
     :type np.array
+
+    todo: There are multiple sorts and memory allocations, may need some optimising in the future.
     """
 
     face_vertex_connectivity = np.empty(shape=[0, 2], dtype=int)
@@ -109,15 +113,20 @@ def connect_faces_to_vertex(_cell_vertex_connectivity):
             face_vertex_connectivity[-1].sort()
 
     # Each row is already sorted, so we now go to sort the entire list by column 0, the column 1,
+    # Then delete all duplicates (both of them), but record them, they are the internal faces. The remaining list are
+    # boundaries then we re-append the interior faces back onto the face_vertex_connectivity.
     # I not claiming this efficient.
     face_vertex_connectivity = face_vertex_connectivity[face_vertex_connectivity[:, 0].argsort()]
     face_vertex_connectivity = face_vertex_connectivity[face_vertex_connectivity[:, 1].argsort(kind='mergesort')]
-
     delete_indices = np.empty(shape=[0], dtype=int)
+    interior_faces = np.empty(shape=[0, 2], dtype=int)
     for iface, vertex_connectivity in enumerate(face_vertex_connectivity):
         if np.array_equal(face_vertex_connectivity[iface - 1], vertex_connectivity):
             delete_indices = np.append(delete_indices, iface)
+            delete_indices = np.append(delete_indices, iface - 1)
+            interior_faces = np.append(interior_faces, [vertex_connectivity], axis=0)
     face_vertex_connectivity = np.delete(face_vertex_connectivity, delete_indices, axis=0)
+    face_vertex_connectivity = np.append(face_vertex_connectivity, interior_faces, axis=0)
 
     return face_vertex_connectivity
 
