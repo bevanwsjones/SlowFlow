@@ -31,6 +31,7 @@ class FaceTable:
         :type _number_of_faces: int
         """
         self.max_face = _number_of_faces
+        self.max_boundary_face = _number_of_faces
 
         self.boundary = np.zeros([_number_of_faces, ], dtype=bool)
         self.connected_cell = -1*np.ones([_number_of_faces, 2], dtype=int)

@@ -20,6 +20,8 @@ from mesh import cell as cl
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+# Cell Geometry
+# ----------------------------------------------------------------------------------------------------------------------
 # Cell Central Co-Ordinate
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -316,19 +318,3 @@ def calculate_face_normal(_cell_type, _face_vertex_connectivity, _vertex_coordin
                          for vector in np.cross(_vertex_coordinates[_face_vertex_connectivity[:, 1]]
                                                 - _vertex_coordinates[_face_vertex_connectivity[:, 0]],
                                                 np.array((0, 0, 1), dtype=float))[:, 0:2]])
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-# finite volume setup
-# ----------------------------------------------------------------------------------------------------------------------
-
-def setup_finite_volume_geometry(_mesh):
-    return
-    # calculate_cell_center(_mesh.cell_table, _mesh.vertex_table)
-    #
-    # calculate_face_cell_cell_length(_mesh.face_table, _mesh.cell_table.coordinate)
-    # calculate_face_cell_cell_tangent(_mesh.face_table, _mesh.cell_table.coordinate)
-    # calculate_face_area(_mesh.face_table, _mesh.vertex_table.vertex_coordinate)
-    # calculate_face_normal(_mesh.face_table, _mesh.vertex_table.vertex_coordinate)
-    #
-    # calculate_cell_volume(_mesh.cell_table, _mesh.vertex_table)

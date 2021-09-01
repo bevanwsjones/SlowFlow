@@ -84,9 +84,9 @@ class TestFaceOperators(unittest.TestCase):
         for max_cell in max_cell_list:
             cell_table, face_table, vertex_table = mg.setup_1d_mesh(max_cell)
             gradient_coef = fcop.construct_gauss_green_coefficient_matrix(cell_table, face_table, vertex_table)
-            fx = np.array([f(x) for x in cell_table.coordinate[:]])
+            fx = np.array([f(x) for x in cell_table.centroid[:]])
             error = np.abs(gradient_coef.dot(fx).reshape((max_cell, 2))[:, 0]
-                           - np.array([dfdx(x) for x in cell_table.coordinate[0:cell_table.max_cell, ]]))
+                           - np.array([dfdx(x) for x in cell_table.centroid[0:cell_table.max_cell, ]]))
             errorL2.append(L2Norm(error, cell_table.volume[0:cell_table.max_cell]))
 
         # note log(dx_0/dx_1) = log((1.0/mc_0)/(1.0/mc_1)) = log(mc_1/mc_0)
@@ -107,12 +107,12 @@ class TestFaceOperators(unittest.TestCase):
         gradient_coef = fcop.construct_gauss_green_coefficient_matrix(cell_table, face_table, vertex_table)
         # print(gradient_coef)
 
-        fx = np.array([f(x) for x in cell_table.coordinate[:]])
-        dfdx_x = [np.array([dfdx(x), dfdy(x)]) for x in cell_table.coordinate[0:cell_table.max_cell]]
+        fx = np.array([f(x) for x in cell_table.centroid[:]])
+        dfdx_x = [np.array([dfdx(x), dfdy(x)]) for x in cell_table.centroid[0:cell_table.max_cell]]
         gradient = gradient_coef.dot(fx).reshape((cell_table.max_cell, 2))[:]
 
         print(cell_table.volume)
-        print(cell_table.coordinate)
+        print(cell_table.centroid)
         print(face_table.coefficient)
         print(fx)
         #print(np.shape(gradient_coef))

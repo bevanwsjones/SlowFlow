@@ -208,8 +208,6 @@ def setup_2d_cartesian_mesh(_number_of_cells, _start_co_ordinates=None, _domain_
         x_index = i_vertex % (_number_of_cells[0] + 1)
         y_index = int(i_vertex / _number_of_cells[1])
 
-
-
         current_length_x = geometric_series_sum(delta_x, x_index, _ratio[0]) \
             if _ratio[0] != 1.0 else float(x_index) * delta_x
 

@@ -74,4 +74,4 @@ class CellTable:
         self.boundary = np.zeros(shape=[_number_of_cells, ], dtype=bool)
 
         self.volume = np.zeros(shape=[_number_of_cells, ], dtype=float)
-        self.coordinate = np.zeros([_number_of_cells, 2], dtype=float)
+        self.centroid = np.zeros([_number_of_cells, 2], dtype=float)

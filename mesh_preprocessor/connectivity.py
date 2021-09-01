@@ -86,6 +86,7 @@ def connect_vertices_to_vertices(_cell_vertex_connectivity, _number_of_vertices)
 
 
 def compute_number_of_faces():
+    # todo  max_boundary_face must be calculated here.
     return -1
 
 
@@ -212,12 +213,12 @@ def connect_cells_to_faces(_face_cell_connectivity, _number_of_cells, _cell_type
                     break
 
     return cell_face_connectivity
-# ----------------------------------------------------------------------------------------------------------------------
-# Mesh Connectivity-Preprocessing Simplex Mesh
-# ----------------------------------------------------------------------------------------------------------------------
 
-def connect_1D_mesh(mesh):
-
-    return
-
-# todo sort out shape of arrays.
+def determine_cell_boundary_status(_face_cell_connectivity, _face_boundry_status):
+    """
+    todo
+    :param _face_cell_connectivity:
+    :param _face_boundry_status:
+    :return:
+    """
+    return -1
