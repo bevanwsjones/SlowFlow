@@ -18,6 +18,7 @@
 import connectivity as ct
 import numpy as np
 import unittest as ut
+from mesh import cell as cl
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -159,3 +160,23 @@ class FaceConnectivityTest(ut.TestCase):
 # ----------------------------------------------------------------------------------------------------------------------
 # Cell connectivity
 # ----------------------------------------------------------------------------------------------------------------------
+
+class CellConnectivityTest(ut.TestCase):
+
+    def test_connect_cells_to_faces(self):
+        face_cell_connectivity = np.array([[0, -1], [0, -1], [1, -1], [2, -1], [3, -1], [3, -1], [0, 1], [1, 2],
+                                           [2, 3]])
+        cell_face_connectivity = ct.connect_cells_to_faces(face_cell_connectivity, 4, cl.CellType.triangle)
+
+        # Check lengths
+        self.assertEqual(4, len(cell_face_connectivity))
+        self.assertEqual(3, len(cell_face_connectivity[0]))
+        self.assertEqual(3, len(cell_face_connectivity[1]))
+        self.assertEqual(3, len(cell_face_connectivity[2]))
+        self.assertEqual(3, len(cell_face_connectivity[3]))
+
+        # check values (must be ascending for each vertex) - boundary faces must be first.
+        self.assertTrue(np.array_equal([0, 1, 6], cell_face_connectivity[0]))
+        self.assertTrue(np.array_equal([2, 6, 7], cell_face_connectivity[1]))
+        self.assertTrue(np.array_equal([3, 7, 8], cell_face_connectivity[2]))
+        self.assertTrue(np.array_equal([4, 5, 8], cell_face_connectivity[3]))

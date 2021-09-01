@@ -16,6 +16,7 @@
 # ----------------------------------------------------------------------------------------------------------------------
 
 import numpy as np
+from mesh import cell as cl
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -28,7 +29,7 @@ def connect_vertices_to_cells(_cell_vertex_connectivity, _number_of_vertices):
     each row is sorted ascending.
 
     :param _cell_vertex_connectivity: Cell-vertex connectivity table, of the form [i_cell][list of vertices].
-    :type _cell_vertex_connectivity: np.array
+    :type _cell_vertex_connectivity: numpy.array
     :param _number_of_vertices: Number of vertices in the mesh.
     :type _number_of_vertices: int
     :return: The vertex-vertex connectivity table of the form [i_vertex][ascending list of vertex indices]
@@ -52,7 +53,7 @@ def connect_vertices_to_vertices(_cell_vertex_connectivity, _number_of_vertices)
     have been found each row is sorted ascending.
 
     :param _cell_vertex_connectivity: Cell-vertex connectivity table, of the form [i_cell][list of vertices].
-    :type _cell_vertex_connectivity: np.array
+    :type _cell_vertex_connectivity: numpy.array
     :param _number_of_vertices: Number of vertices in the mesh.
     :type _number_of_vertices: int
     :return: The vertex-vertex connectivity table of the form [i_vertex][ascending list of vertices]
@@ -97,9 +98,9 @@ def connect_faces_to_vertex(_cell_vertex_connectivity):
           order correctly in regard to having boundary faces first.
 
     :param _cell_vertex_connectivity: Cell-vertex connectivity table, of the form [i_cell][list of vertices].
-    :type _cell_vertex_connectivity: np.array
+    :type _cell_vertex_connectivity: numpy.array
     :return Face-vertex connectivity table, of the form [i_face][ascending list of vertices].
-    :type np.array
+    :type numpy.array
 
     todo: There are multiple sorts and memory allocations, may need some optimising in the future.
     """
@@ -138,11 +139,11 @@ def connect_faces_to_cells(_vertex_cell_connectivity, _face_vertex_connectivity)
     cell connectivity table is -1 for boundary faces.
 
     :param _vertex_cell_connectivity: Vertex-cell connectivity table, of the form [i_vertex][list of cells].
-    :type _vertex_cell_connectivity: np.array
+    :type _vertex_cell_connectivity: numpy.array
     :param _face_vertex_connectivity: Face-vertex connectivity table, of the form [i_face][list of vertices].
-    :type _face_vertex_connectivity: np.array
+    :type _face_vertex_connectivity: numpy.array
     :return Face-cell connectivity table, of the form [i_face][ascending list of cells].
-    :type np.array
+    :type numpy.array
     """
 
     face_cell_connectivity = -1*np.ones(shape=(len(_face_vertex_connectivity), 2), dtype=int)
@@ -171,7 +172,9 @@ def determine_face_boundary_status(_face_cell_connectivity):
     Determines the boundary status for each face, boundary faces are considered to be faces not connected to two cells.
 
     :param _face_cell_connectivity: Face-cell connectivity table, of the form [i_cell][list of vertices].
-    :type _face_cell_connectivity: np.array
+    :type _face_cell_connectivity: numpy.array
+    :return List of booleans, true if the face is boundary else false.
+    :type numpy.array
     """
 
     return np.array((_face_cell_connectivity[:, 1] == -1))
@@ -181,32 +184,40 @@ def determine_face_boundary_status(_face_cell_connectivity):
 # Cell connectivity
 # ----------------------------------------------------------------------------------------------------------------------
 
-def connect_cells_to_faces(_face_cell_connectivity):
+def connect_cells_to_faces(_face_cell_connectivity, _number_of_cells, _cell_type):
     """
-    todo
+    Using the face-cell connectivity the cell face connectivity is constructed.
 
-    :param _vertex_cell_connectivity: Vertex cell connectivity, data should be [i_vertex][i_connected_cell]
-    :type _vertex_cell_connectivity: np.array
-    :param _vertex_table: Vertex cell connectivity, data should be [i_vertex][i_connected_cell]
-    :type _vertex_table: np.array
-    :param _face_table: The vertex table for which the vertex cell connectivity is to be built.
-    :type _face_table: face.FaceTable
+    :param _face_cell_connectivity: Face-cell connectivity table, of the form [i_face][ascending list of cells].
+    :type _face_cell_connectivity: numpy.array
+    :param _number_of_cells: number of cells in the mesh.
+    :type _number_of_cells: integer
+    :param _cell_type: The type of cell in the mesh, edge, triangle, etc
+    :type _cell_type: mesh.cell.CellType
+    :return: Face-cell connectivity table, of the form [i_cell][list of faces].
+    :type: numpy.array
+
+    todo: I am sure again there is a better way to do this.
     """
+    cell_face_connectivity = -1*np.ones(shape=[_number_of_cells, cl.number_of_vertex_face(_cell_type)], dtype=int)
+    for i_face, connected_cells in enumerate(_face_cell_connectivity):
+        for icv, i_cell_face in enumerate(cell_face_connectivity[connected_cells[0]]):
+            if i_cell_face == -1:
+                cell_face_connectivity[connected_cells[0]][icv] = i_face
+                break
+        if connected_cells[1] != -1:
+            for icv, i_cell_face in enumerate(cell_face_connectivity[connected_cells[1]]):
+                if i_cell_face == -1:
+                    cell_face_connectivity[connected_cells[1]][icv] = i_face
+                    break
 
-
+    return cell_face_connectivity
 # ----------------------------------------------------------------------------------------------------------------------
 # Mesh Connectivity-Preprocessing Simplex Mesh
 # ----------------------------------------------------------------------------------------------------------------------
 
 def connect_1D_mesh(mesh):
+
     return
 
-    # sort boundaries to found of face table.
-
-    # todo sort for boundaries
-
-# TODO sorting:
-# 1.
-#
-#
-#
+# todo sort out shape of arrays.
