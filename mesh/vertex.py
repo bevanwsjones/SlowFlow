@@ -23,16 +23,13 @@ class VertexTable:
     The vertex table, containing basic mesh vertex geometry data.
     """
 
-    def __init__(self, _number_of_vertices):
+    def __init__(self):
         """
-        Initialises, allocates the memory, for the vertices in the mesh given a number of faces.
-
-        :param _number_of_vertices: Number of vertices to allocate.
-        :type _number_of_vertices: int
+        Default constructor
         """
 
-        self.max_vertex = _number_of_vertices
+        self.max_vertex = 0
 
-        self.connected_cell = [np.empty(shape=(0,), dtype=int) for _ in range(_number_of_vertices)]  # not square
-        self.connected_vertex = [np.empty(shape=(0,), dtype=int) for _ in range(_number_of_vertices)]  # not square
-        self.coordinate = np.zeros([_number_of_vertices, 2], dtype=float)
+        self.connected_cell = [np.empty(shape=(0,), dtype=int) for _ in range(0)]  # not square
+        self.connected_vertex = [np.empty(shape=(0,), dtype=int) for _ in range(0)]  # not square
+        self.coordinate = np.zeros([0, 2], dtype=float)

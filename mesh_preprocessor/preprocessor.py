@@ -28,8 +28,6 @@ from mesh import cell as cl
 def connect_mesh(_cell_vertex_connectivity, _number_of_vertices, _cell_type):
     """
 
-    :param mesh:
-    :type mesh:
     :param _cell_vertex_connectivity:
     :param _cell_vertex_connectivity:
     :param _number_of_vertices:
@@ -45,7 +43,7 @@ def connect_mesh(_cell_vertex_connectivity, _number_of_vertices, _cell_type):
     face_boundary = ct.determine_face_boundary_status(face_cell_connectivity)
     cell_boundary = ct.determine_cell_boundary_status(face_cell_connectivity, face_boundary)
     return [vertex_cell_connectivity, vertex_vertex_connectivity, face_vertex_connectivity, face_cell_connectivity,
-            cell_face_connectivity, face_boundary, cell_boundary]
+            cell_face_connectivity, face_boundary, cell_boundary, _number_of_vertices]
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -98,12 +96,15 @@ def setup_cell_centred_finite_volume_mesh(_vertex_coordinates, _cell_vertex_conn
     :return:
     """
 
-    new_mesh = mesh.CellCenteredMesh(1, 1, 1)
-    # todo init the vertrex coor
+    new_mesh = mesh.CellCenteredMesh(_cell_type)
+    new_mesh.vertex_table.coordinate = _vertex_coordinates
+    new_mesh.vertex_table.max_vertex = len(_vertex_coordinates)
+    new_mesh.cell_table.max_cell = len(_cell_vertex_connectivity)
 
     [new_mesh.vertex_table.connected_cell, new_mesh.vertex_table.connected_vertex, new_mesh.face_table.connected_vertex,
      new_mesh.face_table.connected_cell, new_mesh.cell_table.connected_face, new_mesh.face_table.boundary,
-     new_mesh.cell_table.boundary] = connect_mesh(_cell_vertex_connectivity, len(_vertex_coordinates), _cell_type)
+     new_mesh.cell_table.boundary] = connect_mesh(_cell_vertex_connectivity, new_mesh.vertex_table.max_vertex,
+                                                  _cell_type)
 
     setup_finite_volume_geometry(new_mesh.cell_table, new_mesh.face_table, new_mesh.vertex_table)
 

@@ -25,20 +25,14 @@ class CellCenteredMesh:
     Structure to hold all mesh entities.
     """
 
-    def __init__(self, _number_of_cells, _number_of_faces, _number_of_vertices, _cell_type):
+    def __init__(self, _cell_type):
         """
-        Allocates initial memory for all mesh entities.
+        Constructor to set the cell type
 
-        :param _number_of_cells: Number of cells to allocate.
-        :type _number_of_cells: int
-        :param _number_of_faces: Number of faces to allocate.
-        :type _number_of_faces: int
-        :param _number_of_vertices: Number of vertices to allocate.
-        :type _number_of_vertices: int
         :param _cell_type: Cell type enumerator.
         :type _cell_type: cell.CellType
         """
-
-        self.cell_table = ct.CellTable(_number_of_cells, _cell_type)
-        self.face_table = ft.FaceTable(_number_of_faces)
-        self.vertex_table = vt.VertexTable(_number_of_vertices)
+        print(_cell_type)
+        self.cell_table = ct.CellTable(_cell_type)
+        self.face_table = ft.FaceTable()
+        self.vertex_table = vt.VertexTable()

@@ -39,13 +39,13 @@ def number_of_vertex_face(_cell_type):
     :return: number of vertices/faces for the cell type
     """
 
-    if _cell_type == CellType.edge:
+    if _cell_type.value == CellType.edge.value:
         return 2
-    elif _cell_type == CellType.triangle:
+    elif _cell_type.value == CellType.triangle.value:
         return 3
-    if _cell_type == CellType.quadrilateral:
+    if _cell_type.value == CellType.quadrilateral.value:
         return 4
-    elif _cell_type == CellType.hexagon:
+    elif _cell_type.value == CellType.hexagon.value:
         return 6
     else:
         raise ValueError("Enumerator not found")
@@ -56,22 +56,20 @@ class CellTable:
     The cell table, containing basic mesh cell geometry data.
     """
 
-    def __init__(self, _number_of_cells, _cell_type):
+    def __init__(self, _cell_type):
         """
-        Initialises, allocates the memory, for the cells in the mesh given a number of cells and the mesh type.
+        Sets the cell type for the cells for the mesh.
 
-        :param _number_of_cells: Number of cells to allocate.
-        :type _number_of_cells: int
         :param _cell_type: The type of mesh, triangle, quadrilaterals, etc.
         :type _cell_type: mt.MeshType
         """
 
         self.type = _cell_type
-        self.max_cell = _number_of_cells
+        self.max_cell = 0
 
-        self.connected_face = -1 * np.ones(shape=[_number_of_cells, number_of_vertex_face(_cell_type)], dtype=int)
-        self.connected_vertex = -1 * np.ones(shape=[_number_of_cells, number_of_vertex_face(_cell_type)], dtype=int)
-        self.boundary = np.zeros(shape=[_number_of_cells, ], dtype=bool)
+        self.connected_face = -1 * np.ones(shape=[0, number_of_vertex_face(_cell_type)], dtype=int)
+        self.connected_vertex = -1 * np.ones(shape=[0, number_of_vertex_face(_cell_type)], dtype=int)
+        self.boundary = np.zeros(shape=[0, ], dtype=bool)
 
-        self.volume = np.zeros(shape=[_number_of_cells, ], dtype=float)
-        self.centroid = np.zeros([_number_of_cells, 2], dtype=float)
+        self.volume = np.zeros(shape=[0, ], dtype=float)
+        self.centroid = np.zeros([0, 2], dtype=float)

@@ -23,21 +23,19 @@ class FaceTable:
     The face table, containing basic mesh cell face geometry data.
     """
 
-    def __init__(self, _number_of_faces):
+    def __init__(self):
         """
-        Initialises, allocates the memory, for the faces in the mesh given a number of faces.
-
-        :param _number_of_faces: Number of faces to allocate.
-        :type _number_of_faces: int
+        Default constructor
         """
-        self.max_face = _number_of_faces
-        self.max_boundary_face = _number_of_faces
 
-        self.boundary = np.zeros([_number_of_faces, ], dtype=bool)
-        self.connected_cell = -1*np.ones([_number_of_faces, 2], dtype=int)
-        self.connected_vertex = -1*np.ones([_number_of_faces, 2], dtype=int)
+        self.max_face = 0
+        self.max_boundary_face = 0
 
-        self.cc_length = np.zeros([_number_of_faces, ], dtype=float)
-        self.cc_unit_vector = np.zeros([_number_of_faces, 2], dtype=float)
-        self.area = np.zeros([_number_of_faces, ], dtype=float)
-        self.normal = np.zeros([_number_of_faces, 2], dtype=float)
+        self.boundary = np.zeros([0, ], dtype=bool)
+        self.connected_cell = -1*np.ones([0, 2], dtype=int)
+        self.connected_vertex = -1*np.ones([0, 2], dtype=int)
+
+        self.cc_length = np.zeros([0, ], dtype=float)
+        self.cc_unit_vector = np.zeros([0, 2], dtype=float)
+        self.area = np.zeros([0, ], dtype=float)
+        self.normal = np.zeros([0, 2], dtype=float)
