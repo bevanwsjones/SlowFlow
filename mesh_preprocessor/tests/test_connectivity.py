@@ -86,7 +86,14 @@ class VertexConnectivityTest(ut.TestCase):
 class FaceConnectivityTest(ut.TestCase):
 
     def test_compute_number_of_faces(self):
-        return True
+        cell_vertex_connectivity = np.array([[0, 1, 2], [2, 1, 3], [3, 1, 4], [3, 4, 5]])
+        vertex_cell_connectivity = [np.array([0]), np.array([0, 1, 2]), np.array([0, 1]), np.array([1, 2, 3]),
+                                    np.array([2, 3]), np.array([3])]
+        [number_of_faces, number_of_boundary_faces] = ct.compute_number_of_faces(vertex_cell_connectivity,
+                                                                                 cell_vertex_connectivity)
+
+        self.assertEqual(9, number_of_faces)
+        self.assertEqual(6, number_of_boundary_faces)
 
     def test_connect_faces_to_vertex(self):
         cell_vertex_connectivity = np.array([[0, 1, 2], [2, 1, 3], [3, 1, 4], [3, 4, 5]])

@@ -102,21 +102,19 @@ def calculate_quadrilateral_centroid(_cell_vertex_connectivity, _vertex_coordina
     triangle_centre_2 = calculate_triangle_centroid(_cell_vertex_connectivity[:, [2, 3, 0]], _vertex_coordinates)
     triangle_centre_3 = calculate_triangle_centroid(_cell_vertex_connectivity[:, [3, 0, 1]], _vertex_coordinates)
 
-    return np.stack((np.linalg.det(np.stack((
-        np.column_stack((np.linalg.det(np.stack((triangle_centre_0[:, ], triangle_centre_2[:, ]), axis=1)[:]),
-                         (triangle_centre_0[:, 0] - triangle_centre_2[:, 0])))[:],
-        np.column_stack((np.linalg.det(np.stack((triangle_centre_1[:, ], triangle_centre_3[:, ]), axis=1)[:]),
-                         (triangle_centre_1[:, 0] - triangle_centre_3[:, 0])))[:]), axis=1)),
-                     np.linalg.det(np.stack((np.column_stack((np.linalg.det(
-                         np.stack((triangle_centre_0[:, ], triangle_centre_2[:, ]), axis=1)[:]),
-                                                              (triangle_centre_0[:, 1] - triangle_centre_1[:, 1])))[:],
-                                             np.column_stack((np.linalg.det(
-                                                 np.stack((triangle_centre_1[:, ], triangle_centre_3[:, ]), axis=1)[:]),
-                                                              (triangle_centre_1[:, 1] - triangle_centre_3[:, 1])))[:]),
-                                            axis=1))), axis=1)[:] \
-           / np.linalg.det(
-        np.stack(((triangle_centre_0 - triangle_centre_2)[:], (triangle_centre_1 - triangle_centre_3)[:]), axis=1))[:]
-
+    numerator_det_02 = np.linalg.det(np.stack((triangle_centre_0[:, ], triangle_centre_2[:, ]), axis=1))
+    numerator_det_13 = np.linalg.det(np.stack((triangle_centre_1[:, ], triangle_centre_3[:, ]), axis=1))
+    numerator_x_02 = triangle_centre_0[:, 0] - triangle_centre_2[:, 0]
+    numerator_x_13 = triangle_centre_1[:, 0] - triangle_centre_3[:, 0]
+    numerator_y_02 = triangle_centre_0[:, 1] - triangle_centre_2[:, 1]
+    numerator_y_13 = triangle_centre_1[:, 1] - triangle_centre_3[:, 1]
+    numerator_x = np.linalg.det(np.stack([np.column_stack([numerator_det_02[:, ], numerator_x_02[:, ]]),
+                                          np.column_stack([numerator_det_13[:, ], numerator_x_13[:, ]])], axis=1))
+    numerator_y = np.linalg.det(np.stack([np.column_stack([numerator_det_02[:, ], numerator_y_02[:, ]]),
+                                          np.column_stack([numerator_det_13[:, ], numerator_y_13[:, ]])], axis=1))
+    denominator = np.linalg.det(np.stack(((triangle_centre_0[:] - triangle_centre_2[:]),
+                                          (triangle_centre_1[:] - triangle_centre_3[:])), axis=1))
+    return np.stack([numerator_x[:]/denominator[:], numerator_y[:]/denominator[:]], axis=1)
 
 def calculate_hexagon_centroid(_cell_vertex_connectivity, _vertex_coordinates):
     """

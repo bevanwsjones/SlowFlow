@@ -84,10 +84,29 @@ def connect_vertices_to_vertices(_cell_vertex_connectivity, _number_of_vertices)
 # Face connectivity
 # ----------------------------------------------------------------------------------------------------------------------
 
+def compute_number_of_faces(_vertex_cell_connectivity, _cell_vertex_connectivity):
+    """
+    Computes the number of faces and boundary faces in the mesh, creates a temporary face_vertex_connectivity table and
+    counts duplicates to determine the numbers.
 
-def compute_number_of_faces():
-    # todo  max_boundary_face must be calculated here.
-    return -1
+    :param _vertex_cell_connectivity: Vertex-cell connectivity table, of the form [i_vertex][list of cells].
+    :type _vertex_cell_connectivity: numpy.array
+    :param _cell_vertex_connectivity: Cell-vertex connectivity table, of the form [i_cell][list of vertices].
+    :type _cell_vertex_connectivity: numpy.array
+    :return: [number of faces, number of boundary faces]
+    :type: [int, int]
+    """
+
+    face_vertex_connectivity = np.empty(shape=[0, 2], dtype=int)
+    for cv_connectivity in _cell_vertex_connectivity:
+        for i_cv, i_vertex in enumerate(cv_connectivity):
+            face_vertex_connectivity = np.append(face_vertex_connectivity,
+                                                 [[i_vertex, cv_connectivity[i_cv - 1]]], axis=0)
+            face_vertex_connectivity[-1].sort()
+
+    number_of_boundary_faces = len(np.unique(face_vertex_connectivity))
+    number_of_faces = int((len(face_vertex_connectivity) - number_of_boundary_faces)/2 + number_of_boundary_faces)
+    return [number_of_faces, number_of_boundary_faces]
 
 
 def connect_faces_to_vertex(_cell_vertex_connectivity):
@@ -164,7 +183,6 @@ def connect_faces_to_cells(_vertex_cell_connectivity, _face_vertex_connectivity)
         if face_connectivity[1] != -1:
             face_connectivity.sort()
 
-    print(face_cell_connectivity)
     return face_cell_connectivity
 
 

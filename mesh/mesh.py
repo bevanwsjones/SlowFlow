@@ -32,7 +32,7 @@ class CellCenteredMesh:
         :param _cell_type: Cell type enumerator.
         :type _cell_type: cell.CellType
         """
-        print(_cell_type)
+
         self.cell_table = ct.CellTable(_cell_type)
         self.face_table = ft.FaceTable()
         self.vertex_table = vt.VertexTable()

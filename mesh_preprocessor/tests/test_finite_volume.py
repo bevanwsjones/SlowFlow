@@ -20,6 +20,7 @@ import unittest as ut
 import finite_volume as fv
 from mesh import cell as cl
 
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Cell Geometry
 # ----------------------------------------------------------------------------------------------------------------------
@@ -65,8 +66,8 @@ class CellCentroidTest(ut.TestCase):
         self.assertAlmostEqual(base_y + (2.0 / 3.0) * height, cell_centre[1][1])
 
     def test_calculate_quadrilateral_center_regular(self):
-        vertex_coordinates = np.array([[0.5, 0.5], [1.0, 0.5], [1.0, 1.5], [0.5, 1.5], [2.0, 1.0], [2.0, 2.0]])
-        cell_vertex_connectivity = np.array([[0, 1, 2, 3], [3, 2, 4, 5]])
+        vertex_coordinates = np.array([[0.5, 0.5], [1.0, 0.5], [1.0, 1.5], [0.5, 1.5], [2.0, 1.5], [2.0, 2.5]])
+        cell_vertex_connectivity = np.array([[0, 1, 2, 3], [2, 1, 4, 5]])
         cell_centre = fv.calculate_quadrilateral_centroid(cell_vertex_connectivity, vertex_coordinates)
 
         # Check lengths
@@ -77,13 +78,12 @@ class CellCentroidTest(ut.TestCase):
         # check value
         base0 = [0.5, 0.5]
         base1 = [1.0, 0.5]
-        length0 = [0.5, 1.0]
-        length1 = [1.0, 1.0]
-        print(cell_centre)
-        self.assertAlmostEqual(base0[0] + (1.0 / 2.0) * length0[0], cell_centre[0][0])
-        self.assertAlmostEqual(base0[1] + (1.0 / 2.0) * length0[1], cell_centre[0][1])
-        self.assertAlmostEqual(base1[0] + (1.0 / 2.0) * length1[0], cell_centre[1][0])
-        self.assertAlmostEqual(base1[1] + (1.0 / 2.0) * length1[1], cell_centre[1][1])
+        bound_box_0 = [0.5, 1.0]
+        bound_box_1 = [1.0, 2.0]
+        self.assertAlmostEqual(base0[0] + (1.0 / 2.0)*bound_box_0[0], cell_centre[0][0])
+        self.assertAlmostEqual(base0[1] + (1.0 / 2.0)*bound_box_0[1], cell_centre[0][1])
+        self.assertAlmostEqual(base1[0] + (1.0 / 2.0)*bound_box_1[0], cell_centre[1][0])
+        self.assertAlmostEqual(base1[1] + (1.0 / 2.0)*bound_box_1[1], cell_centre[1][1])
 
     def test_calculate_quadrilateral_center_irregular(self):
         vertex_coordinates = np.array([[0.0, 0.0], [1.0, 0.0], [1.5, 1.5], [0.5, 1.0]])

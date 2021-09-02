@@ -36,6 +36,8 @@ def connect_mesh(_cell_vertex_connectivity, _number_of_vertices, _cell_type):
     """
     vertex_cell_connectivity = ct.connect_vertices_to_cells(_cell_vertex_connectivity, _number_of_vertices)
     vertex_vertex_connectivity = ct.connect_vertices_to_vertices(_cell_vertex_connectivity, _number_of_vertices)
+    [number_of_faces, number_of_boundary_faces] = ct.compute_number_of_faces(vertex_cell_connectivity,
+                                                                             _cell_vertex_connectivity)
     face_vertex_connectivity = ct.connect_faces_to_vertex(_cell_vertex_connectivity)
     face_cell_connectivity = ct.connect_faces_to_cells(vertex_cell_connectivity, face_vertex_connectivity)
     cell_face_connectivity = ct.connect_cells_to_faces(face_cell_connectivity, len(_cell_vertex_connectivity),
@@ -43,7 +45,7 @@ def connect_mesh(_cell_vertex_connectivity, _number_of_vertices, _cell_type):
     face_boundary = ct.determine_face_boundary_status(face_cell_connectivity)
     cell_boundary = ct.determine_cell_boundary_status(face_cell_connectivity, face_boundary)
     return [vertex_cell_connectivity, vertex_vertex_connectivity, face_vertex_connectivity, face_cell_connectivity,
-            cell_face_connectivity, face_boundary, cell_boundary, _number_of_vertices]
+            cell_face_connectivity, face_boundary, cell_boundary, number_of_faces, number_of_boundary_faces]
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -103,8 +105,8 @@ def setup_cell_centred_finite_volume_mesh(_vertex_coordinates, _cell_vertex_conn
 
     [new_mesh.vertex_table.connected_cell, new_mesh.vertex_table.connected_vertex, new_mesh.face_table.connected_vertex,
      new_mesh.face_table.connected_cell, new_mesh.cell_table.connected_face, new_mesh.face_table.boundary,
-     new_mesh.cell_table.boundary] = connect_mesh(_cell_vertex_connectivity, new_mesh.vertex_table.max_vertex,
-                                                  _cell_type)
+     new_mesh.cell_table.boundary, new_mesh.face_table.max_face, new_mesh.face_table.max_boundary_face] =\
+        connect_mesh(_cell_vertex_connectivity, new_mesh.vertex_table.max_vertex, _cell_type)
 
     setup_finite_volume_geometry(new_mesh.cell_table, new_mesh.face_table, new_mesh.vertex_table)
 
