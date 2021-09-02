@@ -65,6 +65,7 @@ def geometric_series_common_factor(_series_sum, _n_terms, _ratio):
 
     return _series_sum * (1.0 - _ratio) / (1.0 - _ratio ** float(_n_terms))
 
+
 # def double_geometric_series_sum(_common_factor_0, _n_terms_0, _ratio_0, _common_factor_1, _n_terms_1, _ratio_1):
 #     """
 #     Computes the sum of a geometric series.
@@ -105,7 +106,7 @@ def double_geometric_series_common_factors(_series_sum, _n_terms, _ratio_0, _rat
     if _ratio_1 == 1.0:
         raise ZeroDivisionError("Divide by zero, _ratio_1: " + str(_ratio_1))
 
-    if _n_terms % 2 is 0:
+    if _n_terms % 2 == 0:
         n_terms_0 = _n_terms / 2
         n_terms_1 = n_terms_0
     else:
@@ -119,10 +120,10 @@ def double_geometric_series_common_factors(_series_sum, _n_terms, _ratio_0, _rat
 
     return _common_factor_0, _common_factor_1
 
+
 # ----------------------------------------------------------------------------------------------------------------------
 # 1D Mesh Generation
 # ----------------------------------------------------------------------------------------------------------------------
-
 
 def setup_1d_mesh(_number_of_cells, _start_co_ordinate=0.0, _domain_size=1.0, _ratio=1.0):
     """
@@ -163,50 +164,60 @@ def setup_1d_mesh(_number_of_cells, _start_co_ordinate=0.0, _domain_size=1.0, _r
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-# 2D Mesh Generation - Cartesian Mesh
+# 2D Mesh Generation - Structured Meshes
 # ----------------------------------------------------------------------------------------------------------------------
-
 
 def setup_2d_cartesian_mesh(_number_of_cells, _start_co_ordinates=None, _domain_size=None, _ratio=None):
     """
-    Generates the vertices and cells for a 2D structured cartesian mesh. The
+    Generates the vertices and cells for a 2D structured cartesian mesh.
+
+    todo: Add stretching and and clean up.
 
     :param _number_of_cells: Number of cells in x and y
-    :type _number_of_cells: list
+    :type _number_of_cells: numpy.array
     :param _start_co_ordinates: bottom left co-ordinate of the domain.
-    :type _start_co_ordinates: np.array
-    :param _domain_size:
-    :type _domain_size: np.array
+    :type _start_co_ordinates: numpy.array
+    :param _domain_size: Size of the domain in x and y
+    :type _domain_size: numpy.array
     :param _ratio: The ratio of change between successive (increasing in x,y) cell sizes.
-    :type _ratio: list
-    :return:
+    :type _ratio: numpy.array
+    :return: [list of vertex co-ordinate, list of cell-vertex connectivity, type of cells]
+    :type: [numpy.array, numpy.array. cell.CellType]
     """
 
-    # Assign default value.
+    # Create cell-vertex connectivity.
+    cell_vertex_connectivity = -1 * np.ones(shape=[0, cl.number_of_vertex_face(cl.CellType.quadrilateral)], dtype=int)
+    for i_y in range(_number_of_cells[0]):
+        for i_x in range(_number_of_cells[0]):
+            cell_vertex_connectivity = np.append(cell_vertex_connectivity,
+                                                 [[i_x + i_y*(_number_of_cells[0] + 1),
+                                                   i_x + 1 + i_y*(_number_of_cells[0] + 1),
+                                                   i_x + (i_y + 1)*(_number_of_cells[0] + 1),
+                                                   i_x + 1 + (i_y + 1)*(_number_of_cells[0] + 1)]], axis=0)
+
+    # Compute geometric constants.
     if _start_co_ordinates is None:
         _start_co_ordinates = np.array((0.0, 0.0))
     if _domain_size is None:
         _domain_size = np.array((1.0, 1.0))
     if _ratio is None:
         _ratio = [1.0, 1.0]
+    else:
+        raise RuntimeError("Ratio not working yet")
 
-    # Layout memory
-    _total_cells = _number_of_cells[0]*_number_of_cells[1]
-    cell_type = np.empty(shape=(_total_cells, 1), dtype=cl.CellType)
-    cell_vertex_connectivity = np.zeros(shape=(_total_cells, 2), dtype=int)
-    vertex_coordinates = np.zeros(shape=((_number_of_cells[0] + 1)*(_number_of_cells[1] + 1), 2), dtype=float)
-
-    # Determine starting delta x.
+    # Determine starting delta x. TODO FIX THIS STUFF
     delta_x = geometric_series_common_factor(_domain_size[0], _number_of_cells[0] + 2, _ratio[0]) \
         if _ratio[0] != 1.0 else _domain_size[0] / float(_number_of_cells[0])
     delta_y = geometric_series_common_factor(_domain_size[1], _number_of_cells[1] + 2, _ratio[1]) \
         if _ratio[1] != 1.0 else _domain_size[1] / float(_number_of_cells[1])
 
     # Compute vertex positions for the domain.
+    _total_cells = _number_of_cells[0]*_number_of_cells[1]
+    vertex_coordinates = np.zeros(shape=((_number_of_cells[0] + 1)*(_number_of_cells[1] + 1), 2), dtype=float)
     for i_vertex, vertex in enumerate(vertex_coordinates):
 
         x_index = i_vertex % (_number_of_cells[0] + 1)
-        y_index = int(i_vertex / _number_of_cells[1])
+        y_index = int(i_vertex / (_number_of_cells[0] + 1))
 
         current_length_x = geometric_series_sum(delta_x, x_index, _ratio[0]) \
             if _ratio[0] != 1.0 else float(x_index) * delta_x
@@ -214,20 +225,10 @@ def setup_2d_cartesian_mesh(_number_of_cells, _start_co_ordinates=None, _domain_
         current_length_y = geometric_series_sum(delta_y, y_index, _ratio[1]) \
             if _ratio[1] != 1.0 else float(y_index) * delta_y
 
-        print(str(x_index) + "  " + str(y_index) + "  " + str(current_length_x))
-
         vertex[0] = _start_co_ordinates[0] + current_length_x
         vertex[1] = _start_co_ordinates[1] + current_length_y
 
-
-
-    # Setup cells
-    cell_type[:] = cl.CellType.quadrilateral
-    # cell_vertex_connectivity[:, ] = [[i_cell, i_cell + 1] for i_cell in range(_number_of_cells)]
-
-    return [vertex_coordinates, cell_vertex_connectivity, cell_type]
-    # new_mesh = mesh.Mesh()
-    # return new_mesh
+    return [vertex_coordinates, cell_vertex_connectivity, cl.CellType.quadrilateral]
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -240,10 +241,11 @@ def setup_2d_simplex_mesh():
 
     :return:
     """
-    geo = dmsh.Polygon([[0.0, 0.0], [1.0, 0.0], [1.0 + np.cos(np.pi / 3.0), np.sin(np.pi / 3.0)],
-                        [1.0, 2.0 * np.sin(np.pi / 3.0)], [0.0, 2.0 * np.sin(np.pi / 3.0)],
-                        [0.0 - np.cos(np.pi / 3.0), np.sin(np.pi / 3.0)]])
-    verticies, cells = dmsh.generate(geo, 0.5)
-    dmsh.helpers.show(verticies, cells, geo)  # Put on to print mesh
+    raise RuntimeError("Currently not working")
+    # geo = dmsh.Polygon([[0.0, 0.0], [1.0, 0.0], [1.0 + np.cos(np.pi / 3.0), np.sin(np.pi / 3.0)],
+    #                     [1.0, 2.0 * np.sin(np.pi / 3.0)], [0.0, 2.0 * np.sin(np.pi / 3.0)],
+    #                     [0.0 - np.cos(np.pi / 3.0), np.sin(np.pi / 3.0)]])
+    # verticies, cells = dmsh.generate(geo, 0.5)
+    # dmsh.helpers.show(verticies, cells, geo)  # Put on to print mesh
     # new_mesh = mesh.Mesh()
     # return new_mesh
