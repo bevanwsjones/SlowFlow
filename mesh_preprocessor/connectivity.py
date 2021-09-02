@@ -218,6 +218,7 @@ def connect_cells_to_faces(_face_cell_connectivity, _number_of_cells, _cell_type
 
     todo: I am sure again there is a better way to do this.
     """
+
     cell_face_connectivity = -1*np.ones(shape=[_number_of_cells, cl.number_of_vertex_face(_cell_type)], dtype=int)
     for i_face, connected_cells in enumerate(_face_cell_connectivity):
         for icv, i_cell_face in enumerate(cell_face_connectivity[connected_cells[0]]):
@@ -231,6 +232,7 @@ def connect_cells_to_faces(_face_cell_connectivity, _number_of_cells, _cell_type
                     break
 
     return cell_face_connectivity
+
 
 def determine_cell_boundary_status(_face_cell_connectivity, _face_boundry_status):
     """
