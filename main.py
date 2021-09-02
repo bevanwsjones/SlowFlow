@@ -18,7 +18,5 @@
 from mesh import mesh
 from mesh_generation import mesh_generator as mg
 from mesh_preprocessor import preprocessor as pp
-
-[vertex_coordinates, cell_vertex_connectivity, cell_type] = mg.setup_2d_cartesian_mesh([4, 4])
-
+[vertex_coordinates, cell_vertex_connectivity, cell_type] = mg.setup_2d_cartesian_mesh([3, 3])
 cell_centre_mesh = pp.setup_cell_centred_finite_volume_mesh(vertex_coordinates, cell_vertex_connectivity, cell_type)

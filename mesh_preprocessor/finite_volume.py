@@ -116,6 +116,7 @@ def calculate_quadrilateral_centroid(_cell_vertex_connectivity, _vertex_coordina
                                           (triangle_centre_1[:] - triangle_centre_3[:])), axis=1))
     return np.stack([numerator_x[:]/denominator[:], numerator_y[:]/denominator[:]], axis=1)
 
+
 def calculate_hexagon_centroid(_cell_vertex_connectivity, _vertex_coordinates):
     """
     Computes the centroid of a non-intersecting hexagon. TODO
@@ -145,14 +146,16 @@ def calculate_cell_centroid(_cell_type, _cell_vertex_connectivity, _vertex_coord
     :type: np.array
     """
 
-    if _cell_type == cl.CellType.edge:
+    if _cell_type.value == cl.CellType.edge.value:
         return calculate_edge_centroid(_cell_vertex_connectivity, _vertex_coordinates)
-    elif _cell_type == cl.CellType.triangle:
+    elif _cell_type.value == cl.CellType.triangle.value:
         return calculate_triangle_centroid(_cell_vertex_connectivity, _vertex_coordinates)
-    elif _cell_type == cl.CellType.quadrilateral:
+    elif _cell_type.value == cl.CellType.quadrilateral.value:
         return calculate_quadrilateral_centroid(_cell_vertex_connectivity, _vertex_coordinates)
-    elif _cell_type == cl.CellType.hexagon:
+    elif _cell_type.value == cl.CellType.hexagon.value:
         return calculate_hexagon_centroid(_cell_vertex_connectivity, _vertex_coordinates)
+    else:
+        raise RuntimeError("Unsupported cell type, cannot compute centroid.")
 
 
 # ----------------------------------------------------------------------------------------------------------------------

@@ -102,6 +102,7 @@ def setup_cell_centred_finite_volume_mesh(_vertex_coordinates, _cell_vertex_conn
     new_mesh.vertex_table.coordinate = _vertex_coordinates
     new_mesh.vertex_table.max_vertex = len(_vertex_coordinates)
     new_mesh.cell_table.max_cell = len(_cell_vertex_connectivity)
+    new_mesh.cell_table.connected_vertex = _cell_vertex_connectivity
 
     [new_mesh.vertex_table.connected_cell, new_mesh.vertex_table.connected_vertex, new_mesh.face_table.connected_vertex,
      new_mesh.face_table.connected_cell, new_mesh.cell_table.connected_face, new_mesh.face_table.boundary,
