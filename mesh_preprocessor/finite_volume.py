@@ -298,7 +298,7 @@ def calculate_face_area(_cell_type, _face_vertex_connectivity, _vertex_coordinat
                               - _vertex_coordinates[_face_vertex_connectivity[:, 0]], axis=1)
 
 
-def calculate_face_normal(_cell_type, _face_vertex_connectivity, _vertex_coordinates):
+def calculate_face_normal(_cell_type, _face_vertex_connectivity, _vertex_coordinates, _face_cell_cell_unit_vector):
     """
     Constructs face normals, are orientated assuming that face are constructed by walking anti-clockwise around cells.
 
@@ -308,6 +308,8 @@ def calculate_face_normal(_cell_type, _face_vertex_connectivity, _vertex_coordin
     :type _face_vertex_connectivity: np.array
     :param _vertex_coordinates: Co-ordinates for all vertices in the mesh, of the form [i_vertex][x, y coordinates]
     :type _vertex_coordinates: np.array
+    :param _face_cell_cell_unit_vector: Cell centroid to centroid unit vector [i_face][x, y unit vector].
+    :type _face_cell_cell_unit_vector: np.array
     :return: List of the face normals of the form [i_face][x, y normal].
     :type: np.array
     """
@@ -315,7 +317,12 @@ def calculate_face_normal(_cell_type, _face_vertex_connectivity, _vertex_coordin
     if _cell_type == cl.CellType.edge:
         raise RuntimeError("still to do")
     else:
-        return np.array([vector / np.linalg.norm(vector)
-                         for vector in np.cross(_vertex_coordinates[_face_vertex_connectivity[:, 1]]
+        face_normal = np.array([vector / np.linalg.norm(vector)
+                                for vector in np.cross(_vertex_coordinates[_face_vertex_connectivity[:, 1]]
                                                 - _vertex_coordinates[_face_vertex_connectivity[:, 0]],
                                                 np.array((0, 0, 1), dtype=float))[:, 0:2]])
+
+        for i_face, normal in enumerate(face_normal):
+            if np.dot(normal, _face_cell_cell_unit_vector[i_face]) < 0.0:
+                normal *= -1.0
+        return face_normal

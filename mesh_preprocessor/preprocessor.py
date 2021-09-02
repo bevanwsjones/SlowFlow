@@ -72,10 +72,9 @@ def setup_finite_volume_geometry(_cell_table, _face_table, _vertex_table):
                                                                          _cell_table.centroid, _vertex_table.coordinate)
     _face_table.area = fv.calculate_face_area(_cell_table.type, _face_table.connected_vertex, _vertex_table.coordinate)
     _face_table.normal = fv.calculate_face_normal(_cell_table.type, _face_table.connected_vertex,
-                                                  _vertex_table.coordinate)
+                                                  _vertex_table.coordinate, _face_table.cc_unit_vector)
     if _cell_table.type == cl.CellType.edge:
-        _cell_table.volume = fv.calculate_edge_volume(_cell_table.connected_vertex,
-                                                      _vertex_table.coordinate)
+        _cell_table.volume = fv.calculate_edge_volume(_cell_table.connected_vertex, _vertex_table.coordinate)
     else:
         _cell_table.volume = fv.calculate_2d_cell_volume(_cell_table.connected_face, _face_table.connected_cell,
                                                          _face_table.connected_vertex, _cell_table.centroid,
