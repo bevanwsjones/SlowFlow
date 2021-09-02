@@ -187,13 +187,13 @@ def setup_2d_cartesian_mesh(_number_of_cells, _start_co_ordinates=None, _domain_
 
     # Create cell-vertex connectivity.
     cell_vertex_connectivity = -1 * np.ones(shape=[0, cl.number_of_vertex_face(cl.CellType.quadrilateral)], dtype=int)
-    for i_y in range(_number_of_cells[0]):
+    for i_y in range(_number_of_cells[1]):
         for i_x in range(_number_of_cells[0]):
             cell_vertex_connectivity = np.append(cell_vertex_connectivity,
                                                  [[i_x + i_y*(_number_of_cells[0] + 1),
                                                    i_x + 1 + i_y*(_number_of_cells[0] + 1),
-                                                   i_x + (i_y + 1)*(_number_of_cells[0] + 1),
-                                                   i_x + 1 + (i_y + 1)*(_number_of_cells[0] + 1)]], axis=0)
+                                                   i_x + 1 + (i_y + 1) * (_number_of_cells[0] + 1),
+                                                   i_x + (i_y + 1)*(_number_of_cells[0] + 1)]], axis=0)
 
     # Compute geometric constants.
     if _start_co_ordinates is None:
