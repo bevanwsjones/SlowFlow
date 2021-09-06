@@ -27,11 +27,14 @@ from mesh import cell as cl
 
 def connect_mesh(_cell_vertex_connectivity, _number_of_vertices, _cell_type):
     """
+    Sets up the cell-centred mesh connectivity, linking first order connection between various mesh entities.
 
-    :param _cell_vertex_connectivity:
-    :param _cell_vertex_connectivity:
-    :param _number_of_vertices:
-    :param _cell_type:
+    :param _cell_vertex_connectivity: Cell-vertex connectivity table, of the form [i_cell][list of vertices].
+    :type _cell_vertex_connectivity: numpy.array
+    :param _number_of_vertices: Number of vertices in the mesh.
+    :type _number_of_vertices: int
+    :param _cell_type: The type of cell in the mesh, edge, triangle, etc
+    :type _cell_type: mesh.cell.CellType
     :return:
     """
     vertex_cell_connectivity = ct.connect_vertices_to_cells(_cell_vertex_connectivity, _number_of_vertices)
@@ -54,11 +57,15 @@ def connect_mesh(_cell_vertex_connectivity, _number_of_vertices, _cell_type):
 
 def setup_finite_volume_geometry(_cell_table, _face_table, _vertex_table):
     """
+    Constructs the finite volume geometry for a cell centred mesh. Note the geometric data is populated in the passed
+    tables.
 
-    :param _cell_table:
-    :param _face_table:
-    :param _vertex_table:
-    :return:
+    :param _cell_table: Cell table with connectivity tables populated.
+    :param _cell_table: cell.CellTable
+    :param _face_table: Face table with connectivity tables populated.
+    :param _face_table: face.FaceTable
+    :param _vertex_table: Vertex table with co-ordinates and connectivity tables populated.
+    :param _vertex_table: vertex.VertexTable
     """
 
     _cell_table.centroid = fv.calculate_cell_centroid(_cell_table.type, _cell_table.connected_vertex,
@@ -87,13 +94,16 @@ def setup_finite_volume_geometry(_cell_table, _face_table, _vertex_table):
 
 def setup_cell_centred_finite_volume_mesh(_vertex_coordinates, _cell_vertex_connectivity, _cell_type):
     """
+    Pre-processes a basic geometry mesh (vertices and cell-vertex connectivity). First the connectivity of the mesh is
+    greatly increased, and cell faces are created. Next the cell and face geometry are computed in a manner which yields
+    a cell-center finite volume geometric mesh.
 
-    :param _vertex_coordinates:
-    :type _vertex_coordinates:
-    :param _cell_vertex_connectivity:
-    :type _cell_vertex_connectivity:
-    :param _cell_type:
-    :type _cell_type:
+    :param _vertex_coordinates: Co-ordinates for all vertices in the mesh, of the form [i_vertex][x, y coordinates]
+    :type _vertex_coordinates: numpy.array
+    :param _cell_vertex_connectivity: Cell-vertex connectivity table, of the form [i_cell][list of vertices].
+    :type _cell_vertex_connectivity: numpy.array
+    :param _cell_type: The type of cell in the mesh, edge, triangle, etc
+    :type _cell_type: mesh.cell.CellType
     :return:
     """
 
