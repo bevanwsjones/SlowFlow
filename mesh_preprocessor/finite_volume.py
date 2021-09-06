@@ -30,11 +30,11 @@ def calculate_edge_centroid(_cell_vertex_connectivity, _vertex_coordinates):
     Computes the centroid of an edge cell, half way done.
     
     :param _cell_vertex_connectivity: Cell-vertex connectivity table, of the form [i_cell][list of vertices].
-    :type _cell_vertex_connectivity: np.array
+    :type _cell_vertex_connectivity: numpy.array
     :param _vertex_coordinates: Co-ordinates for all vertices in the mesh, of the form [i_vertex][x, y coordinates]
-    :type _vertex_coordinates: np.array
+    :type _vertex_coordinates: numpy.array
     :return: List of the cell centroids of the form [i_cell][x, y coordinates].
-    :type: np.array
+    :type: numpy.array
     """""
 
     max_cell = len(_cell_vertex_connectivity)
@@ -47,11 +47,11 @@ def calculate_triangle_centroid(_cell_vertex_connectivity, _vertex_coordinates):
     Computes the centroid of an triangle, third of the sum of the co-ordinates.
 
     :param _cell_vertex_connectivity: Cell-vertex connectivity table, of the form [i_cell][list of vertices].
-    :type _cell_vertex_connectivity: np.array
+    :type _cell_vertex_connectivity: numpy.array
     :param _vertex_coordinates: Co-ordinates for all vertices in the mesh, of the form [i_vertex][x, y coordinates]
-    :type _vertex_coordinates: np.array
+    :type _vertex_coordinates: numpy.array
     :return: List of the cell centroids of the form [i_cell][x, y coordinates].
-    :type: np.array
+    :type: numpy.array
     """""
 
     max_cell = len(_cell_vertex_connectivity)
@@ -90,11 +90,11 @@ def calculate_quadrilateral_centroid(_cell_vertex_connectivity, _vertex_coordina
     For further reading see https://mathworld.wolfram.com/Line-LineIntersection.html
 
     :param _cell_vertex_connectivity: Cell-vertex connectivity table, of the form [i_cell][list of vertices].
-    :type _cell_vertex_connectivity: np.array
+    :type _cell_vertex_connectivity: numpy.array
     :param _vertex_coordinates: Co-ordinates for all vertices in the mesh, of the form [i_vertex][x, y coordinates]
-    :type _vertex_coordinates: np.array
+    :type _vertex_coordinates: numpy.array
     :return: List of the cell centroids of the form [i_cell][x, y coordinates].
-    :type: np.array
+    :type: numpy.array
     """
 
     triangle_centre_0 = calculate_triangle_centroid(_cell_vertex_connectivity[:, [0, 1, 2]], _vertex_coordinates)
@@ -122,11 +122,11 @@ def calculate_hexagon_centroid(_cell_vertex_connectivity, _vertex_coordinates):
     Computes the centroid of a non-intersecting hexagon. TODO
 
     :param _cell_vertex_connectivity: Cell-vertex connectivity table, of the form [i_cell][list of vertices].
-    :type _cell_vertex_connectivity: np.array
+    :type _cell_vertex_connectivity: numpy.array
     :param _vertex_coordinates: Co-ordinates for all vertices in the mesh, of the form [i_vertex][x, y coordinates]
-    :type _vertex_coordinates: np.array
+    :type _vertex_coordinates: numpy.array
     :return: List of the cell centroids of the form [i_cell][x, y coordinates].
-    :type: np.array
+    :type: numpy.array
     """
 
     raise RuntimeError("Still a todo")
@@ -139,11 +139,11 @@ def calculate_cell_centroid(_cell_type, _cell_vertex_connectivity, _vertex_coord
     :param _cell_type: The type of cells described by the _cell_vertex_connectivity.
     :type _cell_type: mesh.cell.CellType
     :param _cell_vertex_connectivity: Cell-vertex connectivity table, of the form [i_cell][list of vertices].
-    :type _cell_vertex_connectivity: np.array
+    :type _cell_vertex_connectivity: numpy.array
     :param _vertex_coordinates: Co-ordinates for all vertices in the mesh, of the form [i_vertex][x, y coordinates]
-    :type _vertex_coordinates: np.array
+    :type _vertex_coordinates: numpy.array
     :return: List of the cell centroids of the form [i_cell][x, y coordinates].
-    :type: np.array
+    :type: numpy.array
     """
 
     if _cell_type.value == cl.CellType.edge.value:
@@ -167,11 +167,11 @@ def calculate_edge_volume(_cell_vertex_connectivity, _vertex_coordinates):
     Computes the volume for edge cells, the distance between the vertices.
 
     :param _cell_vertex_connectivity: Cell-vertex connectivity table, of the form [i_cell][list of vertices].
-    :type _cell_vertex_connectivity: np.array
+    :type _cell_vertex_connectivity: numpy.array
     :param _vertex_coordinates: Co-ordinates for all vertices in the mesh, of the form [i_vertex][x, y coordinates]
-    :type _vertex_coordinates: np.array
+    :type _vertex_coordinates: numpy.array
     :return: List of the cell volumes of the form [i_cell][volume].
-    :type: np.array
+    :type: numpy.array
     """
     return np.linalg.norm(_vertex_coordinates[_cell_vertex_connectivity[:, 0]]
                           - _vertex_coordinates[_cell_vertex_connectivity[:, 1]], axis=1)
@@ -188,21 +188,21 @@ def calculate_2d_cell_volume(_cell_face_connectivity, _face_cell_connectivity, _
     x_f is the vector from the cell centroid to the face centroid.
 
     :param _cell_face_connectivity: Cell-face connectivity table, of the form [i_cell][list of face].
-    :type _cell_face_connectivity: np.array
+    :type _cell_face_connectivity: numpy.array
     :param _face_cell_connectivity: Face-cell connectivity table, of the form [i_face][list of cells].
-    :type _face_cell_connectivity: np.array
+    :type _face_cell_connectivity: numpy.array
     :param _face_vertex_connectivity: Face-vertex connectivity table, of the form [i_face][list of vertices].
-    :type _face_vertex_connectivity: np.array
+    :type _face_vertex_connectivity: numpy.array
     :param _cell_centroids: Co-ordinates for all cell centroids in the mesh, of the form [i_cell][x, y coordinates]
-    :type _cell_centroids: np.array
+    :type _cell_centroids: numpy.array
     :param _face_normals: The normal vector for each face in the mesh, of the form [i_face][x, y coordinates]
-    :type _face_normals: np.array
+    :type _face_normals: numpy.array
     :param _face_areas: The area for each face in the mesh, of the form [i_face_area]
-    :type _face_areas: np.array
+    :type _face_areas: numpy.array
     :param _vertex_coordinates: Co-ordinates for all vertices in the mesh, of the form [i_vertex][x, y coordinates]
-    :type _vertex_coordinates: np.array
+    :type _vertex_coordinates: numpy.array
     :return: List of the cell volumes of the form [i_cell][volume].
-    :type: np.array
+    :type: numpy.array
     """
 
     volume = np.zeros(shape=(len(_cell_face_connectivity),), dtype=float)
@@ -229,15 +229,15 @@ def calculate_face_cell_cell_length(_number_boundary_face, _face_cell_connectivi
     :param _number_boundary_face: number of boundary faces in the mesh.
     :type _number_boundary_face: int
     :param _face_cell_connectivity: Face-cell connectivity table, of the form [i_face][list of cells].
-    :type _face_cell_connectivity: np.array
+    :type _face_cell_connectivity: numpy.array
     :param _face_vertex_connectivity: Face-vertex connectivity table, of the form [i_face][list of vertices].
-    :type _face_vertex_connectivity: np.array
+    :type _face_vertex_connectivity: numpy.array
     :param _cell_centroid: Co-ordinates for all cell centroids in the mesh, of the form [i_cell][x, y coordinates]
-    :type _cell_centroid: np.array
+    :type _cell_centroid: numpy.array
     :param _vertex_coordinates: Co-ordinates for all vertices in the mesh, of the form [i_vertex][x, y coordinates]
-    :type _vertex_coordinates: np.array
+    :type _vertex_coordinates: numpy.array
     :return: List of the face normals of the form [i_face][cell centroid to cell centroid length].
-    :type: np.array
+    :type: numpy.array
     """
 
     return np.concatenate((
@@ -257,15 +257,15 @@ def calculate_face_cell_cell_unit_vector(_number_boundary_face, _face_cell_conne
     :param _number_boundary_face: number of boundary faces in the mesh.
     :type _number_boundary_face: int
     :param _face_cell_connectivity: Face-cell connectivity table, of the form [i_face][list of cells].
-    :type _face_cell_connectivity: np.array
+    :type _face_cell_connectivity: numpy.array
     :param _face_vertex_connectivity: Face-vertex connectivity table, of the form [i_face][list of vertices].
-    :type _face_vertex_connectivity: np.array
+    :type _face_vertex_connectivity: numpy.array
     :param _cell_centroid: Co-ordinates for all cell centroids in the mesh, of the form [i_cell][x, y coordinates]
-    :type _cell_centroid: np.array
+    :type _cell_centroid: numpy.array
     :param _vertex_coordinates: Co-ordinates for all vertices in the mesh, of the form [i_vertex][x, y coordinates]
-    :type _vertex_coordinates: np.array
+    :type _vertex_coordinates: numpy.array
     :return: List of the face cell-cell unit vectors of the form [i_face][cell centroid to cell centroid unit vector].
-    :type: np.array
+    :type: numpy.array
     """
 
     return np.array([vector / np.linalg.norm(vector) for vector in
@@ -284,11 +284,11 @@ def calculate_face_area(_cell_type, _face_vertex_connectivity, _vertex_coordinat
     :param _cell_type: The type of cells described by the _cell_vertex_connectivity.
     :type _cell_type: mesh.cell.CellType
     :param _face_vertex_connectivity: Face-vertex connectivity table, of the form [i_face][list of vertices].
-    :type _face_vertex_connectivity: np.array
+    :type _face_vertex_connectivity: numpy.array
     :param _vertex_coordinates: Co-ordinates for all vertices in the mesh, of the form [i_vertex][x, y coordinates]
-    :type _vertex_coordinates: np.array
+    :type _vertex_coordinates: numpy.array
     :return: List of the face normals of the form [i_face][x, y normal].
-    :type: np.array
+    :type: numpy.array
     """
 
     if _cell_type == cl.CellType.edge:
@@ -305,13 +305,13 @@ def calculate_face_normal(_cell_type, _face_vertex_connectivity, _vertex_coordin
     :param _cell_type: The type of cells described by the _cell_vertex_connectivity.
     :type _cell_type: mesh.cell.CellType
     :param _face_vertex_connectivity: Face-vertex connectivity table, of the form [i_face][list of vertices].
-    :type _face_vertex_connectivity: np.array
+    :type _face_vertex_connectivity: numpy.array
     :param _vertex_coordinates: Co-ordinates for all vertices in the mesh, of the form [i_vertex][x, y coordinates]
-    :type _vertex_coordinates: np.array
+    :type _vertex_coordinates: numpy.array
     :param _face_cell_cell_unit_vector: Cell centroid to centroid unit vector [i_face][x, y unit vector].
-    :type _face_cell_cell_unit_vector: np.array
+    :type _face_cell_cell_unit_vector: numpy.array
     :return: List of the face normals of the form [i_face][x, y normal].
-    :type: np.array
+    :type: numpy.array
     """
 
     if _cell_type == cl.CellType.edge:

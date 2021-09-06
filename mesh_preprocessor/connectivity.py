@@ -119,8 +119,8 @@ def connect_faces_to_vertex(_cell_vertex_connectivity):
 
     :param _cell_vertex_connectivity: Cell-vertex connectivity table, of the form [i_cell][list of vertices].
     :type _cell_vertex_connectivity: numpy.array
-    :return Face-vertex connectivity table, of the form [i_face][ascending list of vertices].
-    :type numpy.array
+    :return: Face-vertex connectivity table, of the form [i_face][ascending list of vertices].
+    :type: numpy.array
 
     todo: There are multiple sorts and memory allocations, may need some optimising in the future.
     """
@@ -162,8 +162,8 @@ def connect_faces_to_cells(_vertex_cell_connectivity, _face_vertex_connectivity)
     :type _vertex_cell_connectivity: numpy.array
     :param _face_vertex_connectivity: Face-vertex connectivity table, of the form [i_face][list of vertices].
     :type _face_vertex_connectivity: numpy.array
-    :return Face-cell connectivity table, of the form [i_face][ascending list of cells].
-    :type numpy.array
+    :return: Face-cell connectivity table, of the form [i_face][ascending list of cells].
+    :type: numpy.array
     """
 
     face_cell_connectivity = -1*np.ones(shape=(len(_face_vertex_connectivity), 2), dtype=int)
@@ -192,8 +192,8 @@ def determine_face_boundary_status(_face_cell_connectivity):
 
     :param _face_cell_connectivity: Face-cell connectivity table, of the form [i_cell][list of vertices].
     :type _face_cell_connectivity: numpy.array
-    :return List of booleans, true if the face is boundary else false.
-    :type numpy.array
+    :return: List of booleans, true if the face is boundary else false.
+    :type: numpy.array
     """
 
     return np.array((_face_cell_connectivity[:, 1] == -1))
@@ -234,11 +234,17 @@ def connect_cells_to_faces(_face_cell_connectivity, _number_of_cells, _cell_type
     return cell_face_connectivity
 
 
-def determine_cell_boundary_status(_face_cell_connectivity, _face_boundry_status):
+def determine_cell_boundary_status(_cell_face_connectivity, _face_boundary_status):
     """
-    todo
-    :param _face_cell_connectivity:
-    :param _face_boundry_status:
-    :return:
+    Determines the boundary status for a cell. If any attached face is a boundary face the cell is considered to be a
+    boundary cell.
+
+    :param _cell_face_connectivity: Cell-face connectivity table, of the form [i_face][list of faces].
+    :type _cell_face_connectivity: numpy.array
+    :param _face_boundary_status: List of booleans, true if the face is boundary else false.
+    :type _face_boundary_status: numpy.array
+    :return: List of booleans, true if the cell is boundary else false.
+    :type: numpy.array
     """
-    return -1
+
+    return np.array(np.sum(_face_boundary_status[_cell_face_connectivity[:]], axis=1), dtype=bool)

@@ -187,3 +187,17 @@ class CellConnectivityTest(ut.TestCase):
         self.assertTrue(np.array_equal([2, 6, 7], cell_face_connectivity[1]))
         self.assertTrue(np.array_equal([3, 7, 8], cell_face_connectivity[2]))
         self.assertTrue(np.array_equal([4, 5, 8], cell_face_connectivity[3]))
+
+    def test_determine_cell_boundary_status(self):
+        _cell_face_connectivity = np.array([[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 1], [0, 1, 8, 9]])
+        _face_boundary_status = np.array([True, True, False, False, False, False, False, False, False, False, False])
+        cell_boundary_status = ct.determine_cell_boundary_status(_cell_face_connectivity, _face_boundary_status)
+
+        # Check lengths
+        self.assertEqual(4, len(cell_boundary_status))
+
+        # Check value
+        self.assertTrue(cell_boundary_status[0])
+        self.assertFalse(cell_boundary_status[1])
+        self.assertTrue(cell_boundary_status[2])
+        self.assertTrue(cell_boundary_status[3])
