@@ -206,6 +206,21 @@ class CellVolumeTest(ut.TestCase):
 
 class FaceGeometryTest(ut.TestCase):
 
+    def test_calculate_face_centroid(self):
+        face_vertex_connectivity = np.array([[0, 1], [0, 2], [2, 3], [1, 3]])
+        vertex_coordinates = np.array([[0.0, 0.0], [0.0, 1.0], [4.5, 3.0], [4.5, 4.0]])
+
+        face_centroid = fv.calculate_face_centroid(face_vertex_connectivity, vertex_coordinates)
+
+        # Check lengths
+        self.assertEqual(4, len(face_centroid))
+
+        # Check values
+        self.assertTrue(np.array_equal([0.0, 0.5], face_centroid[0]))
+        self.assertTrue(np.array_equal([2.25, 1.5], face_centroid[1]))
+        self.assertTrue(np.array_equal([4.5, 3.5], face_centroid[2]))
+        self.assertTrue(np.array_equal([2.25, 2.5], face_centroid[3]))
+
     def test_calculate_face_cell_cell_length(self):
         vertex_coordinates = np.array([[0.0, 0.0], [0.0, 1.0], [4.5, 3.0], [4.5, 4.0]])
         cell_centroids = np.array([[0.5, 0.5], [1.5, 1.5], [3.5, 3.5]])

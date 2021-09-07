@@ -220,6 +220,22 @@ def calculate_2d_cell_volume(_cell_face_connectivity, _face_cell_connectivity, _
 # Face Geometry
 # ----------------------------------------------------------------------------------------------------------------------
 
+def calculate_face_centroid(_face_vertex_connectivity, _vertex_coordinates):
+    """
+    Computes the face centroid, which is the mid-point between the two attached face vertices.
+
+    :param _face_vertex_connectivity: Face-vertex connectivity table, of the form [i_face][list of vertices].
+    :type _face_vertex_connectivity: numpy.array
+    :param _vertex_coordinates: Co-ordinates for all vertices in the mesh, of the form [i_vertex][x, y coordinates]
+    :type _vertex_coordinates: numpy.array
+    :return: List of the face centroids.
+    :type: numpy.array
+    """
+
+    return 0.5*(_vertex_coordinates[_face_vertex_connectivity[:, 0]]
+                + _vertex_coordinates[_face_vertex_connectivity[:, 1]])
+
+
 def calculate_face_cell_cell_length(_number_boundary_face, _face_cell_connectivity, _face_vertex_connectivity,
                                     _cell_centroid, _vertex_coordinates):
     """
