@@ -73,6 +73,7 @@ def setup_finite_volume_geometry(_cell_table, _face_table, _vertex_table):
     _face_table.cc_length = fv.calculate_face_cell_cell_length(_face_table.max_boundary_face,
                                                                _face_table.connected_cell, _face_table.connected_vertex,
                                                                _cell_table.centroid, _vertex_table.coordinate)
+    _face_table.centroid = fv.calculate_face_centroid(_face_table.connected_vertex, _vertex_table.coordinate)
     _face_table.cc_unit_vector = fv.calculate_face_cell_cell_unit_vector(_face_table.max_boundary_face,
                                                                          _face_table.connected_cell,
                                                                          _face_table.connected_vertex,
