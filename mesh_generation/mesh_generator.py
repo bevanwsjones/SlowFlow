@@ -209,7 +209,6 @@ def setup_2d_cartesian_mesh(_number_of_cells, _start_co_ordinates=None, _domain_
         if _ratio[1] != 1.0 else _domain_size[1] / float(_number_of_cells[1])
 
     # Compute vertex positions for the domain.
-    _total_cells = _number_of_cells[0]*_number_of_cells[1]
     vertex_coordinates = np.zeros(shape=((_number_of_cells[0] + 1)*(_number_of_cells[1] + 1), 2), dtype=float)
     for i_vertex, vertex in enumerate(vertex_coordinates):
 

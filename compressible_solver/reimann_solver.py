@@ -28,7 +28,7 @@ def flux_1d(state, gamma):
 
 def hllc(state_l, state_r, gamma, face_coefficient):
 
-    unit_face_coefficient = face_coefficient / np.linalg.norm(face_coefficient) # projection vector
+    unit_face_coefficient = face_coefficient / np.linalg.norm(face_coefficient)  # projection vector
     rotation_matrix = np.array(([unit_face_coefficient[0], unit_face_coefficient[1]],
                                 [-unit_face_coefficient[1], unit_face_coefficient[0]]))
     rotation_matrix_inverse = np.array(([unit_face_coefficient[0], -unit_face_coefficient[1]],

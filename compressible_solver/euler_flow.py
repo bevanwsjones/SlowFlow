@@ -69,8 +69,8 @@ class EulerFlowSolver:
                 node.variable[cn.np1 + cn.momentum_x] = density * velocity[0]
                 node.variable[cn.np1 + cn.momentum_y] = density * velocity[1]
                 node.variable[cn.n + cn.density_energy] = (internal_energy + 0.5 * np.dot(velocity, velocity)) * density
-                node.variable[cn.np1 + cn.density_energy] = (internal_energy + 0.5 * np.dot(velocity, velocity)) \
-                                                            * density
+                node.variable[cn.np1 + cn.density_energy] = ((internal_energy + 0.5 * np.dot(velocity, velocity))
+                                                             * density)
         elif case_name == '2D_blast':
             for node in self.node_table:
                 radius = np.sqrt((node.coordinate[0] - 1.0)**2 + (node.coordinate[1] - 1.0)**2)
@@ -178,14 +178,14 @@ class EulerFlowSolver:
                     -self.compute_boundary_flux(face)*np.linalg.norm(face.coefficient)
 
             for ilast in face.node_last:
-                self.node_table[ilast].variable[cn.residual:cn.residual + cn.max_variables] /=\
+                self.node_table[ilast].variable[cn.residual:cn.residual + cn.max_variables] /= \
                     self.node_table[ilast].volume
-                self.node_table[ilast].variable[cn.np1:cn.np1 + cn.max_variables],\
-                self.node_table[ilast].variable[cn.rhs:cn.rhs + cn.max_variables]\
-                    = td.runge_kutta(self.node_table[ilast].variable[cn.n:cn.n + cn.max_variables],
-                                     self.node_table[ilast].variable[cn.residual:cn.residual + cn.max_variables],
-                                     self.node_table[ilast].variable[cn.rhs:cn.rhs + cn.max_variables],
-                                     self.delta_time, iteration, self.max_runge_kutta_stages)
+                [self.node_table[ilast].variable[cn.np1:cn.np1 + cn.max_variables],
+                 self.node_table[ilast].variable[cn.rhs:cn.rhs + cn.max_variables]] = \
+                    td.runge_kutta(self.node_table[ilast].variable[cn.n:cn.n + cn.max_variables],
+                                   self.node_table[ilast].variable[cn.residual:cn.residual + cn.max_variables],
+                                   self.node_table[ilast].variable[cn.rhs:cn.rhs + cn.max_variables],
+                                   self.delta_time, iteration, self.max_runge_kutta_stages)
         return
 
     def compute_face_flux(self, face):
@@ -268,9 +268,8 @@ class EulerFlowSolver:
 
             im = ax[0, 0].pcolormesh(x_coordinate, y_coordinate, density, cmap='RdBu_r', shading='gouraud')
             ax[0, 0].set_title('density')
-            colorbar = self.fig.colorbar(im, ax=ax[0, 0])
 
-            im = ax[0, 1].pcolormesh(x_coordinate, y_coordinate, velocity_norm, cmap='RdBu_r',shading='gouraud')
+            im = ax[0, 1].pcolormesh(x_coordinate, y_coordinate, velocity_norm, cmap='RdBu_r', shading='gouraud')
             ax[0, 1].set_title('velocity mangitude')
             self.fig.colorbar(im, ax=ax[0, 1])
 

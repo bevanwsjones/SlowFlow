@@ -131,19 +131,16 @@ class StreamFormatter(logging.Formatter):
     time_string = build_log_format('asctime', 'bright_white')
     name_string = build_log_format('name', _color='magenta')
     message_string = build_log_format('message', 'white', 'normal')
+    time_name = time_string + space_character
+    space_name_space_message = space_character + name_string + space_character + message_string
 
-    FORMATS = (
-        {
-            logging.DEBUG: time_string + space_character + build_log_format('level_name', 'bright_blue', 'bold')
-                           + space_character + name_string + space_character + message_string,
-            logging.INFO: time_string + space_character + build_log_format('level_name', 'green', 'bold') + space_character
-                          + name_string + space_character + message_string,
-            logging.WARNING: time_string + space_character + build_log_format('level_name', 'yellow', 'bold') + space_character + name_string + space_character + message_string,
-            logging.ERROR: time_string + space_character + build_log_format('level_name', 'red', 'bold') + space_character
-                           + name_string + space_character + message_string,
-            logging.CRITICAL: time_string + space_character + build_log_format('level_name', 'bright_red', 'bold') + space_character + name_string + space_character + message_string
-        }
-    )
+    FORMATS = {
+        logging.DEBUG: time_name + build_log_format('level_name', 'bright_blue', 'bold') + space_name_space_message,
+        logging.INFO: time_name + build_log_format('level_name', 'green', 'bold') + space_name_space_message,
+        logging.WARNING: time_name + build_log_format('level_name', 'yellow', 'bold') + space_name_space_message,
+        logging.ERROR: time_name + build_log_format('level_name', 'red', 'bold') + space_name_space_message,
+        logging.CRITICAL: time_name + build_log_format('level_name', 'bright_red', 'bold') + space_name_space_message
+    }
 
     def format(self, _record):
         """
@@ -165,18 +162,15 @@ class FileFormatter(logging.Formatter):
     time_string = build_log_format('asctime')
     name_string = build_log_format('name')
     message_string = build_log_format('message')
+    time_name = time_string + space_character
+    space_name_space_message = space_character + name_string + space_character + message_string
 
     FORMATS = {
-        logging.DEBUG: time_string + space_character + build_log_format('level_name') + space_character + name_string +
-                       space_character + message_string,
-        logging.INFO: time_string + space_character + build_log_format('level_name') + space_character + name_string +
-                      space_character + message_string,
-        logging.WARNING: time_string + space_character + build_log_format('level_name') + space_character + name_string
-                         + space_character + message_string,
-        logging.ERROR: time_string + space_character + build_log_format('level_name') + space_character + name_string +
-                       space_character + message_string,
-        logging.CRITICAL: time_string + space_character + build_log_format('level_name') + space_character + name_string
-                          + space_character + message_string
+        logging.DEBUG: time_name + build_log_format('level_name') + space_name_space_message,
+        logging.INFO: time_name + build_log_format('level_name') + space_name_space_message,
+        logging.WARNING: time_name + build_log_format('level_name') + space_name_space_message,
+        logging.ERROR: time_name + build_log_format('level_name') + space_name_space_message,
+        logging.CRITICAL: time_name + build_log_format('level_name') + space_name_space_message
     }
 
     def format(self, _record):
