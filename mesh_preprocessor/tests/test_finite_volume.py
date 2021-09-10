@@ -292,10 +292,11 @@ class FaceGeometryTest(ut.TestCase):
         self.assertAlmostEqual(1.0, face_area[3])
 
     def test_calculate_face_normal(self):
-        # todo fix
         vertex_coordinates = np.array([[0.0, 0.0], [1.0, 0.0], [2.0, 1.0], [0.0, 1.0]])
         face_vertex_connectivity = np.array([[0, 1], [1, 2], [2, 3], [3, 0]])
-        face_normals = fv.calculate_face_normal(cl.CellType.quadrilateral, face_vertex_connectivity, vertex_coordinates)
+        _face_cell_cell_unit_vector = np.array([[-1.0, 0.0], [1.0, -2.0], [1.0, 0.0], [-1.0, -1.0]])
+        face_normals = fv.calculate_face_normal(cl.CellType.quadrilateral, face_vertex_connectivity, vertex_coordinates,
+                                                _face_cell_cell_unit_vector)
 
         # Check lengths
         self.assertEqual(4, len(face_normals))
