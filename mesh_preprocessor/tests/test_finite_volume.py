@@ -17,7 +17,7 @@
 
 import numpy as np
 import unittest as ut
-import finite_volume as fv
+from mesh_preprocessor import finite_volume as fv
 from mesh import cell as cl
 
 
@@ -248,7 +248,7 @@ class FaceGeometryTest(ut.TestCase):
         face_tangent = fv.calculate_face_cell_cell_unit_vector(2, face_cell_connectivity, face_vertex_connectivity,
                                                                cell_centroids, vertex_coordinates)
 
-        #Check lengths
+        # Check lengths
         self.assertEqual(4, len(face_tangent))
         self.assertEqual(2, len(face_tangent[0]))
         self.assertEqual(2, len(face_tangent[1]))
@@ -292,10 +292,11 @@ class FaceGeometryTest(ut.TestCase):
         self.assertAlmostEqual(1.0, face_area[3])
 
     def test_calculate_face_normal(self):
-        # todo fix
         vertex_coordinates = np.array([[0.0, 0.0], [1.0, 0.0], [2.0, 1.0], [0.0, 1.0]])
         face_vertex_connectivity = np.array([[0, 1], [1, 2], [2, 3], [3, 0]])
-        face_normals = fv.calculate_face_normal(cl.CellType.quadrilateral, face_vertex_connectivity, vertex_coordinates)
+        _face_cell_cell_unit_vector = np.array([[-1.0, 0.0], [1.0, -2.0], [1.0, 0.0], [-1.0, -1.0]])
+        face_normals = fv.calculate_face_normal(cl.CellType.quadrilateral, face_vertex_connectivity, vertex_coordinates,
+                                                _face_cell_cell_unit_vector)
 
         # Check lengths
         self.assertEqual(4, len(face_normals))

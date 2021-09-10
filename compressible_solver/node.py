@@ -72,8 +72,8 @@ def enthalpy(state_variables):
 
 def flux(state_variables):
     _velocity = velocity(state_variables)
-    return np.outer(state_variables, _velocity) \
-           + pressure(state_variables) * np.array((np.zeros(2), np.eye(2)[0], np.eye(2)[1], _velocity))
+    return np.outer(state_variables, _velocity) + pressure(state_variables) * np.array((np.zeros(2), np.eye(2)[0],
+                                                                                        np.eye(2)[1], _velocity))
 
 
 class Node:
@@ -142,6 +142,7 @@ class CellTable:
         self.boundary = np.concatenate((self.boundary, np.zeros(shape=[self.max_ghost_cell, ], dtype=bool)))
         self.volume = np.concatenate((self.volume, np.zeros(shape=[self.max_ghost_cell, ], dtype=float)))
         self.coordinate = np.concatenate((self.coordinate, np.zeros([self.max_ghost_cell, 2], dtype=float)))
+
 
 class CompressibleCellTable(CellTable):
     """

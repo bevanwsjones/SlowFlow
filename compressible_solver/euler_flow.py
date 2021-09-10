@@ -24,6 +24,7 @@ import compressible_solver.node as cn
 import copy
 import time
 
+
 class EulerFlowSolver:
 
     def __init__(self, gamma, number_of_nodes, domain_size, max_time, cfl, max_runge_kutta_stages):
@@ -68,7 +69,8 @@ class EulerFlowSolver:
                 node.variable[cn.np1 + cn.momentum_x] = density * velocity[0]
                 node.variable[cn.np1 + cn.momentum_y] = density * velocity[1]
                 node.variable[cn.n + cn.density_energy] = (internal_energy + 0.5 * np.dot(velocity, velocity)) * density
-                node.variable[cn.np1 + cn.density_energy] = (internal_energy + 0.5 * np.dot(velocity, velocity)) * density
+                node.variable[cn.np1 + cn.density_energy] = ((internal_energy + 0.5 * np.dot(velocity, velocity))
+                                                             * density)
         elif case_name == '2D_blast':
             for node in self.node_table:
                 radius = np.sqrt((node.coordinate[0] - 1.0)**2 + (node.coordinate[1] - 1.0)**2)
@@ -152,8 +154,8 @@ class EulerFlowSolver:
                     self.node_table[inode1].gradient_variable[ivariable] -= face_contribution
                 else:
                     node = inode0 if inode0 != -1 else inode1
-                    self.node_table[node].gradient_variable[ivariable] += self.node_table[node].variable[cn.np1 + ivariable]\
-                                                                          * face.coefficient
+                    self.node_table[node].gradient_variable[ivariable] +=\
+                        self.node_table[node].variable[cn.np1 + ivariable] * face.coefficient
 
                 for ilast in face.node_last:
                     self.node_table[ilast].gradient_variable[ivariable] /= self.node_table[ilast].volume
@@ -166,21 +168,24 @@ class EulerFlowSolver:
 
             if not face.boundary:
                 flux_contribution = -self.compute_face_flux(face)*np.linalg.norm(face.coefficient)
-                self.node_table[face.connected_cell[0]].variable[cn.residual:cn.residual + cn.max_variables] += flux_contribution
-                self.node_table[face.connected_cell[1]].variable[cn.residual:cn.residual + cn.max_variables] -= flux_contribution
+                self.node_table[face.connected_cell[0]].variable[cn.residual:cn.residual + cn.max_variables] += \
+                    flux_contribution
+                self.node_table[face.connected_cell[1]].variable[cn.residual:cn.residual + cn.max_variables] -= \
+                    flux_contribution
             else:
                 inode = face.connected_cell[0] if face.connected_cell[0] != -1 else face.connected_cell[1]
                 self.node_table[inode].variable[cn.residual:cn.residual + cn.max_variables] += \
                     -self.compute_boundary_flux(face)*np.linalg.norm(face.coefficient)
 
             for ilast in face.node_last:
-                self.node_table[ilast].variable[cn.residual:cn.residual + cn.max_variables] /= self.node_table[ilast].volume
-                self.node_table[ilast].variable[cn.np1:cn.np1 + cn.max_variables],\
-                self.node_table[ilast].variable[cn.rhs:cn.rhs + cn.max_variables]\
-                    = td.runge_kutta(self.node_table[ilast].variable[cn.n:cn.n + cn.max_variables],
-                                     self.node_table[ilast].variable[cn.residual:cn.residual + cn.max_variables],
-                                     self.node_table[ilast].variable[cn.rhs:cn.rhs + cn.max_variables],
-                                     self.delta_time, iteration, self.max_runge_kutta_stages)
+                self.node_table[ilast].variable[cn.residual:cn.residual + cn.max_variables] /= \
+                    self.node_table[ilast].volume
+                [self.node_table[ilast].variable[cn.np1:cn.np1 + cn.max_variables],
+                 self.node_table[ilast].variable[cn.rhs:cn.rhs + cn.max_variables]] = \
+                    td.runge_kutta(self.node_table[ilast].variable[cn.n:cn.n + cn.max_variables],
+                                   self.node_table[ilast].variable[cn.residual:cn.residual + cn.max_variables],
+                                   self.node_table[ilast].variable[cn.rhs:cn.rhs + cn.max_variables],
+                                   self.delta_time, iteration, self.max_runge_kutta_stages)
         return
 
     def compute_face_flux(self, face):
@@ -254,15 +259,17 @@ class EulerFlowSolver:
             y_coordinate = np.array([node.coordinate[1] for node in self.node_table]).reshape((mnode_x, mnode_y))
 
             density = np.array([node.density(cn.np1) for node in self.node_table]).reshape((mnode_x, mnode_y))
-            velocity_norm = np.array([np.linalg.norm(node.velocity(cn.np1)) for node in self.node_table]).reshape((mnode_x, mnode_y))
-            pressure = np.array([node.pressure(cn.np1, self.gamma) for node in self.node_table]).reshape((mnode_x, mnode_y))
-            internal_energy = np.array([node.internal_energy(cn.np1) for node in self.node_table]).reshape((mnode_x, mnode_y))
+            velocity_norm = np.array([np.linalg.norm(node.velocity(cn.np1))
+                                      for node in self.node_table]).reshape((mnode_x, mnode_y))
+            pressure = np.array([node.pressure(cn.np1, self.gamma)
+                                 for node in self.node_table]).reshape((mnode_x, mnode_y))
+            internal_energy = np.array([node.internal_energy(cn.np1)
+                                        for node in self.node_table]).reshape((mnode_x, mnode_y))
 
             im = ax[0, 0].pcolormesh(x_coordinate, y_coordinate, density, cmap='RdBu_r', shading='gouraud')
             ax[0, 0].set_title('density')
-            colorbar = self.fig.colorbar(im, ax=ax[0, 0])
 
-            im = ax[0, 1].pcolormesh(x_coordinate, y_coordinate, velocity_norm, cmap='RdBu_r',shading='gouraud')
+            im = ax[0, 1].pcolormesh(x_coordinate, y_coordinate, velocity_norm, cmap='RdBu_r', shading='gouraud')
             ax[0, 1].set_title('velocity mangitude')
             self.fig.colorbar(im, ax=ax[0, 1])
 

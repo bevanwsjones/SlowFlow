@@ -71,13 +71,14 @@ def construct_gauss_green_coefficient_matrix(cell_table, face_table, vertex_tabl
     :return:
     """
     guass_green_coefficient_matrix =\
-        np.zeros(shape=((cell_table.max_cell)*2, cell_table.max_cell + cell_table.max_ghost_cell), dtype=float)
+        np.zeros(shape=(cell_table.max_cell * 2, cell_table.max_cell + cell_table.max_ghost_cell), dtype=float)
 
     # Pre-compute c_k
     vertex_cell_coefficient = np.zeros(shape=vertex_table.number_of_vertex, dtype=float)
     for ivertex in range(vertex_table.number_of_vertex):
         for icell in vertex_table.connected_cell[ivertex]:
-            vertex_cell_coefficient[ivertex] += 1.0/np.linalg.norm(vertex_table.centroid[ivertex] - cell_table.centroid[icell])
+            vertex_cell_coefficient[ivertex] += 1.0/np.linalg.norm(vertex_table.centroid[ivertex] -
+                                                                   cell_table.centroid[icell])
         vertex_cell_coefficient[ivertex] = 1.0/vertex_cell_coefficient[ivertex]
 
     # Construct Coefficient Matrix.
@@ -86,30 +87,23 @@ def construct_gauss_green_coefficient_matrix(cell_table, face_table, vertex_tabl
         cell1 = face_table.connected_cell[iface][1]
         for ivertex in face_table.connected_vertex[iface]:
             for istencil_cell in vertex_table.connected_cell[ivertex]:
-                distance_interpolation_coefficient = vertex_cell_coefficient[ivertex]*(1.0 / np.linalg.norm(vertex_table.centroid[ivertex] - cell_table.centroid[istencil_cell]))
+                distance_interpolation_coefficient = (
+                        vertex_cell_coefficient[ivertex]*(1.0 / np.linalg.norm(vertex_table.centroid[ivertex]
+                                                                               - cell_table.centroid[istencil_cell]))
+                )
 
                 # Rows only exist for real cells, so ignore 'ghost rows'
                 if cell0 < cell_table.max_cell:
                     cell_coef = 0.5*distance_interpolation_coefficient/cell_table.volume[cell0]
                     guass_green_coefficient_matrix[2*cell0][istencil_cell] += cell_coef*face_table.coefficient[iface][0]
-                    guass_green_coefficient_matrix[2*cell0 + 1][istencil_cell] += cell_coef*face_table.coefficient[iface][1]
+                    guass_green_coefficient_matrix[2*cell0 + 1][istencil_cell] += (
+                            cell_coef*face_table.coefficient[iface][1]
+                    )
                 if cell1 < cell_table.max_cell:
                     cell_coef = 0.5 * distance_interpolation_coefficient / cell_table.volume[cell1]
                     guass_green_coefficient_matrix[2*cell1][istencil_cell] -= cell_coef*face_table.coefficient[iface][0]
-                    guass_green_coefficient_matrix[2*cell1 + 1][istencil_cell] -= cell_coef*face_table.coefficient[iface][1]
+                    guass_green_coefficient_matrix[2*cell1 + 1][istencil_cell] -= (
+                            cell_coef*face_table.coefficient[iface][1]
+                    )
 
     return guass_green_coefficient_matrix
-
-
-
-
-
-
-
-
-
-
-
-
-
-

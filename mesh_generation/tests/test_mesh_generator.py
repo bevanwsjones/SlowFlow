@@ -16,9 +16,9 @@
 # ----------------------------------------------------------------------------------------------------------------------
 
 import numpy as np
-import mesh_generator as mg
 import unittest as ut
-import mesh.cell as cl
+from mesh import cell as cl
+from mesh_generation import mesh_generator as mg
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -58,5 +58,3 @@ class Setup2dCartesianMeshTest(ut.TestCase):
             for i_x in range(5):
                 self.assertTrue(np.array_equal([0.25*i_x, 0.25*i_y], vertices[i_vertex]))
                 i_vertex += 1
-
-
