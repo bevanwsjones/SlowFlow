@@ -33,9 +33,4 @@ jobs:
         flake8 . --count --max-complexity=10 --max-line-length=120 --statistics
     - name: Test with pytest
       run: |
-        cd mesh_preprocessor
-        python -m pytest /tests
-        cd ..
-        cd mesh_generation
-        python -m pytest /tests
-        cd ..
+        pytest
