@@ -28,7 +28,7 @@ from mesh import cell as cl
 def calculate_edge_centroid(_cell_vertex_connectivity, _vertex_coordinates):
     """
     Computes the centroid of an edge cell, half way done.
-    
+
     :param _cell_vertex_connectivity: Cell-vertex connectivity table, of the form [i_cell][list of vertices].
     :type _cell_vertex_connectivity: numpy.array
     :param _vertex_coordinates: Co-ordinates for all vertices in the mesh, of the form [i_vertex][x, y coordinates]
@@ -333,10 +333,12 @@ def calculate_face_normal(_cell_type, _face_vertex_connectivity, _vertex_coordin
     if _cell_type == cl.CellType.edge:
         raise RuntimeError("still to do")
     else:
-        face_normal = np.array([vector / np.linalg.norm(vector)
-                                for vector in np.cross(_vertex_coordinates[_face_vertex_connectivity[:, 1]]
-                                                - _vertex_coordinates[_face_vertex_connectivity[:, 0]],
-                                                np.array((0, 0, 1), dtype=float))[:, 0:2]])
+        face_normal = (
+            np.array([vector / np.linalg.norm(vector)
+                      for vector in np.cross(_vertex_coordinates[_face_vertex_connectivity[:, 1]]
+                                             - _vertex_coordinates[_face_vertex_connectivity[:, 0]],
+                                             np.array((0, 0, 1), dtype=float))[:, 0:2]])
+        )
 
         for i_face, normal in enumerate(face_normal):
             if np.dot(normal, _face_cell_cell_unit_vector[i_face]) < 0.0:

@@ -58,5 +58,3 @@ class Setup2dCartesianMeshTest(ut.TestCase):
             for i_x in range(5):
                 self.assertTrue(np.array_equal([0.25*i_x, 0.25*i_y], vertices[i_vertex]))
                 i_vertex += 1
-
-

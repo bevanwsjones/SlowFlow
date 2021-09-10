@@ -129,16 +129,21 @@ class StreamFormatter(logging.Formatter):
     """
     space_character = build_text_format(' : ', 'bright_white')
     time_string = build_log_format('asctime', 'bright_white')
-    name_string = build_log_format('name',  _color='magenta')
+    name_string = build_log_format('name', _color='magenta')
     message_string = build_log_format('message', 'white', 'normal')
 
-    FORMATS = {
-        logging.DEBUG: time_string + space_character + build_log_format('level_name', 'bright_blue', 'bold') + space_character + name_string + space_character + message_string,
-        logging.INFO: time_string + space_character + build_log_format('level_name', 'green', 'bold') + space_character + name_string + space_character + message_string,
-        logging.WARNING: time_string + space_character + build_log_format('level_name', 'yellow', 'bold') + space_character + name_string + space_character + message_string,
-        logging.ERROR: time_string + space_character + build_log_format('level_name', 'red', 'bold') + space_character + name_string + space_character + message_string,
-        logging.CRITICAL: time_string + space_character + build_log_format('level_name', 'bright_red', 'bold') + space_character + name_string + space_character + message_string
-    }
+    FORMATS = (
+        {
+            logging.DEBUG: time_string + space_character + build_log_format('level_name', 'bright_blue', 'bold')
+                           + space_character + name_string + space_character + message_string,
+            logging.INFO: time_string + space_character + build_log_format('level_name', 'green', 'bold') + space_character
+                          + name_string + space_character + message_string,
+            logging.WARNING: time_string + space_character + build_log_format('level_name', 'yellow', 'bold') + space_character + name_string + space_character + message_string,
+            logging.ERROR: time_string + space_character + build_log_format('level_name', 'red', 'bold') + space_character
+                           + name_string + space_character + message_string,
+            logging.CRITICAL: time_string + space_character + build_log_format('level_name', 'bright_red', 'bold') + space_character + name_string + space_character + message_string
+        }
+    )
 
     def format(self, _record):
         """
@@ -152,7 +157,8 @@ class StreamFormatter(logging.Formatter):
 
 class FileFormatter(logging.Formatter):
     """
-    Formatter for file logging, creates a full logging string which is not colorized or emphasised due to file being writen with utf8.
+    Formatter for file logging, creates a full logging string which is not colorized or emphasised due to file being
+     writen with utf8.
     """
 
     space_character = build_text_format(':')
@@ -161,11 +167,16 @@ class FileFormatter(logging.Formatter):
     message_string = build_log_format('message')
 
     FORMATS = {
-        logging.DEBUG: time_string + space_character + build_log_format('level_name') + space_character + name_string + space_character + message_string,
-        logging.INFO: time_string + space_character + build_log_format('level_name') + space_character + name_string + space_character + message_string,
-        logging.WARNING: time_string + space_character + build_log_format('level_name') + space_character + name_string + space_character + message_string,
-        logging.ERROR: time_string + space_character + build_log_format('level_name') + space_character + name_string + space_character + message_string,
-        logging.CRITICAL: time_string + space_character + build_log_format('level_name') + space_character + name_string + space_character + message_string
+        logging.DEBUG: time_string + space_character + build_log_format('level_name') + space_character + name_string +
+                       space_character + message_string,
+        logging.INFO: time_string + space_character + build_log_format('level_name') + space_character + name_string +
+                      space_character + message_string,
+        logging.WARNING: time_string + space_character + build_log_format('level_name') + space_character + name_string
+                         + space_character + message_string,
+        logging.ERROR: time_string + space_character + build_log_format('level_name') + space_character + name_string +
+                       space_character + message_string,
+        logging.CRITICAL: time_string + space_character + build_log_format('level_name') + space_character + name_string
+                          + space_character + message_string
     }
 
     def format(self, _record):
@@ -180,7 +191,8 @@ class FileFormatter(logging.Formatter):
 
 def set_up_logging():
     """
-    Sets up the logging directory and file, buy creating a session directory if none exists and deleting the old session.log file if it exists.
+    Sets up the logging directory and file, buy creating a session directory if none exists and deleting the old
+    session.log file if it exists.
     """
 
     if os.path.isdir(LOGGING_FOLDER):
@@ -195,11 +207,14 @@ def set_up_logging():
 
 def make_logger(_name, _level):
     """
-    Creates a new logger with both console and file handlers set up. The console handler will have colorized text, while the file handler will write unformated text to the
+    Creates a new logger with both console and file handlers set up. The console handler will have colorized text, while
+    the file handler will write unformated text to the
      './session/session.log' file.
+
     :param _name: Name of the new logger, it is highly recommended to use __name__.
     :type _name: str
-    :param _level: The log level dictionary look up string, used to omit certain messages depending on the severity of the message and level chosen.
+    :param _level: The log level dictionary look up string, used to omit certain messages depending on the severity of
+                   the message and level chosen.
     :type _level: str
     :return: Returns a new logger
     :type: logging.Logger

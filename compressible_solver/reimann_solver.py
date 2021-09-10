@@ -18,11 +18,13 @@
 import numpy as np
 from compressible_solver import node as cn
 
-def flux_1D(state, gamma):
+
+def flux_1d(state, gamma):
     _velocity = cn.velocity(state)
     pressure = cn.pressure(state, gamma)
     return np.array((state[0]*_velocity[0], state[1]*_velocity[0] + pressure, state[2]*_velocity[0],
                     (state[3] + pressure)*_velocity[0]))
+
 
 def hllc(state_l, state_r, gamma, face_coefficient):
 
@@ -31,7 +33,6 @@ def hllc(state_l, state_r, gamma, face_coefficient):
                                 [-unit_face_coefficient[1], unit_face_coefficient[0]]))
     rotation_matrix_inverse = np.array(([unit_face_coefficient[0], -unit_face_coefficient[1]],
                                         [unit_face_coefficient[1], unit_face_coefficient[0]]))
-
 
     momentum_l_rotated = np.dot(rotation_matrix, state_l[1:3])
     momentum_r_rotated = np.dot(rotation_matrix, state_r[1:3])
@@ -56,14 +57,15 @@ def hllc(state_l, state_r, gamma, face_coefficient):
     acoustic_velocity_bar = np.sqrt((gamma - 1.0) * (enthalpy_bar - 0.5 * velocity_bar ** 2))
     s_l = velocity_bar - acoustic_velocity_bar
     s_r = velocity_bar + acoustic_velocity_bar
-    s_star = (pressure_r - pressure_l + momentum_l * (s_l - velocity_l) - momentum_r * (s_r - velocity_r)) / (density_l * (s_l - velocity_l) - density_r * (s_r - velocity_r))
+    s_star = (pressure_r - pressure_l + momentum_l * (s_l - velocity_l) - momentum_r * (s_r - velocity_r)) / \
+             (density_l * (s_l - velocity_l) - density_r * (s_r - velocity_r))
 
     if 0 <= s_l:
-        flux = flux_1D(state_l_reorient, gamma)
+        flux = flux_1d(state_l_reorient, gamma)
         momentum_flux_reoriented = np.dot(rotation_matrix_inverse, flux[1:3])
         return np.array([flux[0], momentum_flux_reoriented[0], momentum_flux_reoriented[1], flux[3]])
     elif s_l <= 0 <= s_star:
-        flux_l = flux_1D(state_l_reorient, gamma)
+        flux_l = flux_1d(state_l_reorient, gamma)
         d_star = np.array([0.0, 1.0, 0.0, s_star], dtype=float)
         p_lr = 0.5 * (pressure_l + pressure_r + density_l * (s_l - velocity_l) * (s_star - velocity_l)
                       + density_r * (s_r - velocity_r) * (s_star - velocity_r))
@@ -71,7 +73,7 @@ def hllc(state_l, state_r, gamma, face_coefficient):
         f_star_l_deconstructed = np.dot(rotation_matrix_inverse, f_star_l[1:3])
         return np.array([f_star_l[0], f_star_l_deconstructed[0], f_star_l_deconstructed[1], f_star_l[3]])
     elif s_star <= 0 <= s_r:
-        flux_r = flux_1D(state_r_reorient, gamma)
+        flux_r = flux_1d(state_r_reorient, gamma)
         d_star = np.array([0.0, 1.0, 0.0, s_star], dtype=float)
         p_lr = 0.5 * (pressure_l + pressure_r + density_l * (s_l - velocity_l) * (s_star - velocity_l)
                       + density_r * (s_r - velocity_r) * (s_star - velocity_r))
@@ -79,7 +81,7 @@ def hllc(state_l, state_r, gamma, face_coefficient):
         f_star_r_deconstructed = np.dot(rotation_matrix_inverse, f_star_r[1:3])
         return np.array([f_star_r[0], f_star_r_deconstructed[0], f_star_r_deconstructed[1], f_star_r[3]])
     elif 0 >= s_r:
-        flux = flux_1D(state_r_reorient, gamma)
+        flux = flux_1d(state_r_reorient, gamma)
         momentum_flux_reoriented = np.dot(rotation_matrix_inverse, flux[1:3])
         return np.array([flux[0], momentum_flux_reoriented[0], momentum_flux_reoriented[1], flux[3]])
     else:

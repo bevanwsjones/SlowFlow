@@ -17,9 +17,6 @@
 
 import numpy as np
 import mesh.cell as cl
-import meshio
-import dmsh
-import optimesh
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -242,6 +239,9 @@ def setup_2d_simplex_mesh():
     :return:
     """
     raise RuntimeError("Currently not working")
+    # import meshio
+    # import dmsh
+    # import optimesh
     # geo = dmsh.Polygon([[0.0, 0.0], [1.0, 0.0], [1.0 + np.cos(np.pi / 3.0), np.sin(np.pi / 3.0)],
     #                     [1.0, 2.0 * np.sin(np.pi / 3.0)], [0.0, 2.0 * np.sin(np.pi / 3.0)],
     #                     [0.0 - np.cos(np.pi / 3.0), np.sin(np.pi / 3.0)]])

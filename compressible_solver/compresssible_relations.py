@@ -66,8 +66,8 @@ def flux(state_variables):
     :return: F
     """
     _velocity = velocity(state_variables)
-    return np.outer(state_variables, _velocity) \
-           + pressure(state_variables) * np.array((np.zeros(2), np.eye(2)[0], np.eye(2)[1], _velocity))
+    return np.outer(state_variables, _velocity) + pressure(state_variables) * np.array((np.zeros(2), np.eye(2)[0],
+                                                                                        np.eye(2)[1], _velocity))
 
 
 def specific_internal_energy(state_variables):
@@ -105,6 +105,7 @@ def specific_energy(state_variables):
     :return: E
     """
     return state_variables[density_energy] / state_variables[density]
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Conserved Variables
