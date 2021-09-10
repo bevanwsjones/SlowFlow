@@ -15,9 +15,9 @@
 # description: Tests the functions in connectivity .py
 # ----------------------------------------------------------------------------------------------------------------------
 
-import connectivity as ct
 import numpy as np
 import unittest as ut
+from mesh_preprocessor import connectivity as ct
 from mesh import cell as cl
 
 

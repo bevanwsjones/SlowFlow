@@ -16,9 +16,9 @@
 # ----------------------------------------------------------------------------------------------------------------------
 
 import numpy as np
-import mesh_generator as mg
 import unittest as ut
-import mesh.cell as cl
+from mesh import cell as cl
+from mesh_generation import mesh_generator as mg
 
 
 # ----------------------------------------------------------------------------------------------------------------------
