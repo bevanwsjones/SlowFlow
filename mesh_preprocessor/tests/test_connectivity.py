@@ -85,7 +85,7 @@ class VertexConnectivityTest(ut.TestCase):
 
 class FaceConnectivityTest(ut.TestCase):
 
-    def test_compute_number_of_faces(self):
+    def test_compute_number_of_faces_triagnle(self):
         cell_vertex_connectivity = np.array([[0, 1, 2], [2, 1, 3], [3, 1, 4], [3, 4, 5]])
         vertex_cell_connectivity = [np.array([0]), np.array([0, 1, 2]), np.array([0, 1]), np.array([1, 2, 3]),
                                     np.array([2, 3]), np.array([3])]
@@ -94,6 +94,19 @@ class FaceConnectivityTest(ut.TestCase):
 
         self.assertEqual(9, number_of_faces)
         self.assertEqual(6, number_of_boundary_faces)
+
+    def test_compute_number_of_faces_quadrilateral(self):
+        cell_vertex_connectivity = np.array([[0, 1,  5,  4], [1, 2, 6, 5], [2, 3, 7, 6], [4, 5, 9, 8], [5, 6, 10, 9],
+                                             [6, 7, 11, 10], [8, 9, 13, 12], [9, 10, 14, 13], [10, 11, 15, 14]])
+        vertex_cell_connectivity = [np.array([0]), np.array([0, 1]), np.array([1, 2]), np.array([2]), np.array([0, 3]),
+                                    np.array([0, 1, 3, 4]), np.array([1, 2, 4, 5]), np.array([2, 5]), np.array([3, 6]),
+                                    np.array([3, 4, 6, 7]), np.array([4, 5, 7, 8]), np.array([5, 8]), np.array([6]),
+                                    np.array([6, 7]), np.array([7, 8]), np.array([8])]
+        [number_of_faces, number_of_boundary_faces] = ct.compute_number_of_faces(vertex_cell_connectivity,
+                                                                                 cell_vertex_connectivity)
+
+        self.assertEqual(24, number_of_faces)
+        self.assertEqual(12, number_of_boundary_faces)
 
     def test_connect_faces_to_vertex(self):
         cell_vertex_connectivity = np.array([[0, 1, 2], [2, 1, 3], [3, 1, 4], [3, 4, 5]])

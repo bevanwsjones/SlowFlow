@@ -104,8 +104,9 @@ def compute_number_of_faces(_vertex_cell_connectivity, _cell_vertex_connectivity
                                                  [[i_vertex, cv_connectivity[i_cv - 1]]], axis=0)
             face_vertex_connectivity[-1].sort()
 
-    number_of_boundary_faces = len(np.unique(face_vertex_connectivity))
-    number_of_faces = int((len(face_vertex_connectivity) - number_of_boundary_faces)/2 + number_of_boundary_faces)
+    [unique, unique_couints] = np.unique(face_vertex_connectivity, return_counts=True, axis=0)
+    number_of_boundary_faces = np.count_nonzero(unique_couints == 1)
+    number_of_faces = len(unique)
     return [number_of_faces, number_of_boundary_faces]
 
 
