@@ -17,7 +17,7 @@
 
 import numpy as np
 import unittest as ut
-import finite_volume as fv
+from mesh_preprocessor import finite_volume as fv
 from mesh import cell as cl
 
 
