@@ -119,6 +119,13 @@ def double_geometric_series_common_factors(_series_sum, _n_terms, _ratio_0, _rat
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+# Standard Mesh Lambdas
+# ----------------------------------------------------------------------------------------------------------------------
+
+def structured(_x): return _x
+
+
+# ----------------------------------------------------------------------------------------------------------------------
 # 1D Mesh Generation
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -164,73 +171,60 @@ def setup_1d_mesh(_number_of_cells, _start_co_ordinate=0.0, _domain_size=1.0, _r
 # 2D Mesh Generation - Structured Meshes
 # ----------------------------------------------------------------------------------------------------------------------
 
-def setup_2d_cartesian_mesh(_number_of_cells, _start_co_ordinates=None, _domain_size=None, _ratio=None):
+def setup_2d_cartesian_mesh(_number_of_cells, _start_co_ordinates=None, _domain_size=None, _transform=structured):
     """
-    Generates the vertices and cells for a 2D structured cartesian mesh.
+    Generates the vertices and cells-vertex connectivity for a 2D structured cartesian mesh. A regular equi-spaced
+    Cartesian grid is first generated using the start co-ordinates and the domain size. The cell-vertex connectivity is
+    ordered in an anti-clockwise manner.
 
-    todo: Add stretching and and clean up.
+    The grid can be transformed by passing in a transformation lambda. In this case each vertex will be mapped to a new
+    co-ordinate using the pared function.
+
+    Note: This can cause the anti-clockwise ordering to be violated. Thus the user should ensure the transformation
+          maintains ordering if desired.
 
     :param _number_of_cells: Number of cells in x and y
     :type _number_of_cells: numpy.array
-    :param _start_co_ordinates: bottom left co-ordinate of the domain.
+    :param _start_co_ordinates: bottom left co-ordinate of the domain. (defaults to 0.0, 0.0)
     :type _start_co_ordinates: numpy.array
-    :param _domain_size: Size of the domain in x and y
+    :param _domain_size: Size of the domain in x and y (defaults to 1.0, 1.0)
     :type _domain_size: numpy.array
-    :param _ratio: The ratio of change between successive (increasing in x,y) cell sizes.
-    :type _ratio: numpy.array
+    :param _transform: The transformation lambda for grid points, must take in and return a numpy array of co-ordinates.
+    :type _transform:lambda
     :return: [list of vertex co-ordinate, list of cell-vertex connectivity, type of cells]
     :type: [numpy.array, numpy.array. cell.CellType]
     """
-
-    # Create cell-vertex connectivity.
-    cell_vertex_connectivity = -1 * np.ones(shape=[0, cl.number_of_vertex_face(cl.CellType.quadrilateral)], dtype=int)
-    for i_y in range(_number_of_cells[1]):
-        for i_x in range(_number_of_cells[0]):
-            cell_vertex_connectivity = np.append(cell_vertex_connectivity,
-                                                 [[i_x + i_y*(_number_of_cells[0] + 1),
-                                                   i_x + 1 + i_y*(_number_of_cells[0] + 1),
-                                                   i_x + 1 + (i_y + 1) * (_number_of_cells[0] + 1),
-                                                   i_x + (i_y + 1)*(_number_of_cells[0] + 1)]], axis=0)
 
     # Compute geometric constants.
     if _start_co_ordinates is None:
         _start_co_ordinates = np.array((0.0, 0.0))
     if _domain_size is None:
         _domain_size = np.array((1.0, 1.0))
-    if _ratio is None:
-        _ratio = [1.0, 1.0]
-    else:
-        raise RuntimeError("Ratio not working yet")
 
-    # Determine starting delta x. TODO FIX THIS STUFF
-    delta_x = geometric_series_common_factor(_domain_size[0], _number_of_cells[0] + 2, _ratio[0]) \
-        if _ratio[0] != 1.0 else _domain_size[0] / float(_number_of_cells[0])
-    delta_y = geometric_series_common_factor(_domain_size[1], _number_of_cells[1] + 2, _ratio[1]) \
-        if _ratio[1] != 1.0 else _domain_size[1] / float(_number_of_cells[1])
+    # Determine starting delta x and y.
+    number_vertices = (_number_of_cells[0] + 1) * (_number_of_cells[1] + 1)
+    delta = np.array([_domain_size[0] / float(_number_of_cells[0]), _domain_size[1] / float(_number_of_cells[1])])
 
-    # Compute vertex positions for the domain.
-    vertex_coordinates = np.zeros(shape=((_number_of_cells[0] + 1)*(_number_of_cells[1] + 1), 2), dtype=float)
-    for i_vertex, vertex in enumerate(vertex_coordinates):
-
-        x_index = i_vertex % (_number_of_cells[0] + 1)
-        y_index = int(i_vertex / (_number_of_cells[0] + 1))
-
-        current_length_x = geometric_series_sum(delta_x, x_index, _ratio[0]) \
-            if _ratio[0] != 1.0 else float(x_index) * delta_x
-
-        current_length_y = geometric_series_sum(delta_y, y_index, _ratio[1]) \
-            if _ratio[1] != 1.0 else float(y_index) * delta_y
-
-        vertex[0] = _start_co_ordinates[0] + current_length_x
-        vertex[1] = _start_co_ordinates[1] + current_length_y
-
-    return [vertex_coordinates, cell_vertex_connectivity, cl.CellType.quadrilateral]
+    # Compute and return the co-ordinates, connectivity, and cell type for the mesh.
+    return [
+        np.array([_transform(np.array([_start_co_ordinates[0]
+                                       + float(i_vertex % (_number_of_cells[0] + 1)) * delta[0],
+                                       _start_co_ordinates[1]
+                                       + float(int(i_vertex / (_number_of_cells[0] + 1))) * delta[1]]))
+                  for i_vertex in range(number_vertices)], dtype=float),
+        np.array([np.array([i_x + i_y * (_number_of_cells[0] + 1),
+                            i_x + 1 + i_y * (_number_of_cells[0] + 1),
+                            i_x + 1 + (i_y + 1) * (_number_of_cells[0] + 1),
+                            i_x + (i_y + 1) * (_number_of_cells[0] + 1)])
+                  for i_y in range(_number_of_cells[1])
+                  for i_x in range(_number_of_cells[0])], dtype=int),
+        cl.CellType.quadrilateral
+    ]
 
 
 # ----------------------------------------------------------------------------------------------------------------------
 # 2D Mesh Generation - Simplex Mesh
 # ----------------------------------------------------------------------------------------------------------------------
-
 
 def setup_2d_simplex_mesh():
     """

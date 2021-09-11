@@ -54,6 +54,7 @@ class Setup2dCartesianMeshTest(ut.TestCase):
         self.assertTrue(np.array_equal([18, 19, 24, 23], cells[15]))
 
         i_vertex = 0
+        # print(vertices)
         for i_y in range(5):
             for i_x in range(5):
                 self.assertTrue(np.array_equal([0.25*i_x, 0.25*i_y], vertices[i_vertex]))
