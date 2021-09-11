@@ -125,6 +125,14 @@ def double_geometric_series_common_factors(_series_sum, _n_terms, _ratio_0, _rat
 def structured(_x): return _x
 
 
+def parallelograms_x(_x): return np.array([3.0*_x[0] + _x[1], 4.0*_x[1]])/4.0
+
+
+def parallelograms_y(_x): return np.array([4.0*_x[0], _x[0] + 3.0*_x[1]])/4.0
+
+
+def rhombus(_x): return np.array([4.0 * _x[0] + _x[1], _x[0] + 4.0 * _x[1]]) / 5.0
+
 # ----------------------------------------------------------------------------------------------------------------------
 # 1D Mesh Generation
 # ----------------------------------------------------------------------------------------------------------------------
