@@ -137,6 +137,7 @@ def rhombus(_x): return np.array([4.0 * _x[0] + _x[1], _x[0] + 4.0 * _x[1]]) / 5
 # 1D Mesh Generation
 # ----------------------------------------------------------------------------------------------------------------------
 
+
 def setup_1d_mesh(_number_of_cells, _start_co_ordinate=0.0, _domain_size=1.0, _ratio=1.0):
     """
     Generates the vertices, cell-vertex connectivity as well as the cell type.
