@@ -22,6 +22,61 @@ from mesh_generation import mesh_generator as mg
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+# Standard Mesh Transformation Functions
+# ----------------------------------------------------------------------------------------------------------------------
+
+class StandardMeshTransformationFunctionsTest(ut.TestCase):
+
+    def test_structured(self):
+        n = [3, 3]
+        x_0 = [-1.0, -1.0]
+        ds = [2.0, 2.0]
+
+        # demonstrate that the co-ordinates are unchanged.
+        self.assertTrue(np.array_equal(np.array([1.0, 1.0]), mg.structured(n, x_0, ds, np.array([1.0, 1.0]))))
+        self.assertTrue(np.array_equal(np.array([0.0, -1.0]), mg.structured(n, x_0, ds, np.array([0.0, -1.0]))))
+        self.assertTrue(np.array_equal(np.array([1.0, 2.0]), mg.structured(n, x_0, ds, np.array([1.0, 2.0]))))
+
+    def test_stretch(self):
+        ratio = np.array([0.5, 0.25])
+        n = [2, 2]
+        x_0 = np.array([-1.0, -1.0])
+        ds = np.array([2.0, 2.0])
+
+        # demonstrate that corners don't change but the centre vertex moves appropriately.
+        self.assertTrue(np.allclose(np.array([1.0/3.0, 0.6]), mg.stretch(ratio, n, x_0, ds, np.array([0.0, 0.0]))))
+        self.assertTrue(np.allclose(np.array([-1.0, -1.0]), mg.stretch(ratio, n, x_0, ds, np.array([-1.0, -1.0]))))
+        self.assertTrue(np.allclose(np.array([-1.0, 1.0]), mg.stretch(ratio, n, x_0, ds, np.array([-1.0, 1.0]))))
+        self.assertTrue(np.allclose(np.array([1.0, -1.0]), mg.stretch(ratio, n, x_0, ds, np.array([1.0, -1.0]))))
+        self.assertTrue(np.allclose(np.array([1.0, 1.0]), mg.stretch(ratio, n, x_0, ds, np.array([1.0, 1.0]))))
+
+    def test_parallelogram_normalised(self):
+        gradient = np.array([0.5, 0.25])
+        n = [2, 2]
+        x_0 = np.array([-1.0, -2.0])
+        ds = np.array([2.0, 2.0])
+
+        # demonstrate start and end point recovery and a random mid-point.
+        self.assertTrue(np.allclose(x_0, mg.parallelogram(True, gradient, n, x_0, ds, x_0)))
+        self.assertTrue(np.allclose(x_0 + ds, mg.parallelogram(True, gradient, n, x_0, ds, x_0 + ds)))
+        self.assertTrue(np.allclose([0.0, -1.0], mg.parallelogram(True, gradient, n, x_0, ds, x_0 + 0.5*ds)))
+
+    def test_parallelogram_unnormalised(self):
+        gradient = np.array([0.5, 0.25])
+        n = [2, 2]
+        x_0 = np.array([1.0, 2.0])
+        ds = np.array([2.0, 2.0])
+
+        # Demonstrate start and gradient recovery.
+        self.assertTrue(np.allclose(x_0, mg.parallelogram(False, gradient, n, x_0, ds, x_0)))
+        self.assertTrue(np.allclose([2.25, 3.5], mg.parallelogram(False, gradient, n, x_0, ds, x_0 + 0.5*ds)))
+        x_point = mg.parallelogram(False, gradient, n, x_0, ds, x_0 + np.array([0.5 * ds[0], 0.0]))
+        self.assertAlmostEqual(gradient[0], (x_point[1] - x_0[1])/(x_point[0] - x_0[0]))
+        y_point = mg.parallelogram(False, gradient, n, x_0, ds, x_0 + np.array([0.0, 0.5 * ds[1]]))
+        self.assertAlmostEqual(gradient[1], (y_point[0] - x_0[0])/(y_point[1] - x_0[1]))
+
+
+# ----------------------------------------------------------------------------------------------------------------------
 # 2D Mesh Generation - Structured Meshes
 # ----------------------------------------------------------------------------------------------------------------------
 
