@@ -19,50 +19,6 @@ import numpy as np
 import mesh.cell as cl
 
 
-# ----------------------------------------------------------------------------------------------------------------------
-# Mesh Generation Functions
-# ----------------------------------------------------------------------------------------------------------------------
-
-def geometric_series_sum(_common_factor, _n_terms, _ratio):
-    """
-    Computes the sum of a geometric series.
-
-    :param _common_factor: The common factor to the geometric series.
-    :type _common_factor: float
-    :param _n_terms: The number of terms in the series.
-    :type _n_terms: int
-    :param _ratio: The ratio between successive terms in the series.
-    :type _ratio: float
-    :return: The sum of the series.
-    :type: float
-    """
-
-    if _ratio == 1.0:
-        raise ZeroDivisionError("Divide by zero, _ratio: " + str(_ratio))
-
-    return _common_factor * (1.0 - _ratio ** float(_n_terms)) / (1.0 - _ratio)
-
-
-def geometric_series_common_factor(_series_sum, _n_terms, _ratio):
-    """
-    Computes the common factor of a geometric series.
-
-    :param _series_sum: The sum of the series for the first n terms.
-    :type _series_sum: float
-    :param _n_terms: The number of terms in the series.
-    :type _n_terms: int
-    :param _ratio: The ratio between successive terms in the series.
-    :type _ratio: float
-    :return: The sum of the series.
-    :type: float
-    """
-
-    if _ratio ** _n_terms == 1.0:
-        raise ZeroDivisionError("Divide by zero, _ratio: " + str(_ratio))
-
-    return _series_sum * (1.0 - _ratio) / (1.0 - _ratio ** float(_n_terms))
-
-
 # def double_geometric_series_sum(_common_factor_0, _n_terms_0, _ratio_0, _common_factor_1, _n_terms_1, _ratio_1):
 #     """
 #     Computes the sum of a geometric series.
@@ -84,6 +40,7 @@ def geometric_series_common_factor(_series_sum, _n_terms, _ratio):
 #
 #     return _common_factor * (1.0 - _ratio ** float(_n_terms)) / (1.0 - _ratio)
 
+
 def double_geometric_series_common_factors(_series_sum, _n_terms, _ratio_0, _ratio_1):
     """
     Computes the common factor of a geometric series.
@@ -92,8 +49,10 @@ def double_geometric_series_common_factors(_series_sum, _n_terms, _ratio_0, _rat
     :type _series_sum: float
     :param _n_terms: The number of terms in the series.
     :type _n_terms: int
-    :param _ratio: The ratio between successive terms in the series.
-    :type _ratio: float
+    :param _ratio_0: The ratio between successive terms in the series.
+    :type _ratio_0: float
+    :param _ratio_1: The ratio between successive terms in the series.
+    :type _ratio_1: float
     :return: The sum of the series.
     :type: float
     """
@@ -119,61 +78,104 @@ def double_geometric_series_common_factors(_series_sum, _n_terms, _ratio_0, _rat
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-# Standard Mesh Lambdas
+# Standard Mesh Transformation Functions
 # ----------------------------------------------------------------------------------------------------------------------
 
-def structured(_x): return _x
+def structured(_n, _x_0, _ds, _x):
+    """
+    Standard structured mesh, the passed co-ordinate is the returned co-ordindate.
+
+    :param _n: number of cells in x and y, [number_of_cells_x, number of cells_y].
+    :type _n: list
+    :param _x_0: Starting co-ordinate of structured grid, [start_co_ordinate_x, start_co_ordinate_y].
+    :type _x_0: list
+    :param _ds: Domain size/length, [size_x, size_y]
+    :type _ds: list
+    :param _x: current co-ordinate to transform, [co_ordinate_x, co_ordinate_y].
+    :type _x: numpy.array
+    :return: parsed co-ordinate, [co_ordinate_x, co_ordinate_y].
+    :type: numpy.array
+    """
+
+    return _x
 
 
-def parallelograms_x(_x): return np.array([3.0*_x[0] + _x[1], 4.0*_x[1]])/4.0
+def stretch(_ratio, _n, _x_0, _ds, _x):
+    """
+    Stretches the mesh in the two cardinal directions, each successive cell size in respective directions differs by the
+    respective constant ratio. This is akin to a geometric series.
+
+    :param _ratio: stretching ratio in x and y, [stretch_x, stretch_y].
+    :type _ratio: numpy.array
+    :param _n: number of cells in x and y, [number_of_cells_x, number of cells_y].
+    :type _n: list
+    :param _x_0: Starting co-ordinate of structured grid, [start_co_ordinate_x, start_co_ordinate_y].
+    :type _x_0: numpy.array
+    :param _ds: Domain size/length, [size_x, size_y]
+    :type _ds: numpy.array
+    :param _x: current co-ordinate to transform, [co_ordinate_x, co_ordinate_y].
+    :type _x: numpy.array
+    :return: transformed co-ordinate, [co_ordinate_x, co_ordinate_y].
+    :type: numpy.array
+    """
+
+    if _ratio[0] == 1.0 or _ratio[1] == 1.0:
+        raise RuntimeError("Attempting to use a stretch ratio of 1.0. " + str(_ratio))
+
+    return np.array([_x_0[0] + _ds[0] * (1.0 - _ratio[0]) / (1.0 - np.power(_ratio[0], _n[0])) *
+                     (1.0 - np.power(_ratio[0], ((_x[0] - _x_0[0]) / (_ds[0] / _n[0])))) / (1.0 - _ratio[0]),
+                     _x_0[1] + _ds[1] * (1.0 - _ratio[1]) / (1.0 - np.power(_ratio[1], _n[1])) *
+                     (1.0 - np.power(_ratio[1], ((_x[1] - _x_0[1]) / (_ds[1] / _n[1])))) / (1.0 - _ratio[1])])
 
 
-def parallelograms_y(_x): return np.array([4.0*_x[0], _x[0] + 3.0*_x[1]])/4.0
+def parallelogram(_normalise, _gradient, _n, _x_0, _ds, _x):
+    """
+    Converts the domain into a parallelogram, by using the two gradients. The first gradient controls the y-ordinate as
+    the x-ordinates are laid down and visa versa for the second gradient and the x- and y-ordinates.
 
+    Note:
+    This function operates in 2 modes, normalised and un-normalised. In normalised mode the start co-ordinate _x_0 and
+    domain size _dx are maintained, however the gradient will be 'adjusted'. In the un-normalised state _x_0 and the
+    gradients _gradient are maintained, [x'_i = x_i + m_1*(y_i - y_0), y'_i = y_i + m_0*(x_i - x_0], i.e. m_1 and m_2
+    are unaltered and the domain size is adjusted.
 
-def rhombus(_x): return np.array([4.0 * _x[0] + _x[1], _x[0] + 4.0 * _x[1]]) / 5.0
+    :param _normalise: Domain is normalised if set to true, else remains un-normalised.
+    :type _normalise: bool
+    :param _gradient: gradient of cell faces in x and y, [gradient_x (horizontal edges), gradient_y (vertical edges)].
+    :type _gradient: numpy.array
+    :param _n: number of cells in x and y, [number_of_cells_x, number of cells_y].
+    :type _n: list
+    :param _x_0: Starting co-ordinate of structured grid, [start_co_ordinate_x, start_co_ordinate_y].
+    :type _x_0: numpy.array
+    :param _ds: Domain size/length, [size_x, size_y]
+    :type _ds: numpy.array
+    :param _x: current co-ordinate to transform, [co_ordinate_x, co_ordinate_y].
+    :type _x: numpy.array
+    :return: transformed co-ordinate, [co_ordinate_x, co_ordinate_y].
+    :type: numpy.array
+    """
+
+    if _gradient[0] >= 1.0 or _gradient[1] >= 1.0:
+        raise RuntimeError("Attempting to use a skewing ratio of 1.0 or more. " + str(_gradient))
+
+    if _normalise:
+        box_size = np.array([_ds[0] + _gradient[1] * _ds[1], _ds[1] + _gradient[0] * _ds[0]])
+        return np.array([_x_0[0] + _ds[0] * (_x[0] - _x_0[0] + _gradient[1] * (_x[1] - _x_0[1])) / box_size[0],
+                         _x_0[1] + _ds[1] * (_x[1] - _x_0[1] + _gradient[0] * (_x[0] - _x_0[0])) / box_size[1]])
+    else:
+        return np.array([_x[0] + _gradient[1] * (_x[1] - _x_0[1]), _x[1] + _gradient[0] * (_x[0] - _x_0[0])])
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # 1D Mesh Generation
 # ----------------------------------------------------------------------------------------------------------------------
 
-
-def setup_1d_mesh(_number_of_cells, _start_co_ordinate=0.0, _domain_size=1.0, _ratio=1.0):
+def setup_1d_mesh(_number_of_cells, _start_co_ordinate=0.0, _domain_size=1.0):
     """
-    Generates the vertices, cell-vertex connectivity as well as the cell type.
-
-    :param _number_of_cells: The number of cells in the mesh.
-    :type _number_of_cells: int
-    :param _start_co_ordinate: The starting co-ordinate (lower x bound).
-    :type _start_co_ordinate: float
-    :param _domain_size: The total length of the domain.
-    :type _domain_size: float
-    :param _ratio: The ratio of change between successive (increasing in x) cell sizes.
-    :type _ratio: float
-    :return:
+    Not implemented
     """
 
-    # Layout memory
-    cell_type = np.empty(shape=(_number_of_cells, 1), dtype=cl.CellType)
-    cell_vertex_connectivity = np.zeros(shape=(_number_of_cells, 2), dtype=int)
-    vertex_coordinates = np.zeros(shape=(_number_of_cells + 1, 2), dtype=float)
-
-    # Determine starting delta x.
-    delta_x = geometric_series_common_factor(_domain_size, _number_of_cells, _ratio) \
-        if _ratio != 1.0 else _domain_size / float(_number_of_cells)
-
-    # Compute vertex positions for the domain.
-    for i_vertex, vertex in enumerate(vertex_coordinates):
-        current_length = geometric_series_sum(delta_x, i_vertex + 2, _ratio) \
-            if _ratio != 1.0 else float(i_vertex) * delta_x
-        vertex[0] = _start_co_ordinate + current_length
-        vertex[1] = 0.0
-
-    # Setup cells
-    cell_type[:] = cl.CellType.edge
-    cell_vertex_connectivity[:, ] = [[i_cell, i_cell + 1] for i_cell in range(_number_of_cells)]
-
-    return [vertex_coordinates, cell_vertex_connectivity, cell_type]
+    raise NotImplementedError("Needs to be implemented.")
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -199,7 +201,7 @@ def setup_2d_cartesian_mesh(_number_of_cells, _start_co_ordinates=None, _domain_
     :param _domain_size: Size of the domain in x and y (defaults to 1.0, 1.0)
     :type _domain_size: numpy.array
     :param _transform: The transformation lambda for grid points, must take in and return a numpy array of co-ordinates.
-    :type _transform:lambda
+    :type _transform: lambda = f(_number_of_cells, _start_co_ordiantes, _domain_size, [x_i, y_i]): return [x'_i, y'_i]
     :return: [list of vertex co-ordinate, list of cell-vertex connectivity, type of cells]
     :type: [numpy.array, numpy.array. cell.CellType]
     """
@@ -216,7 +218,8 @@ def setup_2d_cartesian_mesh(_number_of_cells, _start_co_ordinates=None, _domain_
 
     # Compute and return the co-ordinates, connectivity, and cell type for the mesh.
     return [
-        np.array([_transform(np.array([_start_co_ordinates[0]
+        np.array([_transform(_number_of_cells, _start_co_ordinates, _domain_size,
+                             np.array([_start_co_ordinates[0]
                                        + float(i_vertex % (_number_of_cells[0] + 1)) * delta[0],
                                        _start_co_ordinates[1]
                                        + float(int(i_vertex / (_number_of_cells[0] + 1))) * delta[1]]))
@@ -237,17 +240,7 @@ def setup_2d_cartesian_mesh(_number_of_cells, _start_co_ordinates=None, _domain_
 
 def setup_2d_simplex_mesh():
     """
-
-    :return:
+    Not implemented
     """
-    raise RuntimeError("Currently not working")
-    # import meshio
-    # import dmsh
-    # import optimesh
-    # geo = dmsh.Polygon([[0.0, 0.0], [1.0, 0.0], [1.0 + np.cos(np.pi / 3.0), np.sin(np.pi / 3.0)],
-    #                     [1.0, 2.0 * np.sin(np.pi / 3.0)], [0.0, 2.0 * np.sin(np.pi / 3.0)],
-    #                     [0.0 - np.cos(np.pi / 3.0), np.sin(np.pi / 3.0)]])
-    # verticies, cells = dmsh.generate(geo, 0.5)
-    # dmsh.helpers.show(verticies, cells, geo)  # Put on to print mesh
-    # new_mesh = mesh.Mesh()
-    # return new_mesh
+
+    raise NotImplementedError("Needs to be implemented, if implementing see meshio, dmsh, and optimesh")
