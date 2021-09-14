@@ -17,6 +17,9 @@
 
 import numpy as np
 import mesh.cell as cl
+#import meshio
+#import dmsh
+#import optimesh
 
 
 # def double_geometric_series_sum(_common_factor_0, _n_terms_0, _ratio_0, _common_factor_1, _n_terms_1, _ratio_1):

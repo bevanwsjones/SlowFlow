@@ -15,9 +15,9 @@
 # description: Contains all data for the mesh
 # ----------------------------------------------------------------------------------------------------------------------
 
-import cell as ct
-import face as ft
-import vertex as vt
+from mesh import cell as ct
+from mesh import face as ft
+from mesh import vertex as vt
 
 
 class CellCenteredMesh:

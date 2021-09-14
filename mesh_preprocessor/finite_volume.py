@@ -294,7 +294,7 @@ def calculate_face_cell_cell_unit_vector(_number_boundary_face, _face_cell_conne
 
 def calculate_face_area(_cell_type, _face_vertex_connectivity, _vertex_coordinates):
     """
-    Constructs face areas, computed as the unity in 1D (edge elements) and as the distance between the two faec vertices
+    Constructs face areas, computed as the unity in 1D (edge elements) and as the distance between the two face vertices
     in 2D.
 
     :param _cell_type: The type of cells described by the _cell_vertex_connectivity.

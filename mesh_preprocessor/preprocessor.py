@@ -15,8 +15,8 @@
 # description: Contains the pre-processor function which convert a basic geometric mesh with vertices to a full mesh.
 # ----------------------------------------------------------------------------------------------------------------------
 
-import connectivity as ct
-import finite_volume as fv
+from mesh_preprocessor import connectivity as ct
+from mesh_preprocessor import finite_volume as fv
 from mesh import mesh
 from mesh import cell as cl
 
