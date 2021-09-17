@@ -7,6 +7,10 @@ class MyTestCase(unittest.TestCase):
         x, x_true = -0.3502, -0.4162
         error = ea.relative_error(x, x_true)
         self.assertEqual(round(error, 4), 0.1586)  # add assertion here
+    def test_abs_error(self):
+        x, x_true = -0.3502, -0.4162
+        error = ea.abs_error(x, x_true)
+        self.assertEqual(round(error, 3), 0.066)
     def test_error_var(self):
         x, x_true = -0.3502, 0
         error = ea.abs_error(x, x_true)

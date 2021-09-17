@@ -1,6 +1,7 @@
 import numpy as np
 import math
-from gradient_algorithms import modGreenGauss as modGG
+# from gradient_algorithms import modGreenGauss as modGG
+from gradient_algorithms import NewGG
 
 # ----------------------------------------------------------------------------------------------------------------------
 # -------------------------------------- FUNDAMENTAL DEFINITIONS: Error and Error Norms --------------------------------
@@ -8,7 +9,8 @@ def relative_error(x, x_true):
     return abs(x - x_true)/abs(x_true)
 
 def abs_error(x, x_true):
-    return abs(x - x_true)
+    hey = np.abs(x - x_true)
+    return hey
 
 def array_relative_error(x, x_true):
 # what happens if the analytical function is zero?
@@ -21,17 +23,21 @@ def array_relative_error(x, x_true):
     error[0][1] = error_y
     return error
 
-def L_norm_one(error):
+def L_norm_one(error, vol_table):
     err_sum = 0.0
+    vol_sum = 0.0
     for i in range(len(error)):
-        err_sum += error[i]
-    return err_sum
+        err_sum += abs(error[i]*vol_table[i])
+        vol_sum += vol_table[i]
+    return err_sum/vol_sum
 
-def L_norm_two(error):
+def L_norm_two(error, vol_table):
     err_sum = 0.0
+    vol_sum = 0.0
     for i in range(len(error)):
-        err_sum += (error[i])**2
-    return math.sqrt(err_sum)
+        err_sum += (error[i]*vol_table[i])**2
+        vol_sum += vol_table[i]
+    return math.sqrt(err_sum)/vol_sum
 
 def L_norm_inf(error):
     l = np.amax(error)
@@ -46,28 +52,31 @@ def cell_true_function(cell_centre_mesh):
     coords = cell_centre_mesh.cell_table.centroid
     true_field[:, 0] = np.cos(coords[:, 0])
     true_field[:, 1] = -1*np.sin(coords[:, 1])
+    # true_field[:, 0] = 2*coords[:, 0]
+    # true_field[:, 1] = 2*coords[:, 1]
+    # true_field[:, 0] = 1/np.cosh(coords[:, 0])
+    # true_field[:, 1] = 1/np.cosh(coords[:, 1])
     return true_field
 
 # returns cell error table for each cell phi compared to analytical phi: [i_cell][error_x][error_y]
 def cells_error_analysis(cell_centre_mesh):
-    approx_field = modGG.GreenGauss(cell_centre_mesh)
+    approx_field = NewGG.GreenGauss(cell_centre_mesh)
     true_field = cell_true_function(cell_centre_mesh)
     error = abs_error(approx_field, true_field)
+    # print("approx field is here", approx_field)
     return error
 
 # returns L 1 Norm for error terms from the input error table: [L1_x][L1_y]
-def grid_norm_one(error):
+def grid_norm_one(error, vol_table):
     x_error, y_error = error[:, 0], error[:, 1]
-    L_norm_x, L_norm_y = L_norm_one(x_error),  L_norm_one(y_error)
+    L_norm_x, L_norm_y = L_norm_one(x_error, vol_table),  L_norm_one(y_error, vol_table)
     grid_norm_one = np.array([L_norm_x, L_norm_y])
     return grid_norm_one
 
 # returns L 2 Norm for error terms from the input error table: [L2_x][L2_y]
-def grid_norm_two(error):
+def grid_norm_two(error, vol_table):
     x_error, y_error = error[:, 0], error[:, 1]
-    # print(x_error)
-    #     # print(y_error)
-    L_norm_x, L_norm_y = L_norm_two(x_error),  L_norm_two(y_error)
+    L_norm_x, L_norm_y = L_norm_two(x_error, vol_table),  L_norm_two(y_error, vol_table)
     grid_norm_two = np.array([L_norm_x, L_norm_y])
     return grid_norm_two
 
@@ -79,9 +88,44 @@ def grid_norm_inf(error):
     return grid_norm_two
 
 # return average L1 and L2 Norms: takes in L1 or L2 and then divides by cell_no
-def grid_avg_norm(cell_centre_mesh, grid_norm):
-    no_cells = cell_centre_mesh.cell_table.max_cell
+# def grid_avg_norm(cell_centre_mesh, grid_norm):
+#     no_cells = cell_centre_mesh.cell_table.max_cell
+#     L_avg_x = grid_norm[0] / no_cells
+#     L_avg_y = grid_norm[1] / no_cells
+#     grid_avg_norm = np.array([L_avg_x, L_avg_y])
+#     return grid_avg_norm
+
+def grid_avg_norm(grid_norm, no_cells):
     L_avg_x = grid_norm[0] / no_cells
     L_avg_y = grid_norm[1] / no_cells
     grid_avg_norm = np.array([L_avg_x, L_avg_y])
     return grid_avg_norm
+
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# ---------------------- Internal and Boundary Cell Calcs --------------------------------------------------------------
+
+def seperate_int_ext(cell_centre_mesh, error, vol_table):
+    boundary_cells = NewGG.bound_cells(cell_centre_mesh)
+    size = len(boundary_cells)
+    bound_error = np.zeros(shape=(size, 2))                     # initilaise storage values
+    ext_vol_table = np.zeros(shape=(size, 1))
+    for i, i_cell in enumerate(boundary_cells):
+        bound_error[i] = error[i_cell]
+        ext_vol_table[i] = vol_table[i_cell]
+    int_error = np.delete(error, list(boundary_cells), axis = 0)
+    int_vol_table = np.delete(vol_table, list(boundary_cells), axis = 0)
+    return bound_error, int_error, size, ext_vol_table, int_vol_table
+
+def error_package(error, size, vol_table):
+    norm_one = grid_norm_one(error, vol_table)
+    norm_two = grid_norm_two(error, vol_table)
+    norm_inf = grid_norm_inf(error)
+    print("Norm one", norm_one)
+    print("Norm two", norm_two)
+    print("Norm inf", norm_inf)
+    # norm_one_avg = grid_avg_norm(norm_one, size)
+    # norm_two_avg = grid_avg_norm(norm_two, size)
+    # print("Each Cell on average has a", norm_one_avg, "L1 norm")
+    # print("Each Cell on average has a", norm_two_avg, "L2 norm")
