@@ -18,7 +18,7 @@
 from mesh_generation import mesh_generator as mg
 import unittest as ut
 import mesh.cell as cl
-
+import numpy as np
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Standard Mesh Transformation Functions

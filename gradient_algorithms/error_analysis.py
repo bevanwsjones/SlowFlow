@@ -1,6 +1,5 @@
 import numpy as np
 import math
-# from gradient_algorithms import modGreenGauss as modGG
 from gradient_algorithms import NewGG
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -88,35 +87,28 @@ def grid_norm_inf(error):
     return grid_norm_two
 
 # return average L1 and L2 Norms: takes in L1 or L2 and then divides by cell_no
-# def grid_avg_norm(cell_centre_mesh, grid_norm):
-#     no_cells = cell_centre_mesh.cell_table.max_cell
-#     L_avg_x = grid_norm[0] / no_cells
-#     L_avg_y = grid_norm[1] / no_cells
-#     grid_avg_norm = np.array([L_avg_x, L_avg_y])
-#     return grid_avg_norm
-
 def grid_avg_norm(grid_norm, no_cells):
     L_avg_x = grid_norm[0] / no_cells
     L_avg_y = grid_norm[1] / no_cells
     grid_avg_norm = np.array([L_avg_x, L_avg_y])
     return grid_avg_norm
 
-
-
 # ----------------------------------------------------------------------------------------------------------------------
 # ---------------------- Internal and Boundary Cell Calcs --------------------------------------------------------------
-
+# function that separates the error table from the internal and external cells
 def seperate_int_ext(cell_centre_mesh, error, vol_table):
     boundary_cells = NewGG.bound_cells(cell_centre_mesh)
-    size = len(boundary_cells)
-    bound_error = np.zeros(shape=(size, 2))                     # initilaise storage values
-    ext_vol_table = np.zeros(shape=(size, 1))
+    bound_size = len(boundary_cells)
+    tot_cell = cell_centre_mesh.cell_table.max_cell
+    int_cell = tot_cell - bound_size
+    bound_error = np.zeros(shape=(bound_size, 2))                     # initilaise storage values
+    ext_vol_table = np.zeros(shape=(bound_size, 1))
     for i, i_cell in enumerate(boundary_cells):
         bound_error[i] = error[i_cell]
         ext_vol_table[i] = vol_table[i_cell]
     int_error = np.delete(error, list(boundary_cells), axis = 0)
     int_vol_table = np.delete(vol_table, list(boundary_cells), axis = 0)
-    return bound_error, int_error, size, ext_vol_table, int_vol_table
+    return bound_error, int_error, bound_size, int_cell, ext_vol_table, int_vol_table
 
 def error_package(error, size, vol_table):
     norm_one = grid_norm_one(error, vol_table)
@@ -125,7 +117,4 @@ def error_package(error, size, vol_table):
     print("Norm one", norm_one)
     print("Norm two", norm_two)
     print("Norm inf", norm_inf)
-    # norm_one_avg = grid_avg_norm(norm_one, size)
-    # norm_two_avg = grid_avg_norm(norm_two, size)
-    # print("Each Cell on average has a", norm_one_avg, "L1 norm")
-    # print("Each Cell on average has a", norm_two_avg, "L2 norm")
+    return norm_one, norm_two, norm_inf

@@ -49,12 +49,14 @@ class test_cell_quality(ut.TestCase):
     def test_cell_uneven(self):
         cell_centroid = np.array([[2, 2], [5, 2], [1, 10], [-2, 4], [1, -4]])
         face_centroid = np.array([[4, 6], [3, 7], [1, 2], [1, 1]])
+        fc_connectivity = np.array([[0, 1], [0, 2], [0, 3], [0, 4]])
         uneven = gq.cell_unevenness(cell_centroid, face_centroid, fc_connectivity)
         self.assertEqual(uneven[0], 0.4421)
         self.assertEqual(uneven[1], 1.3333)
     def test_cell_skew(self):
         cell_centroid = np.array([[2, 2], [5, 2], [1, 10], [-2, 4], [1, -4]])
         face_centroid = np.array([[4, 6], [3, 7], [1, 2], [1, 1]])
+        fc_connectivity = np.array([[0, 1], [0, 2], [0, 3], [0, 4]])
         skew = gq.cell_skewness(cell_centroid, face_centroid, fc_connectivity)
         self.assertEqual(skew[0], 0.4421)
         self.assertEqual(skew[1], 1.3333)

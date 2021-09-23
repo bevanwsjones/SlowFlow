@@ -63,21 +63,25 @@ cell_centre_mesh = pp.setup_cell_centred_finite_volume_mesh(vertex_coordinates, 
 def single_cell_grid_quality():
 # return the cell-grid quality metric matrix:
 # returns [i_cell][average non-orthogonality][average unevenness][average skewness]
+# averages indicate face-are weightings
     cell_centroid = np.array([[2, 2], [5, 2], [1, 10], [-2, 4], [1, -4]])
     face_normals =  np.array([[1, 0], [-0.5, 1], [-1, 2], [-1, -1]])
     face_centroid = np.array([[4, 6], [3, 7], [1, 2], [1, 1]])
     fc_connectivity = np.array([[0, 1], [0, 2], [0, 3], [0, 4]])
+    face_areas = np.array([5, 6, 5, 4])
     cell_face_table = np.array([[1, 2, 3, 4]])
     cell_size = 1
     quality_metrics = np.zeros(shape=(cell_size, 3))                # store quality metrics of all cells
     # compute quality metrics for all faces
     faces_grid = faces_grid_quality(cell_centroid, face_normals, face_centroid, fc_connectivity)
     grid = np.zeros(shape=(1, 3))
+    area_sum = 0
     for i_cell in range(cell_size):
         faces = cell_face_table[i_cell]                     # get the faces from each cell
         for i_face in range(len(faces)):
-            grid = grid + faces_grid[i_face]                # sum all the quality metrics from adjacent faces to cell
-        quality_metrics[i_cell] = grid/len(faces)           # find average of quality metrics
+            grid = grid + faces_grid[i_face]*face_areas[i_face]   # sum all the quality metrics from adjacent faces to cell
+            area_sum = area_sum + face_areas[i_face]
+        quality_metrics[i_cell] = grid/area_sum           # find average of quality metrics
     return quality_metrics
 
 # ----------------------------CELL CALCULATION (FOR ALL CELLS IN GRID) QUALITY METRICS---------------------------------
