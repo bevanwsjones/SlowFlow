@@ -1,6 +1,7 @@
 import numpy as np
 import math
 from gradient_algorithms import NewGG
+from matplotlib import pyplot as plt
 
 # ----------------------------------------------------------------------------------------------------------------------
 # -------------------------------------- FUNDAMENTAL DEFINITIONS: Error and Error Norms --------------------------------
@@ -114,7 +115,53 @@ def error_package(error, size, vol_table):
     norm_one = grid_norm_one(error, vol_table)
     norm_two = grid_norm_two(error, vol_table)
     norm_inf = grid_norm_inf(error)
-    print("Norm one", norm_one)
-    print("Norm two", norm_two)
-    print("Norm inf", norm_inf)
+    #print("Norm one", norm_one)
+    #print("Norm two", norm_two)
+    #print("Norm inf", norm_inf)
     return norm_one, norm_two, norm_inf
+
+def error_plotter(int_error_array, bound_error_array, h):
+    # plot 1 - x-gradient error - internal cells
+    plt.subplot(2, 2, 1)
+    plt.plot(h, int_error_array[:, 0, 0], '-o', label='L1 norm')
+    plt.plot(h, int_error_array[:, 1, 0], '-ok', label='L2 norm')
+    plt.plot(h, int_error_array[:, 2, 0], '-or', label='Linf norm')
+    plt.xlabel("Characteristic Length")
+    plt.ylabel("x-gradient internal cell error")
+    plt.xscale("log")
+    plt.yscale("log")
+    plt.legend()
+    # plot 2 - y-gradient error - internal cells
+    plt.subplot(2, 2, 2)
+    plt.plot(h, int_error_array[:, 0, 1], '-o', label='L1 norm')
+    plt.plot(h, int_error_array[:, 1, 1], '-ok', label='L2 norm')
+    plt.plot(h, int_error_array[:, 2, 1], '-or', label='Linf norm')
+    plt.xlabel("Characteristic Length")
+    plt.ylabel("y-gradient internal cell error")
+    plt.xscale("log")
+    plt.yscale("log")
+    plt.legend()
+    # plot 3 - x-gradient error - boundary cells
+    plt.subplot(2, 2, 3)
+    plt.plot(h, bound_error_array[:, 0, 0], '-o', label='L1 norm')
+    plt.plot(h, bound_error_array[:, 1, 0], '-ok', label='L2 norm')
+    plt.plot(h, bound_error_array[:, 2, 0], '-or', label='Linf norm')
+    plt.xlabel("Characteristic Length")
+    plt.ylabel("x-gradient bound cell error")
+    plt.xscale("log")
+    plt.yscale("log")
+    plt.legend()
+    # plot 4 - y-gradient error - boundary cells
+    plt.subplot(2, 2, 4)
+    plt.plot(h, bound_error_array[:, 0, 1], '-o', label='L1 norm')
+    plt.plot(h, bound_error_array[:, 1, 1], '-ok', label='L2 norm')
+    plt.plot(h, bound_error_array[:, 2, 1], '-or', label='Linf norm')
+    plt.xlabel("Characteristic Length")
+    plt.ylabel("y-gradient bound cell error")
+    plt.xscale("log")
+    plt.yscale("log")
+    plt.legend()
+    plt.suptitle("2D Structured Cartesian Grid Error Analysis")
+    plt.tight_layout
+    plt.show()
+    return -1
