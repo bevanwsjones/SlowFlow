@@ -25,7 +25,21 @@ def boundary_phi_function(cell_centre_mesh):
 def arithMean(phi_field_0, phi_field_1):
     return 0.5 * (phi_field_0 + phi_field_1)
 
-def GreenGauss(cell_centre_mesh):
+def close_point(cell_centroid, drn_vector, face_centroid):
+    t = -1 * np.dot(drn_vector, np.subtract(cell_centroid, face_centroid))/(drn_vector[0]**2 + drn_vector[1]**2)
+    close_point = np.add(cell_centroid, t*drn_vector)
+    return close_point
+
+# make exception case for if either x or y coordinate exhibits
+def dist_vector(vec_0, vec_1):
+    return math.sqrt((vec_1[0] - vec_0[0])**2 + (vec_1[1] - vec_0[1])**2)
+
+def lineInter(phi_field_0, phi_field_1, x_0, x_1, x_i, fc):
+    ptc = close_point(x_0, x_i, fc)
+    return (dist_vector(x_1, ptc)*phi_field_0 + dist_vector(x_0, ptc)*phi_field_1)/dist_vector(x_0, x_1)
+    #return (np.abs(ptc - x_1) * phi_field_0 + np.abs(ptc - x_0) * phi_field_1)/np.abs(x_1 - x_0)
+
+def GreenGauss(cell_centre_mesh, status = 0):
     phi_gradient_field = np.zeros(shape=(cell_centre_mesh.cell_table.max_cell, 2), dtype=float)
     phi_field = cell_phi_function(cell_centre_mesh)                             # phi values for all cells
     phi_boundary_field = boundary_phi_function(cell_centre_mesh)                # phi values for all boundaries
@@ -42,7 +56,14 @@ def GreenGauss(cell_centre_mesh):
         i_cell_1 = cell_centre_mesh.face_table.connected_cell[i_face][1]
         phi_field_0 = phi_field[i_cell_0]                               # find phi field for each cell
         phi_field_1 = phi_field[i_cell_1]
-        face_contribution = arithMean(phi_field_0, phi_field_1)       # can turn this into a face operator function?
+        if status == 0:
+            face_contribution = arithMean(phi_field_0, phi_field_1)       # can turn this into a face operator function?
+        elif status == 1:
+            x_0 = cell_centre_mesh.cell_table.centroid[i_cell_0]  # determine coordinates for cell centroids
+            x_1 = cell_centre_mesh.cell_table.centroid[i_cell_1]
+            x_i = cell_centre_mesh.face_table.cc_unit_vector[i_face]  # direction vector
+            fc = cell_centre_mesh.face_table.centroid[i_face]
+            face_contribution = lineInter(phi_field_0, phi_field_1, x_0, x_1, x_i, fc)
         face_area = cell_centre_mesh.face_table.area[i_face]
         face_normal = cell_centre_mesh.face_table.normal[i_face]
         phi_gradient_field[i_cell_0] += face_contribution*face_area*face_normal/cell_centre_mesh.cell_table.volume[i_cell_0]
