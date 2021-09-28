@@ -12,7 +12,7 @@
 #  <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------------------------------------------------------
 # filename: face.py
-# description: Definition of mesh_entities faces.
+# description: Definition of mesh faces.
 # ----------------------------------------------------------------------------------------------------------------------
 
 import numpy as np
@@ -20,7 +20,7 @@ import numpy as np
 
 class FaceTable:
     """
-    The face table, containing basic mesh_entities cell face geometry data.
+    The face table, containing basic mesh cell face geometry data.
     """
 
     def __init__(self):

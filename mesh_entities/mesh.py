@@ -11,18 +11,16 @@
 #  You should have received a copy of the GNU General Public License along with this program. If not, see
 #  <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------------------------------------------------------
-# filename: mesh_entities.py
-# description: Contains all data for the mesh_entities
+# filename: mesh.py
+# description: Contains all data for the mesh
 # ----------------------------------------------------------------------------------------------------------------------
 
-from mesh_entities import cell as ct
-from mesh_entities import face as ft
-from mesh_entities import vertex as vt
+from mesh_entities import cell as ct, face as ft, vertex as vt
 
 
 class CellCenteredMesh:
     """
-    Structure to hold all mesh_entities entities.
+    Structure to hold all mesh entities.
     """
 
     def __init__(self, _cell_type):

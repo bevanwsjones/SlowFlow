@@ -22,8 +22,4 @@ from post_processor import graph as gr
 
 [vertex_coordinates, cell_vertex_connectivity, cell_type] = mg.setup_2d_cartesian_mesh([10, 10])
 cell_centre_mesh = pp.setup_cell_centred_finite_volume_mesh(vertex_coordinates, cell_vertex_connectivity, cell_type)
-phi_0 = np.random.rand(cell_centre_mesh.cell_table.max_cell, 2)
-phi_1 = np.random.rand(cell_centre_mesh.cell_table.max_cell)
-phi_2 = np.random.rand(cell_centre_mesh.cell_table.max_cell)
-phi_3 = np.random.rand(cell_centre_mesh.cell_table.max_cell)
-gr.plot_field(cell_centre_mesh, [phi_0, phi_1, phi_2, phi_3], gr.FieldPlotMetaData)
+gr.plot_field(cell_centre_mesh, gr.generate_random_field(4, cell_centre_mesh.cell_table.max_cell))
