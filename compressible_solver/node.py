@@ -114,7 +114,7 @@ class CompressibleNode(Node):
 
 class CellTable:
     """
-    The node table, containing basic mesh geometry data.
+    The node table, containing basic mesh_entities geometry data.
     """
 
     def __init__(self, max_cell):

@@ -17,6 +17,9 @@
 
 from mesh_generation import mesh_generator as mg
 from mesh_preprocessor import preprocessor as pp
+from post_processor import graph as gr
 
-[vertex_coordinates, cell_vertex_connectivity, cell_type] = mg.setup_2d_cartesian_mesh([3, 3])
+[vertex_coordinates, cell_vertex_connectivity, cell_type] = mg.setup_2d_cartesian_mesh([10, 10])
 cell_centre_mesh = pp.setup_cell_centred_finite_volume_mesh(vertex_coordinates, cell_vertex_connectivity, cell_type)
+gr.plot_field(cell_centre_mesh, gr.generate_random_field(4, cell_centre_mesh.cell_table.max_cell,
+                                                         [True, False, True, False]))

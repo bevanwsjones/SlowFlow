@@ -12,13 +12,13 @@
 #  <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------------------------------------------------------
 # filename: test_mesh_generator.py
-# description: Contains unit tests for the mesh generator.
+# description: Contains unit tests for the mesh_entities generator.
 # ----------------------------------------------------------------------------------------------------------------------
 
 import numpy as np
 import unittest as ut
-from mesh import cell as cl
-from mesh_generation import mesh_generator as mg
+from ...mesh_entities import cell as cl
+from ...mesh_generation import mesh_generator as mg
 
 
 # ----------------------------------------------------------------------------------------------------------------------
