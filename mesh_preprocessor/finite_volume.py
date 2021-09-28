@@ -12,11 +12,11 @@
 #  <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------------------------------------------------------
 # filename: finite_volume.py
-# description: Contains functions for computing the the geometric properties of a finite volume mesh.
+# description: Contains functions for computing the the geometric properties of a finite volume mesh_entities.
 # ----------------------------------------------------------------------------------------------------------------------
 
 import numpy as np
-from mesh import cell as cl
+from mesh_entities import cell as cl
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -31,7 +31,7 @@ def calculate_edge_centroid(_cell_vertex_connectivity, _vertex_coordinates):
 
     :param _cell_vertex_connectivity: Cell-vertex connectivity table, of the form [i_cell][list of vertices].
     :type _cell_vertex_connectivity: numpy.array
-    :param _vertex_coordinates: Co-ordinates for all vertices in the mesh, of the form [i_vertex][x, y coordinates]
+    :param _vertex_coordinates: Co-ordinates for all vertices in the mesh_entities, of the form [i_vertex][x, y coordinates]
     :type _vertex_coordinates: numpy.array
     :return: List of the cell centroids of the form [i_cell][x, y coordinates].
     :type: numpy.array
@@ -48,7 +48,7 @@ def calculate_triangle_centroid(_cell_vertex_connectivity, _vertex_coordinates):
 
     :param _cell_vertex_connectivity: Cell-vertex connectivity table, of the form [i_cell][list of vertices].
     :type _cell_vertex_connectivity: numpy.array
-    :param _vertex_coordinates: Co-ordinates for all vertices in the mesh, of the form [i_vertex][x, y coordinates]
+    :param _vertex_coordinates: Co-ordinates for all vertices in the mesh_entities, of the form [i_vertex][x, y coordinates]
     :type _vertex_coordinates: numpy.array
     :return: List of the cell centroids of the form [i_cell][x, y coordinates].
     :type: numpy.array
@@ -91,7 +91,7 @@ def calculate_quadrilateral_centroid(_cell_vertex_connectivity, _vertex_coordina
 
     :param _cell_vertex_connectivity: Cell-vertex connectivity table, of the form [i_cell][list of vertices].
     :type _cell_vertex_connectivity: numpy.array
-    :param _vertex_coordinates: Co-ordinates for all vertices in the mesh, of the form [i_vertex][x, y coordinates]
+    :param _vertex_coordinates: Co-ordinates for all vertices in the mesh_entities, of the form [i_vertex][x, y coordinates]
     :type _vertex_coordinates: numpy.array
     :return: List of the cell centroids of the form [i_cell][x, y coordinates].
     :type: numpy.array
@@ -123,7 +123,7 @@ def calculate_hexagon_centroid(_cell_vertex_connectivity, _vertex_coordinates):
 
     :param _cell_vertex_connectivity: Cell-vertex connectivity table, of the form [i_cell][list of vertices].
     :type _cell_vertex_connectivity: numpy.array
-    :param _vertex_coordinates: Co-ordinates for all vertices in the mesh, of the form [i_vertex][x, y coordinates]
+    :param _vertex_coordinates: Co-ordinates for all vertices in the mesh_entities, of the form [i_vertex][x, y coordinates]
     :type _vertex_coordinates: numpy.array
     :return: List of the cell centroids of the form [i_cell][x, y coordinates].
     :type: numpy.array
@@ -140,7 +140,7 @@ def calculate_cell_centroid(_cell_type, _cell_vertex_connectivity, _vertex_coord
     :type _cell_type: mesh.cell.CellType
     :param _cell_vertex_connectivity: Cell-vertex connectivity table, of the form [i_cell][list of vertices].
     :type _cell_vertex_connectivity: numpy.array
-    :param _vertex_coordinates: Co-ordinates for all vertices in the mesh, of the form [i_vertex][x, y coordinates]
+    :param _vertex_coordinates: Co-ordinates for all vertices in the mesh_entities, of the form [i_vertex][x, y coordinates]
     :type _vertex_coordinates: numpy.array
     :return: List of the cell centroids of the form [i_cell][x, y coordinates].
     :type: numpy.array
@@ -168,7 +168,7 @@ def calculate_edge_volume(_cell_vertex_connectivity, _vertex_coordinates):
 
     :param _cell_vertex_connectivity: Cell-vertex connectivity table, of the form [i_cell][list of vertices].
     :type _cell_vertex_connectivity: numpy.array
-    :param _vertex_coordinates: Co-ordinates for all vertices in the mesh, of the form [i_vertex][x, y coordinates]
+    :param _vertex_coordinates: Co-ordinates for all vertices in the mesh_entities, of the form [i_vertex][x, y coordinates]
     :type _vertex_coordinates: numpy.array
     :return: List of the cell volumes of the form [i_cell][volume].
     :type: numpy.array
@@ -193,13 +193,13 @@ def calculate_2d_cell_volume(_cell_face_connectivity, _face_cell_connectivity, _
     :type _face_cell_connectivity: numpy.array
     :param _face_vertex_connectivity: Face-vertex connectivity table, of the form [i_face][list of vertices].
     :type _face_vertex_connectivity: numpy.array
-    :param _cell_centroids: Co-ordinates for all cell centroids in the mesh, of the form [i_cell][x, y coordinates]
+    :param _cell_centroids: Co-ordinates for all cell centroids in the mesh_entities, of the form [i_cell][x, y coordinates]
     :type _cell_centroids: numpy.array
-    :param _face_normals: The normal vector for each face in the mesh, of the form [i_face][x, y coordinates]
+    :param _face_normals: The normal vector for each face in the mesh_entities, of the form [i_face][x, y coordinates]
     :type _face_normals: numpy.array
-    :param _face_areas: The area for each face in the mesh, of the form [i_face_area]
+    :param _face_areas: The area for each face in the mesh_entities, of the form [i_face_area]
     :type _face_areas: numpy.array
-    :param _vertex_coordinates: Co-ordinates for all vertices in the mesh, of the form [i_vertex][x, y coordinates]
+    :param _vertex_coordinates: Co-ordinates for all vertices in the mesh_entities, of the form [i_vertex][x, y coordinates]
     :type _vertex_coordinates: numpy.array
     :return: List of the cell volumes of the form [i_cell][volume].
     :type: numpy.array
@@ -226,7 +226,7 @@ def calculate_face_centroid(_face_vertex_connectivity, _vertex_coordinates):
 
     :param _face_vertex_connectivity: Face-vertex connectivity table, of the form [i_face][list of vertices].
     :type _face_vertex_connectivity: numpy.array
-    :param _vertex_coordinates: Co-ordinates for all vertices in the mesh, of the form [i_vertex][x, y coordinates]
+    :param _vertex_coordinates: Co-ordinates for all vertices in the mesh_entities, of the form [i_vertex][x, y coordinates]
     :type _vertex_coordinates: numpy.array
     :return: List of the face centroids.
     :type: numpy.array
@@ -242,15 +242,15 @@ def calculate_face_cell_cell_length(_number_boundary_face, _face_cell_connectivi
     Computes the length between two cell centroids for each face. If the face is a boundary computes the length between
     the cell centroid and the face centre. Assumes all boundary faces are at the front of the connectivity tables.
 
-    :param _number_boundary_face: number of boundary faces in the mesh.
+    :param _number_boundary_face: number of boundary faces in the mesh_entities.
     :type _number_boundary_face: int
     :param _face_cell_connectivity: Face-cell connectivity table, of the form [i_face][list of cells].
     :type _face_cell_connectivity: numpy.array
     :param _face_vertex_connectivity: Face-vertex connectivity table, of the form [i_face][list of vertices].
     :type _face_vertex_connectivity: numpy.array
-    :param _cell_centroid: Co-ordinates for all cell centroids in the mesh, of the form [i_cell][x, y coordinates]
+    :param _cell_centroid: Co-ordinates for all cell centroids in the mesh_entities, of the form [i_cell][x, y coordinates]
     :type _cell_centroid: numpy.array
-    :param _vertex_coordinates: Co-ordinates for all vertices in the mesh, of the form [i_vertex][x, y coordinates]
+    :param _vertex_coordinates: Co-ordinates for all vertices in the mesh_entities, of the form [i_vertex][x, y coordinates]
     :type _vertex_coordinates: numpy.array
     :return: List of the face normals of the form [i_face][cell centroid to cell centroid length].
     :type: numpy.array
@@ -270,15 +270,15 @@ def calculate_face_cell_cell_unit_vector(_number_boundary_face, _face_cell_conne
     Computes the cell centroid to cell centroid unit vectors. The vector points from the local cell index 0 to the local
     cell index 1. If the face is a boundary the vector points from the cell centre to the face centre.
 
-    :param _number_boundary_face: number of boundary faces in the mesh.
+    :param _number_boundary_face: number of boundary faces in the mesh_entities.
     :type _number_boundary_face: int
     :param _face_cell_connectivity: Face-cell connectivity table, of the form [i_face][list of cells].
     :type _face_cell_connectivity: numpy.array
     :param _face_vertex_connectivity: Face-vertex connectivity table, of the form [i_face][list of vertices].
     :type _face_vertex_connectivity: numpy.array
-    :param _cell_centroid: Co-ordinates for all cell centroids in the mesh, of the form [i_cell][x, y coordinates]
+    :param _cell_centroid: Co-ordinates for all cell centroids in the mesh_entities, of the form [i_cell][x, y coordinates]
     :type _cell_centroid: numpy.array
-    :param _vertex_coordinates: Co-ordinates for all vertices in the mesh, of the form [i_vertex][x, y coordinates]
+    :param _vertex_coordinates: Co-ordinates for all vertices in the mesh_entities, of the form [i_vertex][x, y coordinates]
     :type _vertex_coordinates: numpy.array
     :return: List of the face cell-cell unit vectors of the form [i_face][cell centroid to cell centroid unit vector].
     :type: numpy.array
@@ -301,7 +301,7 @@ def calculate_face_area(_cell_type, _face_vertex_connectivity, _vertex_coordinat
     :type _cell_type: mesh.cell.CellType
     :param _face_vertex_connectivity: Face-vertex connectivity table, of the form [i_face][list of vertices].
     :type _face_vertex_connectivity: numpy.array
-    :param _vertex_coordinates: Co-ordinates for all vertices in the mesh, of the form [i_vertex][x, y coordinates]
+    :param _vertex_coordinates: Co-ordinates for all vertices in the mesh_entities, of the form [i_vertex][x, y coordinates]
     :type _vertex_coordinates: numpy.array
     :return: List of the face normals of the form [i_face][x, y normal].
     :type: numpy.array
@@ -322,7 +322,7 @@ def calculate_face_normal(_cell_type, _face_vertex_connectivity, _vertex_coordin
     :type _cell_type: mesh.cell.CellType
     :param _face_vertex_connectivity: Face-vertex connectivity table, of the form [i_face][list of vertices].
     :type _face_vertex_connectivity: numpy.array
-    :param _vertex_coordinates: Co-ordinates for all vertices in the mesh, of the form [i_vertex][x, y coordinates]
+    :param _vertex_coordinates: Co-ordinates for all vertices in the mesh_entities, of the form [i_vertex][x, y coordinates]
     :type _vertex_coordinates: numpy.array
     :param _face_cell_cell_unit_vector: Cell centroid to centroid unit vector [i_face][x, y unit vector].
     :type _face_cell_cell_unit_vector: numpy.array

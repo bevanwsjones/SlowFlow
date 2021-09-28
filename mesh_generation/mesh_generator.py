@@ -16,7 +16,7 @@
 # ----------------------------------------------------------------------------------------------------------------------
 
 import numpy as np
-import mesh.cell as cl
+import mesh_entities.cell as cl
 
 
 # def double_geometric_series_sum(_common_factor_0, _n_terms_0, _ratio_0, _common_factor_1, _n_terms_1, _ratio_1):
@@ -83,7 +83,7 @@ def double_geometric_series_common_factors(_series_sum, _n_terms, _ratio_0, _rat
 
 def structured(_n, _x_0, _ds, _x):
     """
-    Standard structured mesh, the passed co-ordinate is the returned co-ordindate.
+    Standard structured mesh_entities, the passed co-ordinate is the returned co-ordindate.
 
     :param _n: number of cells in x and y, [number_of_cells_x, number of cells_y].
     :type _n: list
@@ -102,7 +102,7 @@ def structured(_n, _x_0, _ds, _x):
 
 def stretch(_ratio, _n, _x_0, _ds, _x):
     """
-    Stretches the mesh in the two cardinal directions, each successive cell size in respective directions differs by the
+    Stretches the mesh_entities in the two cardinal directions, each successive cell size in respective directions differs by the
     respective constant ratio. This is akin to a geometric series.
 
     :param _ratio: stretching ratio in x and y, [stretch_x, stretch_y].
@@ -184,7 +184,7 @@ def setup_1d_mesh(_number_of_cells, _start_co_ordinate=0.0, _domain_size=1.0):
 
 def setup_2d_cartesian_mesh(_number_of_cells, _start_co_ordinates=None, _domain_size=None, _transform=structured):
     """
-    Generates the vertices and cells-vertex connectivity for a 2D structured cartesian mesh. A regular equi-spaced
+    Generates the vertices and cells-vertex connectivity for a 2D structured cartesian mesh_entities. A regular equi-spaced
     Cartesian grid is first generated using the start co-ordinates and the domain size. The cell-vertex connectivity is
     ordered in an anti-clockwise manner.
 
@@ -216,7 +216,7 @@ def setup_2d_cartesian_mesh(_number_of_cells, _start_co_ordinates=None, _domain_
     number_vertices = (_number_of_cells[0] + 1) * (_number_of_cells[1] + 1)
     delta = np.array([_domain_size[0] / float(_number_of_cells[0]), _domain_size[1] / float(_number_of_cells[1])])
 
-    # Compute and return the co-ordinates, connectivity, and cell type for the mesh.
+    # Compute and return the co-ordinates, connectivity, and cell type for the mesh_entities.
     return [
         np.array([_transform(_number_of_cells, _start_co_ordinates, _domain_size,
                              np.array([_start_co_ordinates[0]

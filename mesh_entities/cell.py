@@ -12,7 +12,7 @@
 #  <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------------------------------------------------------
 # filename: cell.py
-# description: Definition of mesh cells.
+# description: Definition of mesh_entities cells.
 # ----------------------------------------------------------------------------------------------------------------------
 
 import numpy as np
@@ -53,14 +53,14 @@ def number_of_vertex_face(_cell_type):
 
 class CellTable:
     """
-    The cell table, containing basic mesh cell geometry data.
+    The cell table, containing basic mesh_entities cell geometry data.
     """
 
     def __init__(self, _cell_type):
         """
-        Sets the cell type for the cells for the mesh.
+        Sets the cell type for the cells for the mesh_entities.
 
-        :param _cell_type: The type of mesh, triangle, quadrilaterals, etc.
+        :param _cell_type: The type of mesh_entities, triangle, quadrilaterals, etc.
         :type _cell_type: mt.MeshType
         """
 

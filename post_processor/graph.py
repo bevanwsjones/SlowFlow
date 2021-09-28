@@ -185,7 +185,7 @@ def setup_field_figure(_meta_data):
 
 def plot_field(_mesh, _field, _meta_data):
     """
-    Given a mesh and associated fields a set of field plots are created
+    Given a mesh_entities and associated fields a set of field plots are created
 
     :param _mesh:
     :param _field:

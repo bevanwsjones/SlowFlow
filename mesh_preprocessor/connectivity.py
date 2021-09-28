@@ -16,7 +16,7 @@
 # ----------------------------------------------------------------------------------------------------------------------
 
 import numpy as np
-from mesh import cell as cl
+from mesh_entities import cell as cl
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -30,7 +30,7 @@ def connect_vertices_to_cells(_cell_vertex_connectivity, _number_of_vertices):
 
     :param _cell_vertex_connectivity: Cell-vertex connectivity table, of the form [i_cell][list of vertices].
     :type _cell_vertex_connectivity: numpy.array
-    :param _number_of_vertices: Number of vertices in the mesh.
+    :param _number_of_vertices: Number of vertices in the mesh_entities.
     :type _number_of_vertices: int
     :return: The vertex-vertex connectivity table of the form [i_vertex][ascending list of vertex indices]
     :type: list
@@ -54,7 +54,7 @@ def connect_vertices_to_vertices(_cell_vertex_connectivity, _number_of_vertices)
 
     :param _cell_vertex_connectivity: Cell-vertex connectivity table, of the form [i_cell][list of vertices].
     :type _cell_vertex_connectivity: numpy.array
-    :param _number_of_vertices: Number of vertices in the mesh.
+    :param _number_of_vertices: Number of vertices in the mesh_entities.
     :type _number_of_vertices: int
     :return: The vertex-vertex connectivity table of the form [i_vertex][ascending list of vertices]
     :type: list
@@ -86,7 +86,7 @@ def connect_vertices_to_vertices(_cell_vertex_connectivity, _number_of_vertices)
 
 def compute_number_of_faces(_vertex_cell_connectivity, _cell_vertex_connectivity):
     """
-    Computes the number of faces and boundary faces in the mesh, creates a temporary face_vertex_connectivity table and
+    Computes the number of faces and boundary faces in the mesh_entities, creates a temporary face_vertex_connectivity table and
     counts duplicates to determine the numbers.
 
     :param _vertex_cell_connectivity: Vertex-cell connectivity table, of the form [i_vertex][list of cells].
@@ -210,9 +210,9 @@ def connect_cells_to_faces(_face_cell_connectivity, _number_of_cells, _cell_type
 
     :param _face_cell_connectivity: Face-cell connectivity table, of the form [i_face][ascending list of cells].
     :type _face_cell_connectivity: numpy.array
-    :param _number_of_cells: number of cells in the mesh.
+    :param _number_of_cells: number of cells in the mesh_entities.
     :type _number_of_cells: integer
-    :param _cell_type: The type of cell in the mesh, edge, triangle, etc
+    :param _cell_type: The type of cell in the mesh_entities, edge, triangle, etc
     :type _cell_type: mesh.cell.CellType
     :return: Face-cell connectivity table, of the form [i_cell][list of faces].
     :type: numpy.array
