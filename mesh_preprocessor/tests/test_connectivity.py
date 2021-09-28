@@ -17,8 +17,8 @@
 
 import numpy as np
 import unittest as ut
-from mesh_preprocessor import connectivity as ct
-from mesh_entities import cell as cl
+from ...mesh_entities import cell as cl
+from ...mesh_preprocessor import connectivity as ct
 
 
 # ----------------------------------------------------------------------------------------------------------------------

@@ -17,8 +17,8 @@
 
 import numpy as np
 import unittest as ut
-from mesh_entities import cell as cl
-from mesh_generation import mesh_generator as mg
+from ...mesh_entities import cell as cl
+from ...mesh_generation import mesh_generator as mg
 
 
 # ----------------------------------------------------------------------------------------------------------------------

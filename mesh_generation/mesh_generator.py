@@ -16,7 +16,7 @@
 # ----------------------------------------------------------------------------------------------------------------------
 
 import numpy as np
-from mesh_entities import cell as cl
+from ..mesh_entities import cell as cl
 
 
 # def double_geometric_series_sum(_common_factor_0, _n_terms_0, _ratio_0, _common_factor_1, _n_terms_1, _ratio_1):
