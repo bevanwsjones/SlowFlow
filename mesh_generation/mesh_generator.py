@@ -16,7 +16,7 @@
 # ----------------------------------------------------------------------------------------------------------------------
 
 import numpy as np
-import mesh.cell as cl
+from ..mesh_entities import cell as cl
 #import meshio
 #import dmsh
 #import optimesh

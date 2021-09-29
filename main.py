@@ -17,28 +17,9 @@
 
 from mesh_generation import mesh_generator as mg
 from mesh_preprocessor import preprocessor as pp
-from gradient_algorithms import NewGG as Newgg
+from post_processor import graph as gr
 
-number_of_cells, start_co_ordinate, domain_size = [3, 3], [0.0, 0.0], [1.0, 1.0]
-[vertex_coordinates, cell_vertex_connectivity, cell_type] = mg.setup_2d_cartesian_mesh(number_of_cells, start_co_ordinate, domain_size)
+[vertex_coordinates, cell_vertex_connectivity, cell_type] = mg.setup_2d_cartesian_mesh([10, 10])
 cell_centre_mesh = pp.setup_cell_centred_finite_volume_mesh(vertex_coordinates, cell_vertex_connectivity, cell_type)
-
-field_0 = Newgg.GreenGauss(cell_centre_mesh, status=0)
-print(field_0)
-field_1 = Newgg.GreenGauss(cell_centre_mesh, status=1)
-print(field_1)
-
-# number_of_cells, start_co_ordinate, domain_size = [3, 3], [0.0, 0.0], [1.0, 1.0]
-# test = Newgg.GreenGauss_neighbourcells(number_of_cells, start_co_ordinate, domain_size)
-# face = Newgg.facecenter_coords(number_of_cells, start_co_ordinate, domain_size)
-# #print(test)
-# #print(face)
-
-# test2 = gg.GreenGauss_2D(number_of_cells, start_co_ordinate, domain_size)
-#print(test2)
-#print(cell_centre_mesh.face_table.normal)
-
-# [vertex_coordinates, cell_vertex_connectivity, cell_type] = mg.setup_1d_mesh(5, 0.0, 1.0)
-# print(cell_type)
-# print("face-cell connectivity table \n", cell_centre_mesh.face_table.connected_cell)
-# print("cell-face connectivity table \n", cell_centre_mesh.cell_table.connected_face)
+gr.plot_field(cell_centre_mesh, gr.generate_random_field(4, cell_centre_mesh.cell_table.max_cell,
+                                                         [True, False, True, False]))

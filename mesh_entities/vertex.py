@@ -11,28 +11,25 @@
 #  You should have received a copy of the GNU General Public License along with this program. If not, see
 #  <http://www.gnu.org/licenses/>.
 # ----------------------------------------------------------------------------------------------------------------------
-# filename: mesh.py
-# description: Contains all data for the mesh
+# filename: vertex.py
+# description: Definition of mesh_entities vertices.
 # ----------------------------------------------------------------------------------------------------------------------
 
-from mesh import cell as ct
-from mesh import face as ft
-from mesh import vertex as vt
+import numpy as np
 
 
-class CellCenteredMesh:
+class VertexTable:
     """
-    Structure to hold all mesh entities.
+    The vertex table, containing basic mesh_entities vertex geometry data.
     """
 
-    def __init__(self, _cell_type):
+    def __init__(self):
         """
-        Constructor to set the cell type
-
-        :param _cell_type: Cell type enumerator.
-        :type _cell_type: cell.CellType
+        Default constructor
         """
 
-        self.cell_table = ct.CellTable(_cell_type)
-        self.face_table = ft.FaceTable()
-        self.vertex_table = vt.VertexTable()
+        self.max_vertex = 0
+
+        self.connected_cell = [np.empty(shape=(0,), dtype=int) for _ in range(0)]  # not square
+        self.connected_vertex = [np.empty(shape=(0,), dtype=int) for _ in range(0)]  # not square
+        self.coordinate = np.zeros([0, 2], dtype=float)
