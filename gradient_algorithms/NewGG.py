@@ -34,7 +34,7 @@ def close_point(cell_centroid, drn_vector, face_centroid):
 def dist_vector(vec_0, vec_1):
     return math.sqrt((vec_1[0] - vec_0[0])**2 + (vec_1[1] - vec_0[1])**2)
 
-def lineInter(phi_field_0, phi_field_1, x_0, x_1, x_i, fc):
+def lineInter(phi_field_0, phi_field_1, x_0, x_1, x_i, fc):                 # unit test this for cartesian grids
     ptc = close_point(x_0, x_i, fc)
     return (dist_vector(x_1, ptc)*phi_field_0 + dist_vector(x_0, ptc)*phi_field_1)/dist_vector(x_0, x_1)
     #return (np.abs(ptc - x_1) * phi_field_0 + np.abs(ptc - x_0) * phi_field_1)/np.abs(x_1 - x_0)

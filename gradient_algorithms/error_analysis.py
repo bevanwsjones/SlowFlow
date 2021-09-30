@@ -1,7 +1,7 @@
 import numpy as np
 import math
 from gradient_algorithms import NewGG
-from matplotlib import pyplot as plt
+from gradient_algorithms import LSMethod as ls
 
 # ----------------------------------------------------------------------------------------------------------------------
 # -------------------------------------- FUNDAMENTAL DEFINITIONS: Error and Error Norms --------------------------------
@@ -31,6 +31,7 @@ def L_norm_one(error, vol_table):
         vol_sum += vol_table[i]
     return err_sum/vol_sum
 
+# retire L_norm_two, rather using L_norm_rms
 def L_norm_two(error, vol_table):
     err_sum = 0.0
     vol_sum = 0.0
@@ -38,6 +39,13 @@ def L_norm_two(error, vol_table):
         err_sum += (error[i]*vol_table[i])**2
         vol_sum += vol_table[i]
     return math.sqrt(err_sum)/vol_sum
+
+def L_norm_rms(error, tot_cell):
+    err_sum = 0.0
+    for i in range(len(error)):
+        err_sum += (error[i])**2
+    rms = math.sqrt(err_sum/tot_cell)
+    return rms
 
 def L_norm_inf(error):
     l = np.amax(error)
@@ -59,8 +67,11 @@ def cell_true_function(cell_centre_mesh):
     return true_field
 
 # returns cell error table for each cell phi compared to analytical phi: [i_cell][error_x][error_y]
-def cells_error_analysis(cell_centre_mesh):
-    approx_field = NewGG.GreenGauss(cell_centre_mesh)
+def cells_error_analysis(cell_centre_mesh, met):
+    if met == 0:
+        approx_field = NewGG.GreenGauss(cell_centre_mesh)
+    else:
+        approx_field = ls.cell_ls(cell_centre_mesh)
     true_field = cell_true_function(cell_centre_mesh)
     error = abs_error(approx_field, true_field)
     # print("approx field is here", approx_field)
@@ -79,6 +90,12 @@ def grid_norm_two(error, vol_table):
     L_norm_x, L_norm_y = L_norm_two(x_error, vol_table),  L_norm_two(y_error, vol_table)
     grid_norm_two = np.array([L_norm_x, L_norm_y])
     return grid_norm_two
+
+def grid_norm_rms(error, tot_cell):
+    x_error, y_error = error[:, 0], error[:, 1]
+    L_norm_x, L_norm_y = L_norm_rms(x_error, tot_cell), L_norm_rms(y_error, tot_cell)
+    grid_norm_rms = np.array([L_norm_x, L_norm_y])
+    return grid_norm_rms
 
 # returns L_inf Norm for error terms from the input error table: [L_inf_x][L_inf_y]
 def grid_norm_inf(error):
@@ -111,57 +128,14 @@ def seperate_int_ext(cell_centre_mesh, error, vol_table):
     int_vol_table = np.delete(vol_table, list(boundary_cells), axis = 0)
     return bound_error, int_error, bound_size, int_cell, ext_vol_table, int_vol_table
 
-def error_package(error, size, vol_table):
+def error_package(error, tot_cell, vol_table):
     norm_one = grid_norm_one(error, vol_table)
-    norm_two = grid_norm_two(error, vol_table)
+    norm_rms = grid_norm_rms(error, tot_cell)
     norm_inf = grid_norm_inf(error)
     #print("Norm one", norm_one)
     #print("Norm two", norm_two)
     #print("Norm inf", norm_inf)
-    return norm_one, norm_two, norm_inf
+    return norm_one, norm_rms, norm_inf
 
-def error_plotter(int_error_array, bound_error_array, h):
-    # plot 1 - x-gradient error - internal cells
-    plt.subplot(2, 2, 1)
-    plt.plot(h, int_error_array[:, 0, 0], '-o', label='L1 norm')
-    plt.plot(h, int_error_array[:, 1, 0], '-ok', label='L2 norm')
-    plt.plot(h, int_error_array[:, 2, 0], '-or', label='Linf norm')
-    plt.xlabel("Characteristic Length")
-    plt.ylabel("x-gradient internal cell error")
-    plt.xscale("log")
-    plt.yscale("log")
-    plt.legend()
-    # plot 2 - y-gradient error - internal cells
-    plt.subplot(2, 2, 2)
-    plt.plot(h, int_error_array[:, 0, 1], '-o', label='L1 norm')
-    plt.plot(h, int_error_array[:, 1, 1], '-ok', label='L2 norm')
-    plt.plot(h, int_error_array[:, 2, 1], '-or', label='Linf norm')
-    plt.xlabel("Characteristic Length")
-    plt.ylabel("y-gradient internal cell error")
-    plt.xscale("log")
-    plt.yscale("log")
-    plt.legend()
-    # plot 3 - x-gradient error - boundary cells
-    plt.subplot(2, 2, 3)
-    plt.plot(h, bound_error_array[:, 0, 0], '-o', label='L1 norm')
-    plt.plot(h, bound_error_array[:, 1, 0], '-ok', label='L2 norm')
-    plt.plot(h, bound_error_array[:, 2, 0], '-or', label='Linf norm')
-    plt.xlabel("Characteristic Length")
-    plt.ylabel("x-gradient bound cell error")
-    plt.xscale("log")
-    plt.yscale("log")
-    plt.legend()
-    # plot 4 - y-gradient error - boundary cells
-    plt.subplot(2, 2, 4)
-    plt.plot(h, bound_error_array[:, 0, 1], '-o', label='L1 norm')
-    plt.plot(h, bound_error_array[:, 1, 1], '-ok', label='L2 norm')
-    plt.plot(h, bound_error_array[:, 2, 1], '-or', label='Linf norm')
-    plt.xlabel("Characteristic Length")
-    plt.ylabel("y-gradient bound cell error")
-    plt.xscale("log")
-    plt.yscale("log")
-    plt.legend()
-    plt.suptitle("2D Structured Cartesian Grid Error Analysis")
-    plt.tight_layout
-    plt.show()
-    return -1
+
+
