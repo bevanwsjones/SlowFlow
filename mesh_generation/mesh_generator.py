@@ -168,6 +168,22 @@ def parallelogram(_normalise, _gradient, _n, _x_0, _ds, _x):
     else:
         return np.array([_x[0] + _gradient[1] * (_x[1] - _x_0[1]), _x[1] + _gradient[0] * (_x[0] - _x_0[0])])
 
+# new implementation - to be confirmed via testing
+def skew_strech(s_factor, _n, _x):
+    ls, full_ls = [], []
+    if _n[0] % 2 == 0:
+        n_gen = _n[0]
+    else:
+        n_gen = _n[0] - 1
+    for i in range(n_gen + 1):
+        if i % 2 == 0:
+            ls.append(i)
+    for j, j_vertex in enumerate(ls):
+        for k in range(_n[1] + 1):
+            full_ls.append(j_vertex + (_n[0] + 1) * k)
+    for l, l_vertex in enumerate(full_ls):
+        _x[l_vertex][1] = _x[l_vertex][1] + s_factor
+    return _x
 
 # ----------------------------------------------------------------------------------------------------------------------
 # 1D Mesh Generation
