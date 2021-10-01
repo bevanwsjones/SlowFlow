@@ -23,24 +23,24 @@ from gradient_algorithms import NewGG as gg
 import numpy as np
 from gradient_algorithms import error_analysis as ea
 
-[vertex_coordinates, cell_vertex_connectivity, cell_type] = mg.setup_2d_cartesian_mesh([3, 3])
+[vertex_coordinates, cell_vertex_connectivity, cell_type] = mg.setup_2d_cartesian_mesh([81, 81])
 cell_centre_mesh = pp.setup_cell_centred_finite_volume_mesh(vertex_coordinates, cell_vertex_connectivity, cell_type)
 # gr.plot_field(cell_centre_mesh, gr.generate_random_field(4, cell_centre_mesh.cell_table.max_cell,
 #                                                          [True, False, True, False]))
 
-# print(ls.cell_ls(cell_centre_mesh))
-# print(gg.GreenGauss(cell_centre_mesh, status = 0))
-# error = ea.cells_error_analysis(cell_centre_mesh, 1)
-# true_func = ea.cell_true_function(cell_centre_mesh)
-# print(true_func)
-# print(error)
+ls.cell_ls(cell_centre_mesh)
 
-cc_length = np.array(cell_centre_mesh.face_table.cc_length)
-print(np.around(cc_length[:, None], 3))
-cc_unit_vector = cell_centre_mesh.face_table.cc_unit_vector
-print(np.around(cc_unit_vector, 3))
-max_face = cell_centre_mesh.face_table.max_face
-matrix = cc_length[:, None] * cc_unit_vector
-print(np.around(matrix, 3))
+error = ea.cells_error_analysis(cell_centre_mesh, met = 2)
+tot_cell = cell_centre_mesh.cell_table.max_cell
+vol_table = cell_centre_mesh.cell_table.volume
+bound_error, int_error, bound_size, int_size, ext_vol_table, int_vol_table = ea.seperate_int_ext(cell_centre_mesh, error, vol_table)
+# process the boundary error
+norm_one_bound, norm_rms_bound, norm_inf_bound = ea.error_package(bound_error, tot_cell, ext_vol_table)
+norm_one_int, norm_rms_int, norm_inf_int = ea.error_package(int_error, tot_cell, int_vol_table)
+print("Internal cells \n", norm_rms_int)
+print("External cells \n", norm_rms_bound)
 
-#ls.ind_cell_LS()
+# dist = np.array([[0, -0.333],[0, 0.333], [0.333, 0],[-0.333, 0]])
+# cells_phi_neighbour = np.array([1.4656, 1.1521, 1.6175,  1.0435])
+# cell_phi_centre = 1.3570
+# print(ls.inv_cell(dist, cells_phi_neighbour, cell_phi_centre))

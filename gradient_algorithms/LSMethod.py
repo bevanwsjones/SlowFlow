@@ -26,13 +26,8 @@ def inv_cell(dist, cells_phi_neighbour, cell_phi_centre):
     phi_diff = (cells_phi_neighbour - cell_array).T
     dist_trans = dist.T
     G = np.matmul(dist_trans, dist)
-    # print(dist_trans)
-    # print(phi_diff)
-    # print("shape G", np.shape(G))
     G_inv = np.linalg.inv(G)
     G_dist_t = np.matmul(G_inv, dist_trans)
-    # print("shape G_dist_t", np.shape(G_dist_t))
-    # print("shape phi_diff", np.shape(phi_diff))
     grad_phi = np.matmul(G_dist_t, phi_diff)
     return grad_phi.T
 
@@ -53,52 +48,32 @@ def cell_ls(cell_centre_mesh):
 
     # Evaluate the phi_field at cell centroids and BC face centroids
     cells_phi_field = phi_field(cell_max_no, cell_centroids)
-
     bound_faces_phi_field = phi_field(face_bound_max, face_centroids)
-    #print("cell phi field", cells_phi_field)
-    #print("boundary phi field", bound_faces_phi_field)
-    # big_phi = np.empty(shape=(cell_max_no, 4))
-    # big_dist = np.empty(shape=(cell_max_no, 4, 2))
+
     store_phi = np.zeros(shape=(cell_max_no, 2))
-    #print(store_phi)
     # distance vector for each face-cell
+
     dist_matrix = cell_centre_mesh.face_table.cc_length[:, None] * cell_centre_mesh.face_table.cc_unit_vector
-    #print("distance matrix", dist_matrix)
+
     for i, i_face in enumerate(connected_face):
         neighbour_phi = np.zeros(shape=(1, 4))      # assuming four neighbour cells (can be generalised)
         dist_array_store = np.zeros(shape=(1, 4, 2))
         for j, j_face in enumerate(i_face):
             if j_face < face_bound_max:
                  adjacent_phi = bound_faces_phi_field[j_face]
+                 neighbour_cell = i
             else:
                 neighbour_cell = cell_face_neighbour(i, connected_cell[j_face])
                 adjacent_phi = cells_phi_field[neighbour_cell]
-            dist_array = dist_matrix[j_face]
+            if neighbour_cell < i:
+                dist_array = -1*dist_matrix[j_face]
+            else:
+                dist_array = dist_matrix[j_face]
             neighbour_phi[0][j] = adjacent_phi
             dist_array_store[0][j] = dist_array
         store_phi[i] = inv_cell(dist_array_store[0], neighbour_phi, cells_phi_field[i])
-        # print("cell_phi", cells_phi_field[i])
-        # print("neighbour_phi", neighbour_phi)
-        # print("dist_array", dist_array_store)
-        # print("store_phi", store_phi)
-        # break
-        #big_phi[i] = neighbour_phi
-        #big_dist[i] = dist_array_store
     return store_phi
 
-
-
-
-
-
-
-
-            #print(j_face)
-    return -1
-
-
-
-#
 # number_of_cells, start_co_ordinate, domain_size = [3, 3], [0.0, 0.0], [1.0, 1.0]
 # [vertex_coordinates, cell_vertex_connectivity, cell_type] = mg.setup_2d_cartesian_mesh(number_of_cells, start_co_ordinate, domain_size)
 # cell_centre_mesh = pp.setup_cell_centred_finite_volume_mesh(vertex_coordinates, cell_vertex_connectivity, cell_type)
