@@ -56,25 +56,26 @@ def L_norm_inf(error):
 
 # Analytical Solution Calculator for each cell centroid
 def cell_true_function(cell_centre_mesh):
-    true_field = np.empty(shape=(cell_centre_mesh.cell_table.max_cell, 2), dtype=float)
+    true_field = np.zeros(shape=(cell_centre_mesh.cell_table.max_cell, 2), dtype=float)
     coords = cell_centre_mesh.cell_table.centroid
-    true_field[:, 0] = np.cos(coords[:, 0])
-    true_field[:, 1] = -1*np.sin(coords[:, 1])
-    # true_field[:, 0] = 2*coords[:, 0]
-    # true_field[:, 1] = 2*coords[:, 1]
-    # true_field[:, 0] = 1/np.cosh(coords[:, 0])
+    # true_field[:, 0] = np.cos(coords[:, 0])
+    # true_field[:, 1] = -1*np.sin(coords[:, 1])
+    true_field[:,0] = np.exp(coords[:, 0]) * np.cos(coords[:, 1])
+    true_field[:, 1] = - np.exp(coords[:, 0]) * np.sin(coords[:, 1])
     # true_field[:, 1] = 1/np.cosh(coords[:, 1])
     return true_field
 
 # returns cell error table for each cell phi compared to analytical phi: [i_cell][error_x][error_y]
 def cells_error_analysis(cell_centre_mesh, met):
     if met == 0:
-        approx_field = NewGG.GreenGauss(cell_centre_mesh)
-    else:
+        approx_field = NewGG.GreenGauss(cell_centre_mesh, met)
+    elif met == 1:
+        approx_field = NewGG.GreenGauss(cell_centre_mesh, met)
+    elif met == 2:
         approx_field = ls.cell_ls(cell_centre_mesh)
     true_field = cell_true_function(cell_centre_mesh)
     error = abs_error(approx_field, true_field)
-    # print("approx field is here", approx_field)
+    # error = relative_error(approx_field, true_field)
     return error
 
 # returns L 1 Norm for error terms from the input error table: [L1_x][L1_y]
@@ -131,10 +132,11 @@ def seperate_int_ext(cell_centre_mesh, error, vol_table):
 def error_package(error, tot_cell, vol_table):
     norm_one = grid_norm_one(error, vol_table)
     norm_rms = grid_norm_rms(error, tot_cell)
+    #norm_two = grid_norm_two(error, vol_table)
     norm_inf = grid_norm_inf(error)
-    #print("Norm one", norm_one)
-    #print("Norm two", norm_two)
-    #print("Norm inf", norm_inf)
+    # print("Norm one", norm_one)
+    # print("Norm two", norm_two)
+    # print("Norm inf", norm_inf)
     return norm_one, norm_rms, norm_inf
 
 
