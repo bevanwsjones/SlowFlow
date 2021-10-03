@@ -5,8 +5,9 @@ from mesh_generation import mesh_generator as mg
 # vector field that is applied to the mesh
 def phi_field(max_item, centroid):
     phi_field = np.zeros(shape=(max_item, ), dtype=float)
-    #phi_field[:] = centroid[0:max_item, 0]**2 + centroid[0:max_item, 1]**2
-    phi_field[:] = np.sin(centroid[0:max_item, 0]) + np.cos(centroid[0:max_item, 1])
+    # phi_field[:] = centroid[0:max_item, 0]**2 + centroid[0:max_item, 1]**2
+    # phi_field[:] = np.sin(centroid[0:max_item, 0]) + np.cos(centroid[0:max_item, 1])
+    phi_field[:] = np.exp(centroid[0:max_item, 0])*np.cos(centroid[0:max_item, 1])
     return phi_field
 
 def ind_cell_LS():

@@ -23,17 +23,19 @@ from gradient_algorithms import error_analysis as ea
 from gradient_algorithms import gridquality as gq
 import functools as ft
 
-number_of_cells, start_co_ordinate, domain_size = [5, 5], [0, 0], [1, 1]
-[vertex_coordinates, cell_vertex_connectivity, cell_type] = \
-    mg.setup_2d_cartesian_mesh(number_of_cells, start_co_ordinate, domain_size,  ft.partial(mg.parallelogram, False, [0.1, 0.1]))
-#s_factor = 0.1
-#vertex_coordinates = mg.skew_strech(s_factor, number_of_cells, vertex_coordinates)
+number_of_cells, start_co_ordinate, domain_size = [30, 30], [0, 0], [1, 1]
+# [vertex_coordinates, cell_vertex_connectivity, cell_type] = \
+#     mg.setup_2d_cartesian_mesh(number_of_cells, start_co_ordinate, domain_size,  ft.partial(mg.parallelogram, False, [0.1, 0.1]))
+# [vertex_coordinates, cell_vertex_connectivity, cell_type] = \
+#     mg.setup_2d_cartesian_mesh(number_of_cells, start_co_ordinate, domain_size,  ft.partial(mg.stretch, [0.1, 0.1]))
+[vertex_coordinates, cell_vertex_connectivity, cell_type] = mg.setup_2d_cartesian_mesh(number_of_cells, start_co_ordinate, domain_size)
+s_factor = 0.5
+vertex_coordinates = mg.skew_strech(s_factor, number_of_cells, vertex_coordinates)
 cell_centre_mesh = pp.setup_cell_centred_finite_volume_mesh(vertex_coordinates, cell_vertex_connectivity, cell_type)
-gr.plot_field(cell_centre_mesh, gr.generate_random_field(4, cell_centre_mesh.cell_table.max_cell,
-                                                          [True, False, True, False]))
-quality_metrics = gq.cells_grid_quality(cell_centre_mesh)
-avg_quality = gq.grid_average_quality(quality_metrics, cell_centre_mesh)
-print(avg_quality)
+gr.plot_field(cell_centre_mesh, gr.generate_random_field(1, cell_centre_mesh.cell_table.max_cell, [True]))
+# quality_metrics = gq.cells_grid_quality(cell_centre_mesh)
+# avg_quality = gq.grid_average_quality(quality_metrics, cell_centre_mesh)
+# print(avg_quality)
 
 # ls.cell_ls(cell_centre_mesh)
 #
