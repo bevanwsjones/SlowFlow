@@ -182,7 +182,7 @@ def skew_strech(s_factor, _n, _x):
         for k in range(_n[1] + 1):
             full_ls.append(j_vertex + (_n[0] + 1) * k)
     for l, l_vertex in enumerate(full_ls):
-        _x[l_vertex][1] = _x[l_vertex][1] + s_factor/_n[1]
+        _x[l_vertex][1] = _x[l_vertex][1] + s_factor
     return _x
 
 # ----------------------------------------------------------------------------------------------------------------------

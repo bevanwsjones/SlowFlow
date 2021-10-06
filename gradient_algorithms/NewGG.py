@@ -81,3 +81,52 @@ def bound_cells(cell_centre_mesh):
         i_cell_0 = cell_centre_mesh.face_table.connected_cell[ibound_face][0]
         cell_storage.add(i_cell_0)
     return cell_storage
+
+def vertex_phi(vertex_coordinates, cell_centroids, cell_phi_function, vertex_cell_connect, max_vertex):
+    vertex_phi = np.zeros(shape=(max_vertex, ))
+    for i, i_cell in enumerate(vertex_cell_connect):
+        # if len(i_cell) == 4:
+        tot_dist = 0
+        phi_dist = 0
+        for j, j_cell in enumerate(i_cell):
+            vert_coord = vertex_coordinates[i]
+            cell_coord = cell_centroids[j_cell]
+            dist = math.sqrt((cell_coord[0] - vert_coord[0])**2 + (cell_coord[1] - vert_coord[1])**2)
+            cell_phi = cell_phi_function[j_cell]
+            tot_dist += 1/dist
+            phi_dist += (1/dist) * cell_phi
+        vertex_phi[i] = phi_dist/tot_dist
+        # else:
+        #     vertex_phi[i] = 0
+    return vertex_phi
+
+def node_GreenGauss(cell_centre_mesh):
+    phi_gradient_field = np.zeros(shape=(cell_centre_mesh.cell_table.max_cell, 2), dtype=float)
+    phi_boundary_field = boundary_phi_function(cell_centre_mesh)                # phi values for all boundaries
+    cell_function = cell_phi_function(cell_centre_mesh)
+    face_vertex_connect = cell_centre_mesh.face_table.connected_vertex
+
+    vertex_coordinates = cell_centre_mesh.vertex_table.coordinate
+    cell_centroids = cell_centre_mesh.cell_table.centroid
+    vertex_cell_connect = cell_centre_mesh.vertex_table.connected_cell
+    max_vertex = cell_centre_mesh.vertex_table.max_vertex
+    phi_vertex = vertex_phi(vertex_coordinates, cell_centroids, cell_function, vertex_cell_connect, max_vertex)
+    # face_contribution is the analytical value - Dirichlet Condition
+    for ibound_face in range(cell_centre_mesh.face_table.max_boundary_face):
+        i_cell_0 = cell_centre_mesh.face_table.connected_cell[ibound_face][0]
+        face_area = cell_centre_mesh.face_table.area[ibound_face]
+        face_normal = cell_centre_mesh.face_table.normal[ibound_face]
+        face_contribution = phi_boundary_field[ibound_face]
+        phi_gradient_field[i_cell_0] += face_contribution * face_area * face_normal/cell_centre_mesh.cell_table.volume[i_cell_0]
+    # Compute gradients for internal faces
+    for i_face in range(cell_centre_mesh.face_table.max_boundary_face, cell_centre_mesh.face_table.max_face):
+        i_cell_0 = cell_centre_mesh.face_table.connected_cell[i_face][0]
+        i_cell_1 = cell_centre_mesh.face_table.connected_cell[i_face][1]
+
+        face_contribution = (phi_vertex[face_vertex_connect[i_face][0]] + phi_vertex[face_vertex_connect[i_face][1]])/2
+
+        face_area = cell_centre_mesh.face_table.area[i_face]
+        face_normal = cell_centre_mesh.face_table.normal[i_face]
+        phi_gradient_field[i_cell_0] += face_contribution*face_area*face_normal/cell_centre_mesh.cell_table.volume[i_cell_0]
+        phi_gradient_field[i_cell_1] -= face_contribution*face_area*face_normal/cell_centre_mesh.cell_table.volume[i_cell_1]
+    return phi_gradient_field

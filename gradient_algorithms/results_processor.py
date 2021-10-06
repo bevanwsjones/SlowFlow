@@ -145,3 +145,47 @@ def grid_refinement_error(cells_matrix, grid_metric, grid_quality = 0, met = 0):
         h = size_store**(-0.5)
     ep.grid_error_refine(int_error_array, bound_error_array, h, grid_metric, grid_quality)
     plt.show()
+
+
+def single_grid_metric(cells_matrix, quality_matrix, grid_quality, met = 0):
+    quality_size = len(quality_matrix)
+    quality_array = np.empty(shape=(1, quality_size))
+    bound_error_array = np.empty(shape=(quality_size, 3, 2))
+    int_error_array =  np.empty(shape=(quality_size, 3, 2))
+    for j, j_metric in enumerate(quality_matrix):
+        number_of_cells, start_co_ordinate, domain_size = cells_matrix, [0.0, 0.0], [1.0, 1.0]
+        if grid_quality == 0:  # non-orthogonality setup
+            [vertex_coordinates, cell_vertex_connectivity, cell_type] = \
+                mg.setup_2d_cartesian_mesh(number_of_cells, start_co_ordinate, domain_size,
+                                           ft.partial(mg.parallelogram, False, j_metric))
+        elif grid_quality == 1:  # unevenness setup
+            [vertex_coordinates, cell_vertex_connectivity, cell_type] = \
+                mg.setup_2d_cartesian_mesh(number_of_cells, start_co_ordinate, domain_size,
+                                           ft.partial(mg.stretch, j_metric))
+        elif grid_quality == 2:  # skewness setup
+            [vertex_coordinates, cell_vertex_connectivity, cell_type] = \
+                mg.setup_2d_cartesian_mesh(number_of_cells, start_co_ordinate, domain_size)
+            vertex_coordinates = mg.skew_strech(j_metric, number_of_cells, vertex_coordinates)
+        cell_centre_mesh = pp.setup_cell_centred_finite_volume_mesh(vertex_coordinates, cell_vertex_connectivity,
+                                                                    cell_type)
+        # error analysis
+        error = ea.cells_error_analysis(cell_centre_mesh, met)
+        vol_table = cell_centre_mesh.cell_table.volume
+        # seperate internal and external error cells - function
+        bound_error, int_error, bound_size, int_size, ext_vol_table, int_vol_table = ea.seperate_int_ext(
+            cell_centre_mesh, error, vol_table)
+        # print("Boundary Cells Analysis:", bound_size, "external cells")
+        # process the boundary cells error
+        norm_one_bound, norm_two_bound, norm_inf_bound = ea.error_package(bound_error, bound_size, ext_vol_table)
+        bound_error_array[j][0], bound_error_array[j][1], bound_error_array[j][
+            2] = norm_one_bound.T, norm_two_bound.T, norm_inf_bound.T
+        # print("Internal Cells Analysis:",int_size, "internal cells")
+        # process the internal cells error
+        norm_one_int, norm_two_int, norm_inf_int = ea.error_package(int_error, int_size, int_vol_table)
+        int_error_array[j][0], int_error_array[j][1], int_error_array[j][
+            2] = norm_one_int.T, norm_two_int.T, norm_inf_int.T
+        quality_metrics = gq.cells_grid_quality(cell_centre_mesh)
+        avg_quality = gq.grid_average_quality(quality_metrics, cell_centre_mesh)
+        quality_array[0][j] = avg_quality[0][grid_quality]
+    ep.grid_metric_plotter(bound_error_array, int_error_array, quality_array, cells_matrix, grid_quality)
+    plt.show()

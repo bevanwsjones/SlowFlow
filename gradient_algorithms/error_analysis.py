@@ -73,6 +73,8 @@ def cells_error_analysis(cell_centre_mesh, met):
         approx_field = NewGG.GreenGauss(cell_centre_mesh, met)
     elif met == 2:
         approx_field = ls.cell_ls(cell_centre_mesh)
+    elif met == 3:
+        approx_field = NewGG.node_GreenGauss(cell_centre_mesh)
     true_field = cell_true_function(cell_centre_mesh)
     error = abs_error(approx_field, true_field)
     # error = relative_error(approx_field, true_field)
