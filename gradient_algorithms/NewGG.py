@@ -20,7 +20,7 @@ def boundary_phi_function(cell_centre_mesh):
     boundary_no = cell_centre_mesh.face_table.max_boundary_face
     phi_bound_field = np.empty(shape=(boundary_no, ), dtype=float)
     coords = cell_centre_mesh.face_table.centroid[0:boundary_no]
-    #phi_bound_field[:] = np.sin(coords[:, 0]) + np.cos(coords[:, 1])
+    # phi_bound_field[:] = np.sin(coords[:, 0]) + np.cos(coords[:, 1])
     phi_bound_field[:] = np.exp(coords[:, 0]) * np.cos(coords[:, 1])
     # phi_bound_field[:] = coords[:, 0]**2 + coords[:, 1]**2
     # phi_bound_field[:] = 2 * np.multiply(coords[:, 0], coords[:, 1])
@@ -42,6 +42,12 @@ def lineInter(phi_field_0, phi_field_1, x_0, x_1, x_i, fc):                 # un
     ptc = close_point(x_0, x_i, fc)
     return (dist_vector(x_1, ptc)*phi_field_0 + dist_vector(x_0, ptc)*phi_field_1)/dist_vector(x_0, x_1)
     #return (np.abs(ptc - x_1) * phi_field_0 + np.abs(ptc - x_0) * phi_field_1)/np.abs(x_1 - x_0)
+
+def calcbeta(x_0, x_1, fc):
+    return math.sqrt((x_0[0] - fc[0])**2 + (x_0[1] - fc[1])**2)/math.sqrt((x_0[0] - x_1[0])**2 + (x_0[1] - x_1[1])**2)
+
+def linInt(beta, phi_field_0, phi_field_1):
+    return beta * phi_field_1 + (1 - beta) * phi_field_0
 
 def GreenGauss(cell_centre_mesh, status = 0):
     phi_gradient_field = np.zeros(shape=(cell_centre_mesh.cell_table.max_cell, 2), dtype=float)
@@ -65,9 +71,11 @@ def GreenGauss(cell_centre_mesh, status = 0):
         elif status == 1:
             x_0 = cell_centre_mesh.cell_table.centroid[i_cell_0]  # determine coordinates for cell centroids
             x_1 = cell_centre_mesh.cell_table.centroid[i_cell_1]
-            x_i = cell_centre_mesh.face_table.cc_unit_vector[i_face]  # direction vector
             fc = cell_centre_mesh.face_table.centroid[i_face]
-            face_contribution = lineInter(phi_field_0, phi_field_1, x_0, x_1, x_i, fc)
+            # x_i = cell_centre_mesh.face_table.cc_unit_vector[i_face]  # direction vector
+            # face_contribution = lineInter(phi_field_0, phi_field_1, x_0, x_1, x_i, fc)
+            beta = calcbeta(x_0, x_1, fc)
+            face_contribution = linInt(beta, phi_field_0, phi_field_1)
         face_area = cell_centre_mesh.face_table.area[i_face]
         face_normal = cell_centre_mesh.face_table.normal[i_face]
         phi_gradient_field[i_cell_0] += face_contribution*face_area*face_normal/cell_centre_mesh.cell_table.volume[i_cell_0]

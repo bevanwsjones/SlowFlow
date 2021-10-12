@@ -29,6 +29,8 @@ def L_norm_one(error, vol_table):
     for i in range(len(error)):
         err_sum += abs(error[i]*vol_table[i])
         vol_sum += vol_table[i]
+    if vol_sum == 0:
+        return err_sum
     return err_sum/vol_sum
 
 # retire L_norm_two, rather using L_norm_rms
@@ -38,6 +40,8 @@ def L_norm_two(error, vol_table):
     for i in range(len(error)):
         err_sum += (error[i]*vol_table[i])**2
         vol_sum += vol_table[i]
+    if vol_sum == 0:
+        return err_sum
     return math.sqrt(err_sum)/vol_sum
 
 def L_norm_rms(error, tot_cell):
@@ -62,6 +66,8 @@ def cell_true_function(cell_centre_mesh):
     # true_field[:, 1] = -1*np.sin(coords[:, 1])
     true_field[:,0] = np.exp(coords[:, 0]) * np.cos(coords[:, 1])
     true_field[:, 1] = - np.exp(coords[:, 0]) * np.sin(coords[:, 1])
+    # true_field[:, 0] = 2*coords[:, 0]
+    # true_field[:, 1] = 2*coords[:, 1]
     # true_field[:, 1] = 1/np.cosh(coords[:, 1])
     return true_field
 

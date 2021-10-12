@@ -23,7 +23,7 @@ from gradient_algorithms import error_analysis as ea
 from gradient_algorithms import gridquality as gq
 import functools as ft
 
-number_of_cells, start_co_ordinate, domain_size = [9, 9], [0, 0], [1, 1]
+number_of_cells, start_co_ordinate, domain_size = [9, 1], [0, 0], [1, 1]
 
 # [vertex_coordinates, cell_vertex_connectivity, cell_type] = mg.setup_2d_cartesian_mesh(number_of_cells, start_co_ordinate, domain_size)
 # s_factor = 0.8
