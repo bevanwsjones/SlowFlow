@@ -254,6 +254,9 @@ def setup_2d_simplex_mesh(_number_of_cells, _start_co_ordinates=None, _domain_si
             _start_co_ordinates + _domain_size,
             _start_co_ordinates + np.array([0, 1], dtype=float)*np.dot(_domain_size, np.array([0, 1], dtype=float))
         ])
+    # geo = dmsh.Polygon([[0.0, 0.0], [1.0, 0.0], [1.0 + np.cos(np.pi / 3.0), np.sin(np.pi / 3.0)],
+    #                                         [1.0, 2.0 * np.sin(np.pi / 3.0)], [0.0, 2.0 * np.sin(np.pi / 3.0)],
+    #                                         [0.0 - np.cos(np.pi / 3.0), np.sin(np.pi / 3.0)]])
     X, cells = dmsh.generate(geo, 0.1)
 
     # optionally optimize the mesh
