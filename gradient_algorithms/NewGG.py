@@ -5,6 +5,22 @@ from mesh_preprocessor import preprocessor as pp
 import math
 import matplotlib.pyplot as plt
 
+def exp_cos(_coor_list):
+    return np.exp(_coor_list[:, 0]) * np.cos(_coor_list[:, 1])
+
+def gradient_exp_cos(_coor_list):
+    # computes the analtical gradient 
+    pass
+
+def cell_boundary_face_phi_dphi_calculation(_cell_centre_mesh, _phi_function = 0):
+    cell_centroids = cell_centre_mesh.cell_table.centroid
+    boundary_face_centroids = cell_centre_mesh.face_table.centroid[0:boundary_no]
+    
+    if _phi_function == 0:
+        return [exp_cos(cell_centroids), exp_cos(boundary_face_centroids), gradient_exp_cos(cell_centroids)]
+    else:
+        raise NotImplemented("nice exit message.")
+
 # Calculate phi_function for each internal cell. Return as [i_cell, phi_field_x, phi_field_y]
 def cell_phi_function(cell_centre_mesh):
     phi_field = np.empty(shape=(cell_centre_mesh.cell_table.max_cell, ), dtype=float)
@@ -44,13 +60,20 @@ def lineInter(phi_field_0, phi_field_1, x_0, x_1, x_i, fc):                 # un
     #return (np.abs(ptc - x_1) * phi_field_0 + np.abs(ptc - x_0) * phi_field_1)/np.abs(x_1 - x_0)
 
 def calcbeta(x_0, x_1, fc):
-    return math.sqrt((x_0[0] - fc[0])**2 + (x_0[1] - fc[1])**2)/math.sqrt((x_0[0] - x_1[0])**2 + (x_0[1] - x_1[1])**2)
+    # BUT CHECK THIS => np.linalg.norm(x_0 - fc) same as math.sqrt((vec_1[0] - vec_0[0])**2 + (vec_1[1] - vec_0[1])**2) 
+    # Point on line x_i = x_0 + lambda * t  where t = x_1 - x_0 | lambda \in [0, 1] and x_0 and x_1 are the line segement end points.
+    return math.sqrt((fc[0] - x_0[0])**2 + (fc[1] - x_0[1])**2)/math.sqrt((x_1[0] - x_0[0])**2 + (x_1[1] - x_0[1])**2)
 
 def linInt(beta, phi_field_0, phi_field_1):
+    # linInt(phi_field_0, phi_field_1, x_0, x_1, x_i) 
+    # CHECK below not supposed to be (1 - beta)*phi_field_1 + beta*phi_field_0?+
+    # calcbeta(x_0, x_1, fc)
     return beta * phi_field_1 + (1 - beta) * phi_field_0
 
 def GreenGauss(cell_centre_mesh, status = 0):
     phi_gradient_field = np.zeros(shape=(cell_centre_mesh.cell_table.max_cell, 2), dtype=float)
+    # numerical_phi_gradient_field = np.zeros(shape=(cell_centre_mesh.cell_table.max_cell, 2), dtype=float)
+    # phi_field, phi_boundary_field, dphi_analytical = cell_boundary_face_phi_dphi_calculation(_cell_centre_mesh, _phi_function = 0)
     phi_field = cell_phi_function(cell_centre_mesh)                             # phi values for all cells
     phi_boundary_field = boundary_phi_function(cell_centre_mesh)                # phi values for all boundaries
     # face_contribution is the analytical value - Dirichlet Condition
@@ -81,6 +104,7 @@ def GreenGauss(cell_centre_mesh, status = 0):
         phi_gradient_field[i_cell_0] += face_contribution*face_area*face_normal/cell_centre_mesh.cell_table.volume[i_cell_0]
         phi_gradient_field[i_cell_1] -= face_contribution*face_area*face_normal/cell_centre_mesh.cell_table.volume[i_cell_1]
     return phi_gradient_field
+    # return phi_gradient_field, analytical
 
 # function that makes an array of boundary cell numbers in grid
 def bound_cells(cell_centre_mesh):
@@ -125,6 +149,7 @@ def node_GreenGauss(cell_centre_mesh):
         face_area = cell_centre_mesh.face_table.area[ibound_face]
         face_normal = cell_centre_mesh.face_table.normal[ibound_face]
         face_contribution = phi_boundary_field[ibound_face]
+        # use the average of two analytical values from the two vertices connected to the boundary face. More consistent.
         phi_gradient_field[i_cell_0] += face_contribution * face_area * face_normal/cell_centre_mesh.cell_table.volume[i_cell_0]
     # Compute gradients for internal faces
     for i_face in range(cell_centre_mesh.face_table.max_boundary_face, cell_centre_mesh.face_table.max_face):
