@@ -26,12 +26,14 @@ cell_centroid, neighbour_centroid, face_unit_normal, face_centroid = np.array([2
 
 # ---------------------------------------------------------------------------------------------------------------------
 # ------------------------------- Mesh Test ---------------------------------------------------------------------------
-#number_of_cells, start_co_ordinate, domain_size = [90, 90], [0.0, 0.0], [1.0, 1.0]
-#[vertex_coordinates, cell_vertex_connectivity, cell_type] = mg.setup_2d_cartesian_mesh(number_of_cells, start_co_ordinate, domain_size)
-#cell_centre_mesh = pp.setup_cell_centred_finite_volume_mesh(vertex_coordinates, cell_vertex_connectivity, cell_type)
-# print(cell_centre_mesh.face_table.centroid[1][1])
-# boundary_no = cell_centre_mesh.face_table.max_boundary_face
-# print(cell_centre_mesh.face_table.centroid[0:boundary_no])
+number_of_cells, start_co_ordinate, domain_size = [3, 3], [0.0, 0.0], [1.0, 1.0]
+[vertex_coordinates, cell_vertex_connectivity, cell_type] = mg.setup_2d_cartesian_mesh(number_of_cells, start_co_ordinate, domain_size)
+cell_centre_mesh = pp.setup_cell_centred_finite_volume_mesh(vertex_coordinates, cell_vertex_connectivity, cell_type)
+centroids = cell_centre_mesh.cell_table.centroid
+# q = NewGG.GreenGauss(cell_centre_mesh, status = 1, phi_function = 0)
+# print(q)
+h = ls.cell_ls(cell_centre_mesh, phi_function = 0)
+print(h)
 
 # error = ea.cells_error_analysis(cell_centre_mesh)
 # new_error = ea.seperate_int_ext(cell_centre_mesh, error)

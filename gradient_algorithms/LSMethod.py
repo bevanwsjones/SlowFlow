@@ -1,15 +1,5 @@
 import numpy as np
-from mesh_preprocessor import preprocessor as pp
-from mesh_generation import mesh_generator as mg
-
-# vector field that is applied to the mesh
-def phi_field(max_item, centroid):
-    phi_field = np.zeros(shape=(max_item, ), dtype=float)
-    # phi_field[:] = centroid[0:max_item, 0]**2 + centroid[0:max_item, 1]**2
-    # phi_field[:] = np.sin(centroid[0:max_item, 0]) + np.cos(centroid[0:max_item, 1])
-    phi_field[:] = np.exp(centroid[0:max_item, 0])*np.cos(centroid[0:max_item, 1])
-    # phi_field[:] = centroid[:, 0]**2 + centroid[:, 1]**2
-    return phi_field
+from gradient_algorithms import NewGG
 
 def ind_cell_LS():
     phi_neighbours = np.array([18, 20, 10, 8])
@@ -39,22 +29,17 @@ def cell_face_neighbour(i_cell, face_cell_connect):
     return face_cell_connect
 
 # LS unweighted method
-def cell_ls(cell_centre_mesh):
+def cell_ls(cell_centre_mesh, phi_function):
     # store required metrics from the cell_centre_mesh
     connected_face = cell_centre_mesh.cell_table.connected_face
     connected_cell = cell_centre_mesh.face_table.connected_cell
     face_bound_max = cell_centre_mesh.face_table.max_boundary_face
-    cell_centroids = cell_centre_mesh.cell_table.centroid
-    face_centroids = cell_centre_mesh.face_table.centroid
     cell_max_no = cell_centre_mesh.cell_table.max_cell
 
     # Evaluate the phi_field at cell centroids and BC face centroids
-    cells_phi_field = phi_field(cell_max_no, cell_centroids)
-    bound_faces_phi_field = phi_field(face_bound_max, face_centroids)
-
+    cells_phi_field, bound_faces_phi_field, dphi_analytical = NewGG.cell_boundary_face_phi_dphi_calculation(cell_centre_mesh, phi_function)
     store_phi = np.zeros(shape=(cell_max_no, 2))
     # distance vector for each face-cell
-
     dist_matrix = cell_centre_mesh.face_table.cc_length[:, None] * cell_centre_mesh.face_table.cc_unit_vector
 
     for i, i_face in enumerate(connected_face):
@@ -74,11 +59,4 @@ def cell_ls(cell_centre_mesh):
             neighbour_phi[0][j] = adjacent_phi
             dist_array_store[0][j] = dist_array
         store_phi[i] = inv_cell(dist_array_store[0], neighbour_phi, cells_phi_field[i])
-    return store_phi
-
-# number_of_cells, start_co_ordinate, domain_size = [3, 3], [0.0, 0.0], [1.0, 1.0]
-# [vertex_coordinates, cell_vertex_connectivity, cell_type] = mg.setup_2d_cartesian_mesh(number_of_cells, start_co_ordinate, domain_size)
-# cell_centre_mesh = pp.setup_cell_centred_finite_volume_mesh(vertex_coordinates, cell_vertex_connectivity, cell_type)
-#
-# #print(cell_centre_mesh.cell_table.connected_face)
-# print(cell_centre_mesh.face_table.connected_cell)
+    return store_phi, dphi_analytical

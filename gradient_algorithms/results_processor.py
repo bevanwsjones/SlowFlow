@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 
 # ------------------------------- CARTESIAN GRID PLOTTER & RESULTS PROCESSOR ------------------------------------------
 # Error Plotter for Cartesian Grid Test
-def cartesian_error(cells_matrix, met = 0):
+def cartesian_error(cells_matrix, met = 0, phi_function = 0):
     """
     Determines the 3 grid errors (L1, L2 (LRms), Linf) in a Cartesian Grid, and shows how grid refinement changes the error
     accuracy.
@@ -30,7 +30,7 @@ def cartesian_error(cells_matrix, met = 0):
         number_of_cells, start_co_ordinate, domain_size = i_matrix, [0.0, 0.0], [1.0, 1.0]
         [vertex_coordinates, cell_vertex_connectivity, cell_type] = mg.setup_2d_cartesian_mesh(number_of_cells, start_co_ordinate, domain_size)
         cell_centre_mesh = pp.setup_cell_centred_finite_volume_mesh(vertex_coordinates, cell_vertex_connectivity, cell_type)
-        error = ea.cells_error_analysis(cell_centre_mesh, met)
+        error = ea.cells_error_analysis(cell_centre_mesh, met, phi_function)
         vol_table = cell_centre_mesh.cell_table.volume
         # seperate internal and external error cells from each other
         bound_error, int_error, bound_size, int_size, ext_vol_table, int_vol_table = ea.seperate_int_ext(cell_centre_mesh, error, vol_table)
@@ -45,7 +45,7 @@ def cartesian_error(cells_matrix, met = 0):
     h = size_store**(-0.5)
     ep.cartesian_plotter(int_error_array, bound_error_array, h)
 
-def quality_error(cells_matrix, quality_matrix, grid_quality, met = 0):
+def quality_error(cells_matrix, quality_matrix, grid_quality, met = 0, phi_function = 0):
     """
     Determines the 3 grid error norms as a function of the applied grid transformation.
 
@@ -82,7 +82,7 @@ def quality_error(cells_matrix, quality_matrix, grid_quality, met = 0):
                 vertex_coordinates = mg.skew_strech(j_metric, number_of_cells, vertex_coordinates)
             cell_centre_mesh = pp.setup_cell_centred_finite_volume_mesh(vertex_coordinates, cell_vertex_connectivity, cell_type)
             # error analysis
-            error = ea.cells_error_analysis(cell_centre_mesh, met)
+            error = ea.cells_error_analysis(cell_centre_mesh, met, phi_function)
             vol_table = cell_centre_mesh.cell_table.volume
             # seperate internal and external error cells - function
             bound_error, int_error, bound_size, int_size, ext_vol_table, int_vol_table = ea.seperate_int_ext(cell_centre_mesh, error, vol_table)
@@ -100,7 +100,7 @@ def quality_error(cells_matrix, quality_matrix, grid_quality, met = 0):
         ep.error_plotter(bound_error_array, int_error_array, quality_array, i, i_matrix, grid_quality)
     plt.show()
 
-def grid_refinement_error(cells_matrix, grid_metric, grid_quality = 0, met = 0):
+def grid_refinement_error(cells_matrix, grid_metric, grid_quality = 0, met = 0, phi_function = 0):
     matrix_size = len(cells_matrix)
     metric_size = len(grid_metric)
     size_store = np.empty(shape=(matrix_size, ))
@@ -124,7 +124,7 @@ def grid_refinement_error(cells_matrix, grid_metric, grid_quality = 0, met = 0):
                 vertex_coordinates = mg.skew_strech(j_metric, number_of_cells, vertex_coordinates)
             cell_centre_mesh = pp.setup_cell_centred_finite_volume_mesh(vertex_coordinates, cell_vertex_connectivity, cell_type)
 
-            error = ea.cells_error_analysis(cell_centre_mesh, met)
+            error = ea.cells_error_analysis(cell_centre_mesh, met, phi_function)
             vol_table = cell_centre_mesh.cell_table.volume
             tot_cell = cell_centre_mesh.cell_table.max_cell
             # seperate internal and external error cells - function
@@ -132,12 +132,12 @@ def grid_refinement_error(cells_matrix, grid_metric, grid_quality = 0, met = 0):
             # print("Boundary Cells Analysis:", bound_size, "external cells")
 
             # process the boundary error
-            norm_one_bound, norm_rms_bound, norm_inf_bound = ea.error_package(bound_error, tot_cell, ext_vol_table)
-            bound_error_array[j][i] = norm_rms_bound.T
-            #bound_error_array[j][i] = norm_one_bound.T
-            norm_one_int, norm_rms_int, norm_inf_int = ea.error_package(int_error, tot_cell, int_vol_table)
-            #int_error_array[j][i] = norm_one_int.T
-            int_error_array[j][i] = norm_rms_int.T
+            norm_one_bound, norm_two_bound, norm_inf_bound = ea.error_package(bound_error, tot_cell, ext_vol_table)
+            bound_error_array[j][i] = norm_two_bound.T
+
+            norm_one_int, norm_two_int, norm_inf_int = ea.error_package(int_error, tot_cell, int_vol_table)
+            int_error_array[j][i] = norm_two_int.T
+
             # bound_error_array[i][0], bound_error_array[i][1], bound_error_array[i][2] = norm_one_bound.T, norm_two_bound.T, norm_inf_bound.T
             # print("Internal Cells Analysis:",int_size, "internal cells")
             # process the internal error
@@ -147,7 +147,7 @@ def grid_refinement_error(cells_matrix, grid_metric, grid_quality = 0, met = 0):
     plt.show()
 
 
-def single_grid_metric(cells_matrix, quality_matrix, grid_quality, met = 0):
+def single_grid_metric(cells_matrix, quality_matrix, grid_quality, met = 0, phi_function = 0):
     quality_size = len(quality_matrix)
     quality_array = np.empty(shape=(1, quality_size))
     bound_error_array = np.empty(shape=(quality_size, 3, 2))
@@ -169,7 +169,7 @@ def single_grid_metric(cells_matrix, quality_matrix, grid_quality, met = 0):
         cell_centre_mesh = pp.setup_cell_centred_finite_volume_mesh(vertex_coordinates, cell_vertex_connectivity,
                                                                     cell_type)
         # error analysis
-        error = ea.cells_error_analysis(cell_centre_mesh, met)
+        error = ea.cells_error_analysis(cell_centre_mesh, met, phi_function)
         vol_table = cell_centre_mesh.cell_table.volume
         # seperate internal and external error cells - function
         bound_error, int_error, bound_size, int_size, ext_vol_table, int_vol_table = ea.seperate_int_ext(

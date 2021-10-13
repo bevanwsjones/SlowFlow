@@ -188,7 +188,7 @@ def grid_error_refine(int_error_array, bound_error_array, h, grid_quality, gq = 
     plt.axis('equal')
     plt.legend()
     plt.tight_layout()
-    # plot 2 - y-gradient error - internal cells
+    # plot 2 - x-gradient error - boundrary cells
     plt.subplot(1, 2, 2)
     for i, i_metric in enumerate(grid_quality):
         plt.plot(h, bound_error_array[i, :, 0], '-o', label=str(i_metric))
