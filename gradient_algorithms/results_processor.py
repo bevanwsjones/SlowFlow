@@ -92,7 +92,7 @@ def grid_refinement_error(cells_matrix, grid_metric, grid_quality = 0, met = 0, 
 
             # face transform value storage (for plotting)
             qual_name_store[j][i] = np.average(int_qual[:, grid_quality])
-            # int_qual_1 = np.average(int_qual[:, 0])   # INCLUDE FOR DOING SKEWNESS ANALYSIS (Y-GRAD COMP)
+            # qual_name_store[j][i] = np.average(int_qual[:, 0]) # INCLUDE FOR DOING SKEWNESS ANALYSIS (Y-GRAD COMP)
 
             # process the boundary error
             norm_one_bound, norm_two_bound, norm_inf_bound = ea.error_package(bound_error, tot_cell, ext_vol_table)
@@ -103,10 +103,10 @@ def grid_refinement_error(cells_matrix, grid_metric, grid_quality = 0, met = 0, 
     grid_name = np.round(np.average(qual_name_store, axis=1), 3)
     plt_name = naming_fuc(grid_quality, met, phi_function)
     fig1, fig2 = ep.grid_error_refine(int_error_array, bound_error_array, h, grid_name, grid_quality)
-    fig1.savefig('plot_images_weight/'+plt_name+'xcomp.pdf')
-    fig2.savefig('plot_images_weight/'+plt_name+'ycomp.pdf')
+    #fig1.savefig('plot_images_weight/'+plt_name+'xcomp.pdf')
+    #fig2.savefig('plot_images_weight/'+plt_name+'ycomp.pdf')
     print("Your Graph Name is:\n", plt_name)
-    #plt.show()
+    plt.show()
 
 
 def single_grid_metric(cells_matrix, quality_matrix, grid_quality, met = 0, phi_function = 0):
@@ -150,7 +150,7 @@ def single_grid_metric(cells_matrix, quality_matrix, grid_quality, met = 0, phi_
         int_error_array[j][0], int_error_array[j][1], int_error_array[j][
             2] = norm_one_int.T, norm_two_int.T, norm_inf_int.T
         quality_metrics = gq.cells_grid_quality(cell_centre_mesh)
-        avg_quality = gq.grid_average_quality(quality_metrics, cell_centre_mesh)
+        avg_quality = gq.grid_average_quality(quality_metrics, cell_centre_mesh.cell_table.volume)
         quality_array[0][j] = avg_quality[0][grid_quality]
     ep.grid_metric_plotter(bound_error_array, int_error_array, quality_array, cells_matrix, grid_quality)
     plt.show()
