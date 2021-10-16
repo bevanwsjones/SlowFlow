@@ -1,9 +1,6 @@
 import numpy as np
 import math
-#import scipy as sp
-from scipy import linalg, sparse
-from mesh_generation import mesh_generator as mg
-from mesh_preprocessor import preprocessor as pp
+from gradient_algorithms import NewGG
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------VECTOR CALCULATION (FOR SINGLE FACE) QUALITY METRICS -------------------------------------
@@ -64,10 +61,6 @@ def faces_grid_quality(cell_centre_mesh):
 # ----------------------------------------------------------------------------------------------------------------------
 # -----------------------------------------------------SINGLE CELL GRID COMPUTATION HAND CALCULATION -------------------
 
-#number_of_cells, start_co_ordinate, domain_size = [3, 3], [0.0, 0.0], [1.0, 1.0]
-#[vertex_coordinates, cell_vertex_connectivity, cell_type] = mg.setup_2d_cartesian_mesh(number_of_cells, start_co_ordinate, domain_size)
-#cell_centre_mesh = pp.setup_cell_centred_finite_volume_mesh(vertex_coordinates, cell_vertex_connectivity, cell_type)
-
 # return the cell-grid quality metric matrix:
 # returns [i_cell][average non-orthogonality][average unevenness][average skewness]
 # averages indicate face-area weightings
@@ -113,16 +106,31 @@ def cells_grid_quality(cell_centre_mesh):
         quality_metrics[i_cell] = grid/area_sum         # find average of quality metrics
     return quality_metrics
 
+def seperate_int_ext(cell_centre_mesh, quality_metrics, vol_table):
+    boundary_cells = NewGG.bound_cells(cell_centre_mesh)
+    bound_size = len(boundary_cells)
+    tot_cell = cell_centre_mesh.cell_table.max_cell
+    int_cell = tot_cell - bound_size
+    bound_qual = np.zeros(shape=(bound_size, 3))                     # initilaise storage values
+    ext_vol_table = np.zeros(shape=(bound_size, 1))
+    for i, i_cell in enumerate(boundary_cells):
+        bound_qual[i] = quality_metrics[i_cell]
+        ext_vol_table[i] = vol_table[i_cell]
+    int_qual = np.delete(quality_metrics, list(boundary_cells), axis = 0)
+    int_vol_table = np.delete(vol_table, list(boundary_cells), axis = 0)
+    return bound_qual, int_qual, bound_size, int_cell, ext_vol_table, int_vol_table
+
 # return the grid average quality
-def grid_average_quality(quality_metrics, cell_centre_mesh):
+def grid_average_quality(quality_metrics, vol_table):
     avg_array = np.empty(shape=(1, 3))
-    vol_table = cell_centre_mesh.cell_table.volume
     vol_tot = 0
     for i, i_cell in enumerate(quality_metrics):
         avg_array += vol_table[i]*i_cell
         vol_tot += vol_table[i]
     avg_array = avg_array/vol_tot
     return avg_array
+
+
 
 
 # def faces_grid_quality(cell_centroid, face_normals, face_centroid, fc_connectivity, number_of_faces):

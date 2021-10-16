@@ -25,6 +25,13 @@ def gradient_xysquared(_coor_list):
     true_field[:, 1] = 2*_coor_list[:, 1]
     return true_field
 
+def sin(_coor_list):
+    return np.sin(_coor_list[:, 0])
+def gradient_sin(_coor_list):
+    true_field = np.zeros(shape=(len(_coor_list), 2), dtype=float)
+    true_field[:, 0] = np.cos(_coor_list[:, 0])
+    return true_field
+
 def cell_boundary_face_phi_dphi_calculation(_cell_centre_mesh, _phi_function = 0):
     boundary_no = _cell_centre_mesh.face_table.max_boundary_face
     cell_centroids = _cell_centre_mesh.cell_table.centroid
@@ -36,6 +43,8 @@ def cell_boundary_face_phi_dphi_calculation(_cell_centre_mesh, _phi_function = 0
         return [sin_cos(cell_centroids), sin_cos(boundary_face_centroids), gradient_sin_cos(cell_centroids)]
     elif _phi_function == 2:
         return [xysquared(cell_centroids), xysquared(boundary_face_centroids), gradient_xysquared(cell_centroids)]
+    elif _phi_function == 3:
+        return [sin(cell_centroids), sin(boundary_face_centroids), gradient_sin(cell_centroids)]
     else:
         raise NotImplemented("More phi fields to be entered")
 

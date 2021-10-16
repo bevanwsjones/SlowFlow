@@ -38,11 +38,12 @@ def L_norm_two(error, vol_table):
     err_sum = 0.0
     vol_sum = 0.0
     for i in range(len(error)):
-        err_sum += (error[i]*vol_table[i])**2
+        # err_sum += (error[i]*vol_table[i])**2
+        err_sum += vol_table[i] * (error[i])**2
         vol_sum += vol_table[i]
     if vol_sum == 0:
-        return err_sum
-    return math.sqrt(err_sum)/vol_sum
+        return math.sqrt(err_sum)
+    return math.sqrt(err_sum/vol_sum)
 
 def L_norm_rms(error, tot_cell):
     err_sum = 0.0
@@ -52,7 +53,10 @@ def L_norm_rms(error, tot_cell):
     return rms
 
 def L_norm_inf(error):
-    l = np.amax(error)
+    try:
+        l = np.amax(error)
+    except ValueError:  # raise if error is empty
+        return -1
     return l
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -122,25 +126,28 @@ def grid_avg_norm(grid_norm, no_cells):
 # ----------------------------------------------------------------------------------------------------------------------
 # ---------------------- Internal and Boundary Cell Calcs --------------------------------------------------------------
 # function that separates the error table from the internal and external cells
-def seperate_int_ext(cell_centre_mesh, error, vol_table):
+def seperate_int_ext(cell_centre_mesh, error, vol_table, quality_metrics):
     boundary_cells = NewGG.bound_cells(cell_centre_mesh)
     bound_size = len(boundary_cells)
     tot_cell = cell_centre_mesh.cell_table.max_cell
     int_cell = tot_cell - bound_size
     bound_error = np.zeros(shape=(bound_size, 2))                     # initilaise storage values
     ext_vol_table = np.zeros(shape=(bound_size, 1))
+    bound_qual = np.zeros(shape=(bound_size, 3))
     for i, i_cell in enumerate(boundary_cells):
         bound_error[i] = error[i_cell]
+        bound_qual[i] = quality_metrics[i_cell]
         ext_vol_table[i] = vol_table[i_cell]
     int_error = np.delete(error, list(boundary_cells), axis = 0)
+    int_qual = np.delete(quality_metrics, list(boundary_cells), axis=0)
     int_vol_table = np.delete(vol_table, list(boundary_cells), axis = 0)
-    return bound_error, int_error, bound_size, int_cell, ext_vol_table, int_vol_table
+    return bound_error, int_error, bound_size, int_cell, ext_vol_table, int_vol_table, bound_qual, int_qual
 
 def error_package(error, tot_cell, vol_table):
     norm_one = grid_norm_one(error, vol_table)
-    norm_two = grid_norm_two(error, vol_table)
+    # norm_two = grid_norm_two(error, vol_table)
     norm_inf = grid_norm_inf(error)
-    # norm_rms = grid_norm_rms(error, tot_cell)
+    norm_two = grid_norm_rms(error, tot_cell)
     # print("Norm one", norm_one)
     # print("Norm two", norm_two)
     # print("Norm inf", norm_inf)

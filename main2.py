@@ -1,10 +1,12 @@
 from mesh_preprocessor import preprocessor as pp
 from mesh_generation import mesh_generator as mg
 import numpy as np
+from gradient_algorithms import gridquality as gq
 from gradient_algorithms import NewGG
 from gradient_algorithms import error_analysis as ea
 from gradient_algorithms import LSMethod as ls
 from gradient_algorithms import results_processor as rp
+import functools as ft
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ------------------------------- FACES & GRID QUALITY -----------------------------------------------------------------
@@ -26,15 +28,30 @@ cell_centroid, neighbour_centroid, face_unit_normal, face_centroid = np.array([2
 
 # ---------------------------------------------------------------------------------------------------------------------
 # ------------------------------- Mesh Test ---------------------------------------------------------------------------
-number_of_cells, start_co_ordinate, domain_size = [3, 3], [0.0, 0.0], [1.0, 1.0]
-[vertex_coordinates, cell_vertex_connectivity, cell_type] = mg.setup_2d_cartesian_mesh(number_of_cells, start_co_ordinate, domain_size)
+number_of_cells, start_co_ordinate, domain_size = [10, 10], [0.0, 0.0], [1.0, 1.0]
+#[vertex_coordinates, cell_vertex_connectivity, cell_type] = \
+#      mg.setup_2d_cartesian_mesh(number_of_cells, start_co_ordinate, domain_size,  ft.partial(mg.stretch, [0.8, 0.8]))
+# [vertex_coordinates, cell_vertex_connectivity, cell_type] = \
+#    mg.setup_2d_cartesian_mesh(number_of_cells, start_co_ordinate, domain_size,  ft.partial(mg.parallelogram, False, [0.9, 0.9]))
+#[vertex_coordinates, cell_vertex_connectivity, cell_type] = mg.setup_2d_cartesian_mesh(number_of_cells, start_co_ordinate, domain_size)
+[vertex_coordinates, cell_vertex_connectivity, cell_type] = \
+     mg.setup_2d_cartesian_mesh(number_of_cells, start_co_ordinate, domain_size)
+vertex_coordinates = mg.skew_strech(0.5, number_of_cells, vertex_coordinates)
 cell_centre_mesh = pp.setup_cell_centred_finite_volume_mesh(vertex_coordinates, cell_vertex_connectivity, cell_type)
-centroids = cell_centre_mesh.cell_table.centroid
+# print(cell_centre_mesh.cell_table.centroid)
 # q = NewGG.GreenGauss(cell_centre_mesh, status = 1, phi_function = 0)
 # print(q)
-h = ls.cell_ls(cell_centre_mesh, phi_function = 0)
-print(h)
+# h = ls.cell_ls(cell_centre_mesh, phi_function = 0)
+# print(h)
+quality_metrics = gq.cells_grid_quality(cell_centre_mesh)
+vol_table = cell_centre_mesh.cell_table.volume
+bound_qual, int_qual, bound_size, int_cell, ext_vol_table, int_vol_table = gq.seperate_int_ext(cell_centre_mesh, quality_metrics, vol_table)
+print(int_qual[:, 1])
+print(np.average(int_qual[:, 0]))
 
+
+#print(quality_metrics)
+#print(gq.grid_average_quality(quality_metrics, cell_centre_mesh))
 # error = ea.cells_error_analysis(cell_centre_mesh)
 # new_error = ea.seperate_int_ext(cell_centre_mesh, error)
 #print(cell_centre_mesh.face_table.centroid)
