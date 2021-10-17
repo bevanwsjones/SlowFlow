@@ -17,6 +17,10 @@
 
 import numpy as np
 from mesh_entities import cell as cl
+import dmsh
+import meshio
+import optimesh
+from mesh_entities import cell as cl
 #import meshio
 #import dmsh
 #import optimesh
@@ -222,7 +226,7 @@ def setup_2d_cartesian_mesh(_number_of_cells, _start_co_ordinates=None, _domain_
     :param _transform: The transformation lambda for grid points, must take in and return a numpy array of co-ordinates.
     :type _transform: lambda = f(_number_of_cells, _start_co_ordiantes, _domain_size, [x_i, y_i]): return [x'_i, y'_i]
     :return: [list of vertex co-ordinate, list of cell-vertex connectivity, type of cells]
-    :type: [numpy.array, numpy.array. cell.CellType]
+    :type: [numpy.array, numpy.array, cell.CellType]
     """
 
     # Compute geometric constants.
@@ -257,9 +261,29 @@ def setup_2d_cartesian_mesh(_number_of_cells, _start_co_ordinates=None, _domain_
 # 2D Mesh Generation - Simplex Mesh
 # ----------------------------------------------------------------------------------------------------------------------
 
-def setup_2d_simplex_mesh():
+def setup_2d_simplex_mesh(_number_of_cells, _start_co_ordinates=None, _domain_size=None, _transform=structured):
     """
     Not implemented
+    :return: [list of vertex co-ordinate, list of cell-vertex connectivity, type of cells]
+    :type: [numpy.array, numpy.array, cell.CellType]
     """
 
-    raise NotImplementedError("Needs to be implemented, if implementing see meshio, dmsh, and optimesh")
+    geo = dmsh.Polygon(
+        [
+            _start_co_ordinates,
+            _start_co_ordinates + np.array([1, 0], dtype=float)*np.dot(_domain_size, np.array([1, 0], dtype=float)),
+            _start_co_ordinates + _domain_size,
+            _start_co_ordinates + np.array([0, 1], dtype=float)*np.dot(_domain_size, np.array([0, 1], dtype=float))
+        ])
+    # geo = dmsh.Polygon([[0.0, 0.0], [1.0, 0.0], [1.0 + np.cos(np.pi / 3.0), np.sin(np.pi / 3.0)],
+    #                                         [1.0, 2.0 * np.sin(np.pi / 3.0)], [0.0, 2.0 * np.sin(np.pi / 3.0)],
+    #                                         [0.0 - np.cos(np.pi / 3.0), np.sin(np.pi / 3.0)]])
+    X, cells = dmsh.generate(geo, 0.1)
+
+    # optionally optimize the mesh
+    # X, cells = optimesh.optimize_points_cells(X, cells, "CVT (full)", 1.0e-10, 100)
+
+    # visualize the mesh
+    dmsh.helpers.show(X, cells, geo)
+
+    return X, cells, cl.CellType.triangle
