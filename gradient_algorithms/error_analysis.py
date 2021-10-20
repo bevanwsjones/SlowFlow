@@ -145,9 +145,9 @@ def seperate_int_ext(cell_centre_mesh, error, vol_table, quality_metrics):
 
 def error_package(error, tot_cell, vol_table):
     norm_one = grid_norm_one(error, vol_table)
-    # norm_two = grid_norm_two(error, vol_table)
+    norm_two = grid_norm_two(error, vol_table)
     norm_inf = grid_norm_inf(error)
-    norm_two = grid_norm_rms(error, tot_cell)
+    # norm_two = grid_norm_rms(error, tot_cell)
     # print("Norm one", norm_one)
     # print("Norm two", norm_two)
     # print("Norm inf", norm_inf)

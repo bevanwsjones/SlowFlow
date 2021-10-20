@@ -18,8 +18,8 @@
 import numpy as np
 from mesh_entities import cell as cl
 import dmsh
-import meshio
-import optimesh
+# import meshio
+# import optimesh
 from mesh_entities import cell as cl
 #import meshio
 #import dmsh

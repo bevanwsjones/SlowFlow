@@ -18,6 +18,7 @@
 from mesh_generation import mesh_generator as mg
 from mesh_preprocessor import preprocessor as pp
 from post_processor import graph as gr
+from gradient_algorithms import NewGG
 from gradient_algorithms import LSMethod as ls
 from gradient_algorithms import error_analysis as ea
 from gradient_algorithms import gridquality as gq
@@ -38,18 +39,23 @@ number_of_cells, start_co_ordinate, domain_size = [3, 3], [0, 0], [1, 1]
 
 
 # [vertex_coordinates, cell_vertex_connectivity, cell_type] = \
-#     mg.setup_2d_cartesian_mesh(number_of_cells, start_co_ordinate, domain_size,  ft.partial(mg.parallelogram, False, [0.0, 0.9]))
-#[vertex_coordinates, cell_vertex_connectivity, cell_type] = \
+#     mg.setup_2d_cartesian_mesh(number_of_cells, start_co_ordinate, domain_size,  ft.partial(mg.parallelogram, True, [0.0, 0.5]))
+# [vertex_coordinates, cell_vertex_connectivity, cell_type] = \
 #    mg.setup_2d_cartesian_mesh(number_of_cells, start_co_ordinate, domain_size,  ft.partial(mg.stretch, [0.8, 0.8]))
-[vertex_coordinates, cell_vertex_connectivity, cell_type] = \
-    mg.setup_2d_cartesian_mesh(number_of_cells, start_co_ordinate, domain_size)
-vertex_coordinates = mg.skew_strech(0.5, number_of_cells, vertex_coordinates)
+[vertex_coordinates, cell_vertex_connectivity, cell_type] = mg.setup_2d_cartesian_mesh(number_of_cells, start_co_ordinate, domain_size)
+# vertex_coordinates = mg.skew_strech(0.15, number_of_cells, vertex_coordinates)
 cell_centre_mesh = pp.setup_cell_centred_finite_volume_mesh(vertex_coordinates, cell_vertex_connectivity, cell_type)
-gr.plot_field(cell_centre_mesh, gr.generate_random_field(1, cell_centre_mesh.cell_table.max_cell, [False]))
 
+
+# NewGG.node_GreenGauss(cell_centre_mesh, phi_function = 0)
+
+# field = NewGG.cell_boundary_face_phi_dphi_calculation(cell_centre_mesh, _phi_function = 0)
+# print(field[2])
+# gr.plot_field(cell_centre_mesh, gr.generate_random_field(1, cell_centre_mesh.cell_table.max_cell, [False]))
+# gr.plot_field(cell_centre_mesh, field[0], [False])
 
 # quality_metrics = gq.cells_grid_quality(cell_centre_mesh)
-# avg_quality = gq.grid_average_quality(quality_metrics, cell_centre_mesh)
+# avg_quality = gq.grid_average_quality(quality_metrics, cell_centre_mesh.cell_table.volume)
 # print(avg_quality)
 
 
