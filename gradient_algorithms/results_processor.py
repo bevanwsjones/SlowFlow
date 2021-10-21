@@ -7,11 +7,40 @@ from gradient_algorithms import errorplotter as ep
 from gradient_algorithms import gridquality as gq
 from matplotlib import pyplot as plt
 from post_processor import graph as gr
+from matplotlib import rcParams
+
 def naming_fuc(grid_quality, met, phi_function):
     method = ['MGG', 'IGG', 'LS', 'NGG']
     grid_quality_name = ['nonorth','uneven','skew']
-    phi_function_array = ['exp_cos', 'sin_cos', 'xysquared', 'sin']
+    phi_function_array = ['exp_cos', 'sin_cos', 'xycubed', 'tanh']
     return method[met]+'_'+grid_quality_name[grid_quality]+'_'+phi_function_array[phi_function]
+
+def save_plot(_fig, _figure_title):
+    """
+    Saves the current figure, ensures rcParams are correctly set. Will set to latex formatting and the name of the file
+    will be the passed _figure_title. Note must be called before plt.show() otherwise the current figure is cleared and
+    nothing will be saved.
+
+    :param _figure_title: Name of the figure, will be the name of the .pdf file.
+    :type _figure_title: str
+    """
+    #rcParams.update(plt.rcParamsDefault)
+    plt.rcParams.update({
+        "backend": "pdf",
+        'pdf.compression': 4,
+        'font.family': 'serif',
+        "font.serif": ["Palatino"],
+        'text.usetex': True,
+        'savefig.bbox': 'tight',
+        'font.size': 16,
+        'axes.titlesize': 18,
+        'axes.labelsize': 14,
+        'legend.fontsize': 14,
+        'xtick.labelsize': 12,
+        'ytick.labelsize': 12,
+    })
+    _fig.savefig('plot_images_weight/'+_figure_title + '.pdf')
+
 
 # ------------------------------- CARTESIAN GRID PLOTTER & RESULTS PROCESSOR ------------------------------------------
 # Error Plotter for Cartesian Grid Test
@@ -103,10 +132,15 @@ def grid_refinement_error(cells_matrix, grid_metric, grid_quality = 0, met = 0, 
     grid_name = np.round(np.average(qual_name_store, axis=1), 3)
     plt_name = naming_fuc(grid_quality, met, phi_function)
     fig1, fig2 = ep.grid_error_refine(int_error_array, bound_error_array, h, grid_name, grid_quality)
+    fig1.set_size_inches(11.5, 9.5)
+    fig2.set_size_inches(11.5, 9.5)
+    save_plot(fig1, plt_name+'xcomp')
+    save_plot(fig2, plt_name+'ycomp')
     #fig1.savefig('plot_images_weight/'+plt_name+'xcomp.pdf')
     #fig2.savefig('plot_images_weight/'+plt_name+'ycomp.pdf')
     print("Your Graph Name is:\n", plt_name)
-    plt.show()
+    # gr.show_plot()
+    # plt.show()
 
 
 def single_grid_metric(cells_matrix, quality_matrix, grid_quality, met = 0, phi_function = 0):

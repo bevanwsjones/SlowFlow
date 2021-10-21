@@ -17,19 +17,20 @@ def gradient_sin_cos(_coor_list):
     true_field[:, 1] = -1*np.sin(_coor_list[:, 1])
     return true_field
 
-def xysquared(_coor_list):
-    return _coor_list[:, 0]**2 + _coor_list[:, 1]**2
-def gradient_xysquared(_coor_list):
+def xycubed(_coor_list):
+    return 2 * _coor_list[:, 0]**3 + 2 * _coor_list[:, 1]**3
+def gradient_xycubed(_coor_list):
     true_field = np.zeros(shape=(len(_coor_list), 2), dtype=float)
-    true_field[:, 0] = 2*_coor_list[:, 0]
-    true_field[:, 1] = 2*_coor_list[:, 1]
+    true_field[:, 0] = 6*_coor_list[:, 0]**2
+    true_field[:, 1] = 6*_coor_list[:, 1]**2
     return true_field
 
-def sin(_coor_list):
-    return np.sin(_coor_list[:, 0])
-def gradient_sin(_coor_list):
+def tanh(_coor_list):
+    return np.tanh(_coor_list[:, 0]) + np.tanh(_coor_list[:, 1])
+def gradient_tanh(_coor_list):
     true_field = np.zeros(shape=(len(_coor_list), 2), dtype=float)
-    true_field[:, 0] = np.cos(_coor_list[:, 0])
+    true_field[:, 0] = 1/np.cosh(_coor_list[:, 0])**2
+    true_field[:, 1] = 1/np.cosh(_coor_list[:, 1])**2
     return true_field
 
 def cell_boundary_face_phi_dphi_calculation(_cell_centre_mesh, _phi_function = 0):
@@ -42,9 +43,9 @@ def cell_boundary_face_phi_dphi_calculation(_cell_centre_mesh, _phi_function = 0
     elif _phi_function == 1:
         return [sin_cos(cell_centroids), sin_cos(boundary_face_centroids), gradient_sin_cos(cell_centroids)]
     elif _phi_function == 2:
-        return [xysquared(cell_centroids), xysquared(boundary_face_centroids), gradient_xysquared(cell_centroids)]
+        return [xycubed(cell_centroids), xycubed(boundary_face_centroids), gradient_xycubed(cell_centroids)]
     elif _phi_function == 3:
-        return [sin(cell_centroids), sin(boundary_face_centroids), gradient_sin(cell_centroids)]
+        return [tanh(cell_centroids), tanh(boundary_face_centroids), gradient_tanh(cell_centroids)]
     else:
         raise NotImplemented("More phi fields to be entered")
 
