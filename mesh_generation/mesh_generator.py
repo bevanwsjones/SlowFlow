@@ -174,6 +174,19 @@ def parallelogram(_normalise, _gradient, _n, _x_0, _ds, _x):
 
 # new implementation - to be confirmed via testing
 def skew_strech(s_factor, _n, _x):
+    """
+    Introduces a stretch factor to specific vertex coordinates. This allows for the grid to undergo an unevenness transformation"
+
+    :param s_factor: Stretch factor that is applied to vertex coordinates
+    :type s_factor: int
+    :param _n: number of cells in x and y, [number_of_cells_x, number of cells_y].
+    :type _n: list
+    :param _x: list of all vertex coordinates in the 2D Cartesian mesh
+    :type _x: numpy.array
+    :return: transformed vertex co-ordinates, [co_ordinate_x, co_ordinate_y].
+    :type: numpy.array
+    """
+
     ls, full_ls = [], []
     if _n[0] % 2 == 0:
         n_gen = _n[0]
@@ -261,29 +274,44 @@ def setup_2d_cartesian_mesh(_number_of_cells, _start_co_ordinates=None, _domain_
 # 2D Mesh Generation - Simplex Mesh
 # ----------------------------------------------------------------------------------------------------------------------
 
-def setup_2d_simplex_mesh(_number_of_cells, _start_co_ordinates=None, _domain_size=None, _transform=structured):
+def setup_2d_simplex_mesh(_number_of_cells, hex, _start_co_ordinates=None, _domain_size=None,_transform=structured):
     """
-    Not implemented
+    Generates the vertices and cells-vertex connectivity for a 2D unstructured triangular mesh.
+    Two choices are available: a square domain or a hexagonal domain
+
+    :param _number_of_cells: Number of cells in first row of mesh
+    :type _number_of_cells: integer
+    :param hex: generates triangular mesh on square domain if False. Generates triangular mesh on hex domain if True.
+    :type hex: bool
+    :param _start_co_ordinates: bottom left co-ordinate of the domain. (defaults to 0.0, 0.0)
+    :type _start_co_ordinates: numpy.array
+    :param _domain_size: Size of the domain in x and y (defaults to 1.0, 1.0)
+    :type _domain_size: numpy.array
+    :param _transform: The transformation lambda for grid points, must take in and return a numpy array of co-ordinates.
+    :type _transform: lambda = f(_number_of_cells, _start_co_ordiantes, _domain_size, [x_i, y_i]): return [x'_i, y'_i]
     :return: [list of vertex co-ordinate, list of cell-vertex connectivity, type of cells]
     :type: [numpy.array, numpy.array, cell.CellType]
     """
+    if hex == False:
+        geo = dmsh.Polygon(
+            [
+                _start_co_ordinates,
+                _start_co_ordinates + np.array([1, 0], dtype=float)*np.dot(_domain_size, np.array([1, 0], dtype=float)),
+                _start_co_ordinates + _domain_size,
+                _start_co_ordinates + np.array([0, 1], dtype=float)*np.dot(_domain_size, np.array([0, 1], dtype=float))
+            ])
+    else:
+        geo = dmsh.Polygon([[0.0, 0.0], [1.0, 0.0], [1.0 + np.cos(np.pi / 3.0), np.sin(np.pi / 3.0)],
+                            [1.0, 2.0 * np.sin(np.pi / 3.0)], [0.0, 2.0 * np.sin(np.pi / 3.0)],
+                            [0.0 - np.cos(np.pi / 3.0), np.sin(np.pi / 3.0)]])
 
-    geo = dmsh.Polygon(
-        [
-            _start_co_ordinates,
-            _start_co_ordinates + np.array([1, 0], dtype=float)*np.dot(_domain_size, np.array([1, 0], dtype=float)),
-            _start_co_ordinates + _domain_size,
-            _start_co_ordinates + np.array([0, 1], dtype=float)*np.dot(_domain_size, np.array([0, 1], dtype=float))
-        ])
-    # geo = dmsh.Polygon([[0.0, 0.0], [1.0, 0.0], [1.0 + np.cos(np.pi / 3.0), np.sin(np.pi / 3.0)],
-    #                                         [1.0, 2.0 * np.sin(np.pi / 3.0)], [0.0, 2.0 * np.sin(np.pi / 3.0)],
-    #                                         [0.0 - np.cos(np.pi / 3.0), np.sin(np.pi / 3.0)]])
-    X, cells = dmsh.generate(geo, 0.1)
+    dist = 1.0/_number_of_cells
+    X, cells = dmsh.generate(geo, dist)
 
     # optionally optimize the mesh
     # X, cells = optimesh.optimize_points_cells(X, cells, "CVT (full)", 1.0e-10, 100)
 
     # visualize the mesh
-    dmsh.helpers.show(X, cells, geo)
+    # dmsh.helpers.show(X, cells, geo)
 
     return X, cells, cl.CellType.triangle

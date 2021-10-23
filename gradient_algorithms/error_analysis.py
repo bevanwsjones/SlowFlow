@@ -134,6 +134,8 @@ def seperate_int_ext(cell_centre_mesh, error, vol_table, quality_metrics):
     bound_error = np.zeros(shape=(bound_size, 2))                     # initilaise storage values
     ext_vol_table = np.zeros(shape=(bound_size, 1))
     bound_qual = np.zeros(shape=(bound_size, 3))
+    if quality_metrics == "none":
+        quality_metrics = np.zeros(tot_cell)
     for i, i_cell in enumerate(boundary_cells):
         bound_error[i] = error[i_cell]
         bound_qual[i] = quality_metrics[i_cell]

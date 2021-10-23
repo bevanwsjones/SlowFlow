@@ -11,7 +11,7 @@ from matplotlib import rcParams
 
 def naming_fuc(grid_quality, met, phi_function):
     method = ['MGG', 'IGG', 'LS', 'NGG']
-    grid_quality_name = ['nonorth','uneven','skew']
+    grid_quality_name = ['nonorth','uneven','skew', 'none']
     phi_function_array = ['exp_cos', 'sin_cos', 'xycubed', 'tanh']
     return method[met]+'_'+grid_quality_name[grid_quality]+'_'+phi_function_array[phi_function]
 
@@ -80,7 +80,13 @@ def cartesian_error(cells_matrix, met = 0, phi_function = 0):
         norm_one_int, norm_two_int, norm_inf_int = ea.error_package(int_error, int_size, int_vol_table)
         int_error_array[i][0], int_error_array[i][1], int_error_array[i][2] = norm_one_int.T, norm_two_int.T, norm_inf_int.T
     h = size_store**(-0.5)
-    ep.cartesian_plotter(int_error_array, bound_error_array, h)
+    plt_name = naming_fuc(3, met, phi_function)
+    fig1, fig2 = ep.cartesian_plotter(int_error_array, bound_error_array, h)
+    fig1.set_size_inches(11.5, 9.5)
+    fig2.set_size_inches(11.5, 9.5)
+    save_plot(fig1, plt_name+'xcomp')
+    save_plot(fig2, plt_name+'ycomp')
+    print("Your Graph Name is:\n", plt_name)
 
 def grid_refinement_error(cells_matrix, grid_metric, grid_quality = 0, met = 0, phi_function = 0):
     matrix_size = len(cells_matrix)
@@ -136,11 +142,10 @@ def grid_refinement_error(cells_matrix, grid_metric, grid_quality = 0, met = 0, 
     fig2.set_size_inches(11.5, 9.5)
     save_plot(fig1, plt_name+'xcomp')
     save_plot(fig2, plt_name+'ycomp')
-    #fig1.savefig('plot_images_weight/'+plt_name+'xcomp.pdf')
-    #fig2.savefig('plot_images_weight/'+plt_name+'ycomp.pdf')
     print("Your Graph Name is:\n", plt_name)
     # gr.show_plot()
     # plt.show()
+    return -1
 
 
 def single_grid_metric(cells_matrix, quality_matrix, grid_quality, met = 0, phi_function = 0):
@@ -186,5 +191,50 @@ def single_grid_metric(cells_matrix, quality_matrix, grid_quality, met = 0, phi_
         quality_metrics = gq.cells_grid_quality(cell_centre_mesh)
         avg_quality = gq.grid_average_quality(quality_metrics, cell_centre_mesh.cell_table.volume)
         quality_array[0][j] = avg_quality[0][grid_quality]
-    ep.grid_metric_plotter(bound_error_array, int_error_array, quality_array, cells_matrix, grid_quality)
-    plt.show()
+    fig1, fig2 = ep.grid_metric_plotter(bound_error_array, int_error_array, quality_array, cells_matrix, grid_quality)
+    fig1.set_size_inches(10.5, 10.5)
+    fig2.set_size_inches(10.5, 10.5)
+    plt_name = naming_fuc(grid_quality, met, phi_function)
+    save_plot(fig1, 'trend'+plt_name+'xcomp')
+    save_plot(fig2, 'trend'+plt_name+'ycomp')
+    print("Your Graph Name is:\n", plt_name)
+    # gr.show_plot()
+    # plt.show()
+    return -1
+
+
+def triangle_error(cells_matrix, hex, met = 0, phi_function = 0):
+    """
+    Determines the 3 grid errors (L1, L2 (LRms), Linf) in a Cartesian Grid, and shows how grid refinement changes the error
+    accuracy.
+    :param cells_matrix: various sizes of grid cells, [[N_x_1, N_y_1], [N_x_2, N_y_2], [N_x_3, N_y_3]]
+    :type cells_matrix: numpy.array
+    :param met: indicates the gradient algorithm method that is used in analysis. met = 0 is mean GG; met = 1 is interpolated GG; met = 2 is LS unweighted
+    :type met: integer
+    """
+    matrix_size = len(cells_matrix)
+    size_store = np.empty(shape=(matrix_size, ))
+    error_array = np.empty(shape=(matrix_size, 3, 2))
+
+    for i, i_matrix in enumerate(cells_matrix):
+        [vertex_coordinates, cell_vertex_connectivity, cell_type] = \
+            mg.setup_2d_simplex_mesh(i_matrix, hex, _start_co_ordinates=np.array([0.0, 0.0]), _domain_size=np.array([1.0, 1.0]))
+        cell_centre_mesh = pp.setup_cell_centred_finite_volume_mesh(vertex_coordinates, cell_vertex_connectivity, cell_type)
+        size_store[i] = cell_centre_mesh.cell_table.max_cell
+
+        # define mesh, setup & preprocess mesh, then find error of the mesh using gradient algorithm
+        error = ea.cells_error_analysis(cell_centre_mesh, met, phi_function)
+        vol_table = cell_centre_mesh.cell_table.volume
+
+        # process the total error
+        norm_one, norm_two, norm_inf = ea.error_package(error, cell_centre_mesh.cell_table.max_cell, vol_table)
+        error_array[i][0], error_array[i][1], error_array[i][2] = norm_one.T, norm_two.T, norm_inf.T
+    h = size_store**(-0.5)
+
+    # plt_name = 'trig_' + naming_fuc(3, met, phi_function)
+    plt_name = 'hex_trig_' + naming_fuc(3, met, phi_function)
+    fig1 = ep.triangle_plotter(error_array, h)
+    fig1.set_size_inches(11.5, 9.5)
+    save_plot(fig1, plt_name)
+    print("Your Graph Name is:\n", plt_name)
+    return -1

@@ -62,12 +62,12 @@ def save_plot(_figure_title):
         'font.family': 'serif',
         'text.usetex': True,
         'savefig.bbox': 'tight',
-        'font.size': 10,
-        'axes.titlesize': 10,
-        'axes.labelsize': 10,
-        'legend.fontsize': 10,
-        'xtick.labelsize': 8,
-        'ytick.labelsize': 8,
+        'font.size': 16,
+        'axes.titlesize': 18,
+        'axes.labelsize': 14,
+        'legend.fontsize': 14,
+        'xtick.labelsize': 12,
+        'ytick.labelsize': 12,
     })
     plt.savefig(_figure_title + '.pdf')
 
