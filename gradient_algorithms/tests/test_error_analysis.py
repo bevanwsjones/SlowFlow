@@ -32,3 +32,16 @@ class MyTestCase(unittest.TestCase):
         error = np.array([[1.0, 1.5, 2.0, 3.0, 0.5, 2.0, 4.0]])
         norm_inf = ea.L_norm_inf(error)
         self.assertEqual(norm_inf, 4.0)
+    def test_res_norm_test(self):
+        error_table = np.array([[1.0, 2.0], [2.0, 4.0], [3.0, 3.0]])
+        print(error_table[:,0])
+        error_result = ea.res_error(error_table)
+        print(error_result)
+        self.assertEqual(error_result[0], 5**0.5)
+        self.assertEqual(error_result[1], 20 ** 0.5)
+        self.assertEqual(error_result[2], 18 ** 0.5)
+    def test_inf_norm_vol(self):
+        error = np.array([2, 5, 10, 1, 2])
+        vol_table = np.array([0.1, 0.1, 0.1, 10, 10])
+        val = ea.L_norm_inf(error, vol_table)
+        self.assertEqual(val, 2)

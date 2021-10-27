@@ -63,18 +63,14 @@ def triangle_experiment():
     # cells_matrix = np.array([3, 5, 10])
     cells_matrix = np.array([5, 10, 15, 20, 40])
     hex = True
-    rp.triangle_error(cells_matrix, hex, met=0, phi_function=1)
-    rp.triangle_error(cells_matrix, hex, met=0, phi_function=1)
-    rp.triangle_error(cells_matrix, hex, met=1, phi_function=1)
-    rp.triangle_error(cells_matrix, hex, met=2, phi_function=1)
-
+    rp.triangle_error(cells_matrix, hex, met=0, phi_function=2)
     rp.triangle_error(cells_matrix, hex, met=0, phi_function=2)
     rp.triangle_error(cells_matrix, hex, met=1, phi_function=2)
     rp.triangle_error(cells_matrix, hex, met=2, phi_function=2)
-
-    rp.triangle_error(cells_matrix, hex, met=0, phi_function=3)
-    rp.triangle_error(cells_matrix, hex, met=1, phi_function=3)
-    rp.triangle_error(cells_matrix, hex, met=2, phi_function=3)
+    # rp.triangle_error(cells_matrix, hex, met=2, phi_function=2)
     return -1
 
-triangle_experiment()
+# triangle_experiment()
+cells_matrix = np.array([5, 10, 15, 20, 40])
+rp.cell_qual_plotter(cells_matrix)
+rp.cell_qual_plotter(cells_matrix)

@@ -7,7 +7,9 @@ from gradient_algorithms import NewGG
 
 def nonorthogonality(cell_centroid, neighbour_centroid, face_unit_normal):
     cell_dist = np.subtract(neighbour_centroid, cell_centroid)
-    zeta = math.acos((np.dot(cell_dist, face_unit_normal))/np.dot(np.linalg.norm(cell_dist), np.linalg.norm(face_unit_normal)))
+    zeta_frac = (np.dot(cell_dist, face_unit_normal))/np.dot(np.linalg.norm(cell_dist), np.linalg.norm(face_unit_normal))
+    zeta = math.acos(round(zeta_frac, 6))
+    # zeta = math.acos((np.dot(cell_dist, face_unit_normal))/np.dot(np.linalg.norm(cell_dist), np.linalg.norm(face_unit_normal)))
     return zeta
 
 def close_point(cell_centroid, neighbour_centroid, face_centroid):

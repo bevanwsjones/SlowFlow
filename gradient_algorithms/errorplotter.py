@@ -213,44 +213,90 @@ def triangle_plotter(error_array, h):
     # plot 1 - x-gradient error - internal cells
     golden_mean = (np.sqrt(5) - 1.0) / 2.0
     # plot 1 - x-gradient error - internal cells
-    fig1, (ax, ax2) = plt.subplots(ncols=2)
-    ax.plot(h, error_array[:, 0, 0], '-o', label='$L_{1} norm$')
-    ax.plot(h, error_array[:, 1, 0], '-ok', label='$L_{2} norm$')
-    ax.plot(h, error_array[:, 2, 0], '-or', label='$L_{\infty} norm$')
-    ax.axline((0.01, 0.001), (0.1, 0.01), color='g', label='$\mathcal{O}(h)$', ls='--')
-    ax.axline((0.01, 0.001), (0.1, 0.1), color='b', label='$\mathcal{O}(h^2)$', ls='--')
-    # ax.axline((0.01, 0.01), (0.1, 0.1), color='g', label='$\mathcal{O}(h)$', ls='--')
-    # ax.axline((0.01, 0.01), (0.1, 1.0), color='b', label='$\mathcal{O}(h^2)$', ls='--')
+    fig1, ax = plt.subplots(ncols=1)
+    ax.plot(h, error_array[:, 0], '-o', label='$L_{1} norm$')
+    ax.plot(h, error_array[:, 1], '-ok', label='$L_{2} norm$')
+    ax.plot(h, error_array[:, 2], '-or', label='$L_{\infty} norm$')
+    # ax.axline((0.01, 0.001), (0.1, 0.01), color='g', label='$\mathcal{O}(h)$', ls='--')
+    # ax.axline((0.01, 0.001), (0.1, 0.1), color='b', label='$\mathcal{O}(h^2)$', ls='--')
+    ax.axline((0.01, 0.01), (0.1, 0.1), color='g', label='$\mathcal{O}(h)$', ls='--')
+    ax.axline((0.01, 0.01), (0.1, 1.0), color='b', label='$\mathcal{O}(h^2)$', ls='--')
     ax.set(xlabel='$h$', ylabel= r'$\varepsilon_{x}$')
     ax.set_yscale('log')
     ax.set_xscale('log')
     ax.set_xlim(0.5 * np.min(h), 1.2 * np.max(h))
-    ax.set_ylim(0.8 * np.min(error_array[:, :, 0]), 1.2 * np.max(error_array[:, :, 0]))
+    ax.set_ylim(0.8 * np.min(error_array[:, :]), 1.2 * np.max(error_array[:, :]))
     set_size(ax)
     dy = np.abs(np.log10(ax.get_ylim()[1]) - np.log10(ax.get_ylim()[0]))
     dx = np.abs(np.log10(ax.get_xlim()[1]) - np.log10(ax.get_xlim()[0]))
     ax.set_aspect((dx / dy) * golden_mean, adjustable='box')
 
-    # plot 2 - x-gradient error - boundrary cells
-    ax2.plot(h, error_array[:, 0, 1], '-o', label='$L_{1} norm$')
-    ax2.plot(h, error_array[:, 1, 1], '-ok', label='$L_{2} norm$')
-    ax2.plot(h, error_array[:, 2, 1], '-or', label='$L_{\infty} norm$')
-    ax2.axline((0.01, 0.001), (0.1, 0.01), color='g', ls='--')
-    ax2.axline((0.01, 0.001), (0.1, 0.1), color='b', ls='--')
-    # ax2.axline((0.01, 0.01), (0.1, 0.1), color='g', ls='--')
-    # ax2.axline((0.01, 0.01), (0.1, 1.0), color='b', ls='--')
-    ax2.set(xlabel='$h$', ylabel=r'$\varepsilon_{y}$')
-    ax2.set_yscale('log')
-    ax2.set_xscale('log')
-    ax2.set_xlim(0.5 * np.min(h), 1.2 * np.max(h))
-    ax2.set_ylim(0.8 * np.min(error_array[:, :, 1]), 1.2 * np.max(error_array[:, :, 1]))
-    set_size(ax2)
-    dy = np.abs(np.log10(ax2.get_ylim()[1]) - np.log10(ax2.get_ylim()[0]))
-    dx = np.abs(np.log10(ax2.get_xlim()[1]) - np.log10(ax2.get_xlim()[0]))
-    ax2.set_aspect((dx / dy) * golden_mean, adjustable='box')
-
     handles, labels = ax.get_legend_handles_labels()
-    fig1.legend(handles, labels, loc='lower center', ncol=5, bbox_to_anchor=(0.55, 0.25), prop={"size":12})
-
+    fig1.legend(handles, labels, loc='lower center', ncol=5, bbox_to_anchor=(0.55, 0.10), prop={"size":12})
     fig1.tight_layout(pad=0.4, w_pad=0.5, h_pad=0.1)
     return fig1
+
+def grid_relation_refine(h, grid_qual):
+    # plot 1 - x-gradient error - internal cells
+    golden_mean = (np.sqrt(5) - 1.0) / 2.0
+    # plot 1 - x-gradient error - internal cells
+    fig1, ax = plt.subplots(ncols=1)
+    ax.plot(h, grid_qual[:, 0], '-o', label='$\zeta_{no}$')
+    ax.plot(h, grid_qual[:, 1], '-ok', label='$\zeta_{ue}$')
+    ax.plot(h, grid_qual[:, 2], '-or', label='$\zeta_{sk}$')
+    ax.set(xlabel='$h$', ylabel= r'$\zeta$')
+    ax.set_xlim(0.5 * np.min(h), 1.2 * np.max(h))
+    ax.set_ylim(0.8 * np.min(grid_qual[:, :]), 1.2 * np.max(grid_qual[:, :]))
+    dy = ax.get_ylim()[1] - ax.get_ylim()[0]
+    dx = ax.get_xlim()[1] - ax.get_xlim()[0]
+    ax.set_aspect((dx / dy) * golden_mean, adjustable='box')
+    plt.legend()
+    set_size(ax)
+    fig1.tight_layout(pad=0.4, w_pad=0.5, h_pad=0.1)
+    return fig1
+
+# def triangle_plotter(error_array, h):
+#     # plot 1 - x-gradient error - internal cells
+#     golden_mean = (np.sqrt(5) - 1.0) / 2.0
+#     # plot 1 - x-gradient error - internal cells
+#     fig1, (ax, ax2) = plt.subplots(ncols=2)
+#     ax.plot(h, error_array[:, 0, 0], '-o', label='$L_{1} norm$')
+#     ax.plot(h, error_array[:, 1, 0], '-ok', label='$L_{2} norm$')
+#     ax.plot(h, error_array[:, 2, 0], '-or', label='$L_{\infty} norm$')
+#     ax.axline((0.01, 0.001), (0.1, 0.01), color='g', label='$\mathcal{O}(h)$', ls='--')
+#     ax.axline((0.01, 0.001), (0.1, 0.1), color='b', label='$\mathcal{O}(h^2)$', ls='--')
+#     # ax.axline((0.01, 0.01), (0.1, 0.1), color='g', label='$\mathcal{O}(h)$', ls='--')
+#     # ax.axline((0.01, 0.01), (0.1, 1.0), color='b', label='$\mathcal{O}(h^2)$', ls='--')
+#     ax.set(xlabel='$h$', ylabel= r'$\varepsilon_{x}$')
+#     ax.set_yscale('log')
+#     ax.set_xscale('log')
+#     ax.set_xlim(0.5 * np.min(h), 1.2 * np.max(h))
+#     ax.set_ylim(0.8 * np.min(error_array[:, :, 0]), 1.2 * np.max(error_array[:, :, 0]))
+#     set_size(ax)
+#     dy = np.abs(np.log10(ax.get_ylim()[1]) - np.log10(ax.get_ylim()[0]))
+#     dx = np.abs(np.log10(ax.get_xlim()[1]) - np.log10(ax.get_xlim()[0]))
+#     ax.set_aspect((dx / dy) * golden_mean, adjustable='box')
+#
+#     # plot 2 - x-gradient error - boundrary cells
+#     ax2.plot(h, error_array[:, 0, 1], '-o', label='$L_{1} norm$')
+#     ax2.plot(h, error_array[:, 1, 1], '-ok', label='$L_{2} norm$')
+#     ax2.plot(h, error_array[:, 2, 1], '-or', label='$L_{\infty} norm$')
+#     # ax2.axline((0.01, 0.01), (0.1, 0.1), color='g', ls='--')
+#     # ax2.axline((0.01, 0.01), (0.1, 1.0), color='b', ls='--')
+#     ax2.axline((0.01, 0.01), (0.1, 0.1), color='g', ls='--')
+#     ax2.axline((0.01, 0.01), (0.1, 1.0), color='b', ls='--')
+#     ax2.set(xlabel='$h$', ylabel=r'$\varepsilon_{y}$')
+#     ax2.set_yscale('log')
+#     ax2.set_xscale('log')
+#     ax2.set_xlim(0.5 * np.min(h), 1.2 * np.max(h))
+#     ax2.set_ylim(0.8 * np.min(error_array[:, :, 1]), 1.2 * np.max(error_array[:, :, 1]))
+#     set_size(ax2)
+#     dy = np.abs(np.log10(ax2.get_ylim()[1]) - np.log10(ax2.get_ylim()[0]))
+#     dx = np.abs(np.log10(ax2.get_xlim()[1]) - np.log10(ax2.get_xlim()[0]))
+#     ax2.set_aspect((dx / dy) * golden_mean, adjustable='box')
+#
+#     handles, labels = ax.get_legend_handles_labels()
+#     fig1.legend(handles, labels, loc='lower center', ncol=5, bbox_to_anchor=(0.55, 0.25), prop={"size":12})
+#
+#     fig1.tight_layout(pad=0.4, w_pad=0.5, h_pad=0.1)
+#     return fig1

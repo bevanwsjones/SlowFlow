@@ -23,6 +23,9 @@ def array_relative_error(x, x_true):
     error[0][1] = error_y
     return error
 
+def res_error(error):
+    return np.sqrt(error[:, 0]**2 + error[:, 1]**2)
+
 def L_norm_one(error, vol_table):
     err_sum = 0.0
     vol_sum = 0.0
@@ -52,12 +55,14 @@ def L_norm_rms(error, tot_cell):
     rms = math.sqrt(err_sum/tot_cell)
     return rms
 
-def L_norm_inf(error):
+def L_norm_inf(error, vol_table):
     try:
-        l = np.amax(error)
+        arr = error * vol_table
+        l = np.amax(arr)
+        index = np.where(arr == np.amax(arr))
     except ValueError:  # raise if error is empty
         return -1
-    return l
+    return l/vol_table[index]
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ---------------------- Grid Error Analysis ---------------------------------------------------------------------------
@@ -110,9 +115,9 @@ def grid_norm_rms(error, tot_cell):
     return grid_norm_rms
 
 # returns L_inf Norm for error terms from the input error table: [L_inf_x][L_inf_y]
-def grid_norm_inf(error):
+def grid_norm_inf(error, vol_table):
     x_error, y_error = error[:, 0], error[:, 1]
-    L_norm_x, L_norm_y = L_norm_inf(x_error),  L_norm_inf(y_error)
+    L_norm_x, L_norm_y = L_norm_inf(x_error, vol_table),  L_norm_inf(y_error, vol_table)
     grid_norm_two = np.array([L_norm_x, L_norm_y])
     return grid_norm_two
 
@@ -148,12 +153,15 @@ def seperate_int_ext(cell_centre_mesh, error, vol_table, quality_metrics):
 def error_package(error, tot_cell, vol_table):
     norm_one = grid_norm_one(error, vol_table)
     norm_two = grid_norm_two(error, vol_table)
-    norm_inf = grid_norm_inf(error)
+    norm_inf = grid_norm_inf(error, vol_table)
     # norm_two = grid_norm_rms(error, tot_cell)
     # print("Norm one", norm_one)
     # print("Norm two", norm_two)
     # print("Norm inf", norm_inf)
     return norm_one, norm_two, norm_inf
 
-
-
+def unstruct_grid_error(error, vol_table):
+    Grid_L_one = L_norm_one(error, vol_table)
+    Grid_L_two = L_norm_two(error, vol_table)
+    Grid_L_inf = L_norm_inf(error, vol_table)
+    return Grid_L_one, Grid_L_two, Grid_L_inf

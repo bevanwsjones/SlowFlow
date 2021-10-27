@@ -50,14 +50,14 @@ cell_centre_mesh = pp.setup_cell_centred_finite_volume_mesh(vertex_coordinates, 
 
 phi_function = 1
 phi_field, phi_boundary_field, dphi_analytical = NewGG.cell_boundary_face_phi_dphi_calculation(cell_centre_mesh, phi_function)
-# NewGG.GreenGauss(cell_centre_mesh, 1, phi_function)
+print(NewGG.GreenGauss(cell_centre_mesh, 1, phi_function))
 
-graph_data = gr.FieldPlotMetadata
-graph_data.plot_grid_max_columns = 1
-graph_data.is_show_plot = False
-graph_data.is_save_plot = True
-gr.plot_field(cell_centre_mesh, [phi_field], graph_data)
-gr.plot_field(cell_centre_mesh, [phi_field], graph_data)
+# graph_data = gr.FieldPlotMetadata
+# graph_data.plot_grid_max_columns = 1
+# graph_data.is_show_plot = False
+# graph_data.is_save_plot = True
+# gr.plot_field(cell_centre_mesh, [phi_field], graph_data)
+# gr.plot_field(cell_centre_mesh, [phi_field], graph_data)
 # NewGG.node_GreenGauss(cell_centre_mesh, phi_function = 0)
 
 # field = NewGG.cell_boundary_face_phi_dphi_calculation(cell_centre_mesh, _phi_function = 1)
